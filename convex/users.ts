@@ -132,3 +132,151 @@ export const checkEligibility = query({
     return { eligible: true };
   },
 });
+
+export const createBloodRequest = mutation({
+  args: {
+    phoneNumber: v.string(),
+    patientName: v.string(),
+    hospitalName: v.string(),
+    hospitalLocation: v.string(),
+    bloodTypeNeeded: v.union(
+      v.literal("A+"),
+      v.literal("A-"),
+      v.literal("B+"),
+      v.literal("B-"),
+      v.literal("AB+"),
+      v.literal("AB-"),
+      v.literal("O+"),
+      v.literal("O-"),
+    ),
+    urgency: v.union(
+      v.literal("Low"),
+      v.literal("Medium"),
+      v.literal("High"),
+      v.literal("Critical"),
+    ),
+    contactNumber: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    return await ctx.db.insert("requests", {
+      ...args,
+      requesterId: identity.subject,
+      status: "Open",
+      createdAt: Date.now(),
+    });
+  },
+});
+
+export const getAllRequests = query({
+  args: {
+    bloodType: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    let requests = ctx.db
+      .query("requests")
+      .withIndex("by_status", (q) => q.eq("status", "Open"));
+
+    if (args.bloodType) {
+      requests = requests.filter((q) =>
+        q.eq(q.field("bloodTypeNeeded"), args.bloodType),
+      );
+    }
+
+    return await requests.order("desc").collect();
+  },
+});
+
+export const acceptRequest = mutation({
+  args: {
+    requestId: v.id("requests"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const request = await ctx.db.get(args.requestId);
+    if (!request) throw new Error("Request not found");
+    if (request.status !== "Open") throw new Error("Request no longer open");
+
+    // Create donation record
+    await ctx.db.insert("donations", {
+      donorId: identity.subject,
+      requestId: args.requestId,
+      status: "Pending",
+      acceptedAt: Date.now(),
+    });
+
+    // Update request status
+    await ctx.db.patch(args.requestId, {
+      status: "Accepted",
+    });
+  },
+});
+
+export const getMyRequests = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    return await ctx.db
+      .query("requests")
+      .withIndex("by_requesterId", (q) => q.eq("requesterId", identity.subject))
+      .order("desc")
+      .collect();
+  },
+});
+
+export const getMyDonations = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    const donations = await ctx.db
+      .query("donations")
+      .withIndex("by_donorId", (q) => q.eq("donorId", identity.subject))
+      .collect();
+
+    const enrichedDonations = await Promise.all(
+      donations.map(async (donation) => {
+        const request = await ctx.db.get(donation.requestId);
+        return {
+          ...donation,
+          request,
+        };
+      }),
+    );
+
+    return enrichedDonations;
+  },
+});
+
+export const updateDonationStatus = mutation({
+  args: {
+    donationId: v.id("donations"),
+    status: v.union(v.literal("Donated"), v.literal("No Show")),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const donation = await ctx.db.get(args.donationId);
+    if (!donation) throw new Error("Donation record not found");
+    if (donation.donorId !== identity.subject) throw new Error("Forbidden");
+
+    await ctx.db.patch(args.donationId, {
+      status: args.status,
+    });
+
+    // If completed, update the request status as well
+    if (args.status === "Donated") {
+      await ctx.db.patch(donation.requestId, {
+        status: "Completed",
+      });
+    }
+  },
+});
