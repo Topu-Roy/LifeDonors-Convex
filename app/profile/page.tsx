@@ -158,7 +158,7 @@ export default function ProfilePage() {
           : "",
       });
     }
-  }, [form, profile]);
+  }, [form, profile, isDialogOpen]);
 
   if (profile === undefined) {
     return (
