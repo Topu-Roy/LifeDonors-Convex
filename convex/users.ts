@@ -156,6 +156,7 @@ export const createBloodRequest = mutation({
       v.literal("Critical"),
     ),
     contactNumber: v.string(),
+    numberOfBags: v.number(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -201,18 +202,14 @@ export const acceptRequest = mutation({
     if (!request) throw new Error("Request not found");
     if (request.status !== "Open") throw new Error("Request no longer open");
 
-    // Create donation record
+    // Create donation record as "Offered"
     await ctx.db.insert("donations", {
       donorId: identity.subject,
       requestId: args.requestId,
-      status: "Pending",
+      status: "Offered",
       acceptedAt: Date.now(),
     });
-
-    // Update request status
-    await ctx.db.patch(args.requestId, {
-      status: "Accepted",
-    });
+    // Note: Request remains "Open" until enough donors are "Selected"
   },
 });
 
@@ -230,34 +227,27 @@ export const getMyRequests = query({
 
     return await Promise.all(
       requests.map(async (request) => {
-        if (request.status === "Accepted" || request.status === "Completed") {
-          const donation = await ctx.db
-            .query("donations")
-            .withIndex("by_requestId", (q) => q.eq("requestId", request._id))
-            .filter((q) =>
-              q.or(
-                q.eq(q.field("status"), "Pending"),
-                q.eq(q.field("status"), "Donated"),
-              ),
-            )
-            .first();
+        const donations = await ctx.db
+          .query("donations")
+          .withIndex("by_requestId", (q) => q.eq("requestId", request._id))
+          .collect();
 
-          if (donation) {
+        const volunteers = await Promise.all(
+          donations.map(async (donation) => {
             const donorProfile = await ctx.db
               .query("profiles")
               .withIndex("by_userId", (q) => q.eq("userId", donation.donorId))
               .first();
             return {
-              ...request,
-              donation,
+              ...donation,
               donor: donorProfile,
             };
-          }
-        }
+          }),
+        );
+
         return {
           ...request,
-          donation: undefined,
-          donor: undefined,
+          volunteers,
         };
       }),
     );
@@ -313,16 +303,72 @@ export const updateDonationStatus = mutation({
       status: args.status,
     });
 
-    // If completed, update the request status as well
+    // Recalculate request status
+    const allAcceptedDonations = await ctx.db
+      .query("donations")
+      .withIndex("by_requestId", (q) => q.eq("requestId", donation.requestId))
+      .filter((q) =>
+        q.or(
+          q.eq(q.field("status"), "Accepted"),
+          q.eq(q.field("status"), "Donated"),
+        ),
+      )
+      .collect();
+
+    const filledBags = allAcceptedDonations.length;
+
     if (args.status === "Donated") {
-      await ctx.db.patch(donation.requestId, {
-        status: "Completed",
-      });
+      // If this was the last bag needed, mark request as Completed or keep as Accepted
+      // Actually, if all committed bags are now "Donated", we can mark request as Completed
+      const allDonated = allAcceptedDonations.every(
+        (d) => d.status === "Donated",
+      );
+      if (filledBags >= request.numberOfBags && allDonated) {
+        await ctx.db.patch(donation.requestId, { status: "Completed" });
+      }
     } else if (args.status === "No Show") {
-      // If donor didn't show up, put request back to Open
-      await ctx.db.patch(donation.requestId, {
-        status: "Open",
-      });
+      // If a donor didn't show, we definitely need to open it back up if we were at capacity
+      if (filledBags < request.numberOfBags) {
+        await ctx.db.patch(donation.requestId, { status: "Open" });
+      }
+    }
+  },
+});
+
+export const selectDonor = mutation({
+  args: { donationId: v.id("donations") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const donation = await ctx.db.get(args.donationId);
+    if (!donation) throw new Error("Donation not found");
+
+    const request = await ctx.db.get(donation.requestId);
+    if (!request || request.requesterId !== identity.subject) {
+      throw new Error("Forbidden");
+    }
+
+    if (donation.status !== "Offered") {
+      throw new Error("Can only select donors who have offered help");
+    }
+
+    await ctx.db.patch(args.donationId, { status: "Accepted" });
+
+    // Check if we reached capacity
+    const allAcceptedDonations = await ctx.db
+      .query("donations")
+      .withIndex("by_requestId", (q) => q.eq("requestId", donation.requestId))
+      .filter((q) =>
+        q.or(
+          q.eq(q.field("status"), "Accepted"),
+          q.eq(q.field("status"), "Donated"),
+        ),
+      )
+      .collect();
+
+    if (allAcceptedDonations.length >= request.numberOfBags) {
+      await ctx.db.patch(donation.requestId, { status: "Accepted" });
     }
   },
 });
@@ -339,15 +385,20 @@ export const cancelRequest = mutation({
 
     await ctx.db.patch(args.requestId, { status: "Cancelled" });
 
-    // Cancel any pending donation
-    const pendingDonation = await ctx.db
+    // Cancel any pending/offered/accepted donations
+    const activeDonations = await ctx.db
       .query("donations")
       .withIndex("by_requestId", (q) => q.eq("requestId", args.requestId))
-      .filter((q) => q.eq(q.field("status"), "Pending"))
-      .first();
+      .filter((q) =>
+        q.or(
+          q.eq(q.field("status"), "Offered"),
+          q.eq(q.field("status"), "Accepted"),
+        ),
+      )
+      .collect();
 
-    if (pendingDonation) {
-      await ctx.db.patch(pendingDonation._id, { status: "Cancelled" });
+    for (const donation of activeDonations) {
+      await ctx.db.patch(donation._id, { status: "Cancelled" });
     }
   },
 });
@@ -366,8 +417,26 @@ export const rejectDonor = mutation({
       throw new Error("Forbidden");
     }
 
+    const wasAccepted = donation.status === "Accepted";
     await ctx.db.patch(args.donationId, { status: "Rejected" });
-    await ctx.db.patch(donation.requestId, { status: "Open" });
+
+    if (wasAccepted) {
+      // Re-open request if we drop below capacity
+      const allAcceptedDonations = await ctx.db
+        .query("donations")
+        .withIndex("by_requestId", (q) => q.eq("requestId", donation.requestId))
+        .filter((q) =>
+          q.or(
+            q.eq(q.field("status"), "Accepted"),
+            q.eq(q.field("status"), "Donated"),
+          ),
+        )
+        .collect();
+
+      if (allAcceptedDonations.length < request.numberOfBags) {
+        await ctx.db.patch(donation.requestId, { status: "Open" });
+      }
+    }
   },
 });
 
@@ -382,11 +451,33 @@ export const withdrawDonation = mutation({
       throw new Error("Forbidden");
     }
 
-    if (donation.status !== "Pending") {
-      throw new Error("Can only withdraw pending donations");
+    if (donation.status !== "Offered" && donation.status !== "Accepted") {
+      throw new Error("Can only withdraw active commitments");
     }
 
+    const wasAccepted = donation.status === "Accepted";
     await ctx.db.patch(args.donationId, { status: "Withdrawn" });
-    await ctx.db.patch(donation.requestId, { status: "Open" });
+
+    if (wasAccepted) {
+      const request = await ctx.db.get(donation.requestId);
+      if (request) {
+        const allAcceptedDonations = await ctx.db
+          .query("donations")
+          .withIndex("by_requestId", (q) =>
+            q.eq("requestId", donation.requestId),
+          )
+          .filter((q) =>
+            q.or(
+              q.eq(q.field("status"), "Accepted"),
+              q.eq(q.field("status"), "Donated"),
+            ),
+          )
+          .collect();
+
+        if (allAcceptedDonations.length < request.numberOfBags) {
+          await ctx.db.patch(donation.requestId, { status: "Open" });
+        }
+      }
+    }
   },
 });

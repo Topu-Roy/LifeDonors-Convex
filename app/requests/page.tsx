@@ -42,6 +42,7 @@ const formSchema = z.object({
   urgency: z.enum(urgencies),
   phoneNumber: z.string().min(10, "Phone number is required"),
   contactNumber: z.string().min(10, "Contact number is required"),
+  numberOfBags: z.number().min(1, "At least 1 bag is required"),
 });
 
 export default function RequestsPage() {
@@ -63,6 +64,7 @@ export default function RequestsPage() {
       urgency: "Medium" as (typeof urgencies)[number],
       phoneNumber: "",
       contactNumber: "",
+      numberOfBags: 1,
     },
     validators: {
       onChange: formSchema,
@@ -319,6 +321,36 @@ export default function RequestsPage() {
                     }}
                   </form.Field>
                 </div>
+                <form.Field name="numberOfBags">
+                  {(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched &&
+                      !!field.state.meta.errors.length;
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel htmlFor={field.name}>
+                          Number of Bags Needed
+                        </FieldLabel>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          type="number"
+                          min={1}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) =>
+                            field.handleChange(Number(e.target.value))
+                          }
+                          aria-invalid={isInvalid}
+                          placeholder="How many bags of blood?"
+                        />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </Field>
+                    );
+                  }}
+                </form.Field>
               </FieldGroup>
 
               <form.Subscribe

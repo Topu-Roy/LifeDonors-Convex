@@ -97,8 +97,9 @@ export default function DashboardPage() {
               myRequests.map(
                 (
                   request: Doc<"requests"> & {
-                    donation?: Doc<"donations">;
-                    donor?: Doc<"profiles"> | null;
+                    volunteers?: (Doc<"donations"> & {
+                      donor?: Doc<"profiles"> | null;
+                    })[];
                   },
                 ) => (
                   <RequestCard key={request._id} request={request} isOwner />
@@ -135,9 +136,11 @@ export default function DashboardPage() {
                   className={`overflow-hidden border-l-4 ${
                     donation.status === "Donated"
                       ? "border-l-emerald-500"
-                      : donation.status === "Pending"
-                        ? "border-l-amber-500"
-                        : "border-l-slate-400 opacity-75"
+                      : donation.status === "Accepted"
+                        ? "border-l-blue-500"
+                        : donation.status === "Offered"
+                          ? "border-l-amber-500"
+                          : "border-l-slate-400 opacity-75"
                   } shadow-sm transition-all hover:shadow-md`}
                 >
                   <CardHeader className="pb-2">
@@ -155,9 +158,11 @@ export default function DashboardPage() {
                         className={
                           donation.status === "Donated"
                             ? "bg-emerald-100 text-emerald-800"
-                            : donation.status === "Pending"
-                              ? "bg-amber-100 text-amber-800"
-                              : ""
+                            : donation.status === "Accepted"
+                              ? "bg-blue-100 text-blue-800"
+                              : donation.status === "Offered"
+                                ? "bg-amber-100 text-amber-800 animate-pulse"
+                                : ""
                         }
                       >
                         {donation.status}
@@ -186,17 +191,25 @@ export default function DashboardPage() {
                     </p>
                   </CardContent>
                   <CardFooter className="pt-2 bg-slate-50/50 flex flex-col gap-2">
-                    {donation.status === "Pending" && (
+                    {(donation.status === "Offered" ||
+                      donation.status === "Accepted") && (
                       <div className="flex gap-2 w-full">
-                        <Button
-                          onClick={() =>
-                            handleUpdateStatus(donation._id, "Donated")
-                          }
-                          size="sm"
-                          className="flex-2 bg-emerald-600 hover:bg-emerald-700 font-bold"
-                        >
-                          I Have Donated
-                        </Button>
+                        {donation.status === "Accepted" && (
+                          <Button
+                            onClick={() =>
+                              handleUpdateStatus(donation._id, "Donated")
+                            }
+                            size="sm"
+                            className="flex-2 bg-emerald-600 hover:bg-emerald-700 font-bold"
+                          >
+                            I Have Donated
+                          </Button>
+                        )}
+                        {donation.status === "Offered" && (
+                          <div className="flex-1 text-xs text-amber-700 bg-amber-50 p-2 rounded border border-amber-100 italic">
+                            Waiting for requester to select you...
+                          </div>
+                        )}
                         <Button
                           onClick={() => handleWithdraw(donation._id)}
                           size="sm"

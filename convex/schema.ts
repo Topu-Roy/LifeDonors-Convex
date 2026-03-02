@@ -53,6 +53,7 @@ export default defineSchema({
       v.literal("Cancelled"),
     ),
     contactNumber: v.string(),
+    numberOfBags: v.number(),
     createdAt: v.number(),
   })
     .index("by_status", ["status"])
@@ -64,7 +65,8 @@ export default defineSchema({
     donorId: v.string(), // Better Auth userId
     requestId: v.id("requests"),
     status: v.union(
-      v.literal("Pending"),
+      v.literal("Offered"),
+      v.literal("Accepted"),
       v.literal("Donated"),
       v.literal("No Show"),
       v.literal("Withdrawn"),

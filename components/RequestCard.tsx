@@ -10,15 +10,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, User, Clock } from "lucide-react";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 
 interface RequestCardProps {
   request: Doc<"requests"> & {
-    donation?: Doc<"donations">;
-    donor?: Doc<"profiles"> | null;
+    volunteers?: (Doc<"donations"> & {
+      donor?: Doc<"profiles"> | null;
+    })[];
   };
   isOwner?: boolean;
 }
@@ -26,6 +27,7 @@ interface RequestCardProps {
 export function RequestCard({ request, isOwner }: RequestCardProps) {
   const acceptRequest = useMutation(api.users.acceptRequest);
   const cancelRequest = useMutation(api.users.cancelRequest);
+  const selectDonor = useMutation(api.users.selectDonor);
   const rejectDonor = useMutation(api.users.rejectDonor);
   const updateDonationStatus = useMutation(api.users.updateDonationStatus);
 
@@ -39,9 +41,9 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
   const handleAccept = async () => {
     try {
       await acceptRequest({ requestId: request._id });
-      toast.success("Request accepted successfully!");
+      toast.success("You have volunteered to help!");
     } catch {
-      toast.error("Failed to accept request");
+      toast.error("Failed to volunteer");
     }
   };
 
@@ -56,27 +58,44 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
     }
   };
 
-  const handleRejectDonor = async () => {
-    if (!request.donation) return;
+  const handleSelectDonor = async (donationId: Id<"donations">) => {
     try {
-      if (confirm("Reject this donor and open the request again?")) {
-        await rejectDonor({ donationId: request.donation._id });
-        toast.success("Donor rejected. Request is open again.");
+      await selectDonor({ donationId });
+      toast.success("Donor selected!");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to select donor",
+      );
+    }
+  };
+
+  const handleRejectDonor = async (donationId: Id<"donations">) => {
+    try {
+      if (confirm("Reject this donor?")) {
+        await rejectDonor({ donationId });
+        toast.success("Donor rejected");
       }
     } catch {
       toast.error("Failed to reject donor");
     }
   };
 
-  const handleUpdateStatus = async (status: "Donated" | "No Show") => {
-    if (!request.donation) return;
+  const handleUpdateStatus = async (
+    donationId: Id<"donations">,
+    status: "Donated" | "No Show",
+  ) => {
     try {
-      await updateDonationStatus({ donationId: request.donation._id, status });
+      await updateDonationStatus({ donationId, status });
       toast.success(`Marked as ${status}`);
     } catch {
       toast.error("Failed to update status");
     }
   };
+
+  const acceptedCount =
+    request.volunteers?.filter(
+      (v) => v.status === "Accepted" || v.status === "Donated",
+    ).length || 0;
 
   return (
     <Card
@@ -84,9 +103,16 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
     >
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-xl font-bold flex items-center gap-2">
-            <span className="text-red-600">{request.bloodTypeNeeded}</span>{" "}
-            Blood Needed
+          <CardTitle className="text-xl font-bold flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="text-red-600">{request.bloodTypeNeeded}</span>
+              <span>Blood Needed</span>
+            </div>
+            <span className="text-xs font-normal text-muted-foreground mt-1">
+              Goal: {request.numberOfBags} bag
+              {request.numberOfBags > 1 ? "s" : ""}
+              {isOwner && ` (${acceptedCount} secured)`}
+            </span>
           </CardTitle>
           <Badge className={urgencyColors[request.urgency]}>
             {request.urgency}
@@ -114,15 +140,81 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
           <span>Contact: {request.contactNumber}</span>
         </div>
 
-        {isOwner && request.status === "Accepted" && request.donor && (
-          <div className="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-100">
-            <p className="text-xs font-semibold text-emerald-800 mb-1 flex items-center gap-1">
-              <CheckCircle2 className="h-3 w-3" /> Donor Committed
-            </p>
-            <p className="text-sm font-medium">{request.donor.phoneNumber}</p>
-            <p className="text-[10px] text-emerald-600 italic">
-              Call the donor to coordinate.
-            </p>
+        {isOwner && request.volunteers && request.volunteers.length > 0 && (
+          <div className="mt-4 space-y-3">
+            <h4 className="text-xs font-bold uppercase text-slate-500 tracking-wider">
+              Volunteers ({request.volunteers.length})
+            </h4>
+            <div className="space-y-2">
+              {request.volunteers.map((v) => (
+                <div
+                  key={v._id}
+                  className={`p-3 rounded-lg border text-sm ${
+                    v.status === "Accepted" || v.status === "Donated"
+                      ? "bg-emerald-50 border-emerald-100"
+                      : "bg-slate-50 border-slate-100"
+                  }`}
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="font-semibold text-xs">
+                        {v.donor?.phoneNumber || "Anonymous"}
+                      </p>
+                      <Badge variant="outline" className="text-[10px] h-4 px-1">
+                        {v.status}
+                      </Badge>
+                    </div>
+                    <div className="flex gap-1">
+                      {v.status === "Offered" && (
+                        <>
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            className="h-7 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100"
+                            onClick={() => handleSelectDonor(v._id)}
+                          >
+                            Select
+                          </Button>
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            className="h-7 text-red-600 hover:bg-red-100"
+                            onClick={() => handleRejectDonor(v._id)}
+                          >
+                            Reject
+                          </Button>
+                        </>
+                      )}
+                      {v.status === "Accepted" && (
+                        <>
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            className="h-7 text-emerald-600 hover:bg-emerald-100"
+                            onClick={() => handleUpdateStatus(v._id, "Donated")}
+                          >
+                            Donated
+                          </Button>
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            className="h-7 text-red-600 hover:bg-red-100"
+                            onClick={() => handleUpdateStatus(v._id, "No Show")}
+                          >
+                            NoShow
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  {(v.status === "Accepted" || v.status === "Donated") && (
+                    <p className="text-[10px] text-emerald-600 italic">
+                      Coordinating for bag fulfillment.
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -139,16 +231,16 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
             onClick={handleAccept}
             className="w-full bg-red-600 hover:bg-red-700 font-bold"
           >
-            Accept Request
+            Volunteer Blood
           </Button>
         )}
 
         {isOwner && (
-          <div className="w-full space-y-2">
+          <div className="w-full space-y-2 pt-2 border-t">
             <div className="flex justify-between items-center w-full">
               <Badge
                 variant={request.status === "Open" ? "outline" : "default"}
-                className={`w-full justify-center py-1 ${request.status === "Accepted" ? "bg-emerald-100 text-emerald-800" : ""}`}
+                className={`w-full justify-center py-1 ${request.status === "Accepted" || request.status === "Completed" ? "bg-emerald-100 text-emerald-800" : ""}`}
               >
                 Status: {request.status}
               </Badge>
@@ -159,38 +251,10 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleCancel}
-                className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                className="w-full text-red-600 border-red-200 hover:bg-red-50 text-xs"
               >
-                Cancel Request
+                Cancel Entire Request
               </Button>
-            )}
-
-            {request.status === "Accepted" && (
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  size="sm"
-                  className="bg-emerald-600 hover:bg-emerald-700 col-span-2 font-bold"
-                  onClick={() => handleUpdateStatus("Donated")}
-                >
-                  Confirm Donation Received
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-red-600 border-red-200"
-                  onClick={() => handleUpdateStatus("No Show")}
-                >
-                  Donor No-Show
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-slate-600"
-                  onClick={handleRejectDonor}
-                >
-                  Reject Donor
-                </Button>
-              </div>
             )}
           </div>
         )}
@@ -198,6 +262,3 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
     </Card>
   );
 }
-
-// Internal icons since RequestCard doesn't import them all
-import { CheckCircle2 } from "lucide-react";
