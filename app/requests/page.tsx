@@ -43,14 +43,38 @@ const formSchema = z.object({
   phoneNumber: z.string().min(10, "Phone number is required"),
   contactNumber: z.string().min(10, "Contact number is required"),
   numberOfBags: z.number().min(1, "At least 1 bag is required"),
+  division: z.string().min(1, "Division is required"),
+  district: z.string().min(1, "District is required"),
+  subDistrict: z.string().min(1, "Sub-district is required"),
 });
 
 export default function RequestsPage() {
   const [filterBloodType, setFilterBloodType] = useState<string | undefined>(
     undefined,
   );
+  const [filterDivision, setFilterDivision] = useState<string | undefined>(
+    undefined,
+  );
+  const [filterDistrict, setFilterDistrict] = useState<string | undefined>(
+    undefined,
+  );
+  const [filterSubDistrict, setFilterSubDistrict] = useState<
+    string | undefined
+  >(undefined);
+
+  const profile = useQuery(api.users.getMyProfile);
+
+  if (profile && !filterDivision) {
+    setFilterDivision(profile.division);
+    setFilterDistrict(profile.district);
+    setFilterSubDistrict(profile.subDistrict);
+  }
+
   const requests = useQuery(api.users.getAllRequests, {
     bloodType: filterBloodType === "ALL" ? undefined : filterBloodType,
+    division: filterDivision === "ALL" ? undefined : filterDivision,
+    district: filterDistrict === "ALL" ? undefined : filterDistrict,
+    subDistrict: filterSubDistrict === "ALL" ? undefined : filterSubDistrict,
   });
   const createRequest = useMutation(api.users.createBloodRequest);
   const [open, setOpen] = useState(false);
@@ -65,6 +89,9 @@ export default function RequestsPage() {
       phoneNumber: "",
       contactNumber: "",
       numberOfBags: 1,
+      division: "",
+      district: "",
+      subDistrict: "",
     },
     validators: {
       onChange: formSchema,

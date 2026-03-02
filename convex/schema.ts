@@ -20,6 +20,9 @@ export default defineSchema({
     diseases: v.array(v.string()),
     phoneNumber: v.string(),
     lastDonationDate: v.number(), // Timestamp
+    division: v.optional(v.string()),
+    district: v.optional(v.string()),
+    subDistrict: v.optional(v.string()),
   })
     .index("by_bloodType", ["bloodType"])
     .index("by_userId", ["userId"]),
@@ -30,6 +33,9 @@ export default defineSchema({
     patientName: v.string(),
     hospitalName: v.string(),
     hospitalLocation: v.string(),
+    division: v.optional(v.string()),
+    district: v.optional(v.string()),
+    subDistrict: v.optional(v.string()),
     bloodTypeNeeded: v.union(
       v.literal("A+"),
       v.literal("A-"),

@@ -19,6 +19,9 @@ export const updateProfile = mutation({
     diseases: v.array(v.string()),
     phoneNumber: v.string(),
     lastDonationDate: v.number(),
+    division: v.optional(v.string()),
+    district: v.optional(v.string()),
+    subDistrict: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -157,6 +160,9 @@ export const createBloodRequest = mutation({
     ),
     contactNumber: v.string(),
     numberOfBags: v.number(),
+    division: v.optional(v.string()),
+    district: v.optional(v.string()),
+    subDistrict: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -174,6 +180,9 @@ export const createBloodRequest = mutation({
 export const getAllRequests = query({
   args: {
     bloodType: v.optional(v.string()),
+    division: v.optional(v.string()),
+    district: v.optional(v.string()),
+    subDistrict: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     let requests = ctx.db
@@ -183,6 +192,24 @@ export const getAllRequests = query({
     if (args.bloodType) {
       requests = requests.filter((q) =>
         q.eq(q.field("bloodTypeNeeded"), args.bloodType),
+      );
+    }
+
+    if (args.division) {
+      requests = requests.filter((q) =>
+        q.eq(q.field("division"), args.division),
+      );
+    }
+
+    if (args.district) {
+      requests = requests.filter((q) =>
+        q.eq(q.field("district"), args.district),
+      );
+    }
+
+    if (args.subDistrict) {
+      requests = requests.filter((q) =>
+        q.eq(q.field("subDistrict"), args.subDistrict),
       );
     }
 

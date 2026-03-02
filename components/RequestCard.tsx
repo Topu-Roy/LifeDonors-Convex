@@ -129,11 +129,19 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
             </span>
           </span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <MapPin className="h-4 w-4" />
-          <span>
-            {request.hospitalName}, {request.hospitalLocation}
-          </span>
+        <div className="flex items-start gap-2 text-sm text-muted-foreground">
+          <MapPin className="h-4 w-4 mt-0.5" />
+          <div className="flex flex-col">
+            <span className="text-foreground font-medium">
+              {request.hospitalName}
+            </span>
+            <span>{request.hospitalLocation}</span>
+            {request.division && (
+              <span className="text-[10px] italic text-slate-500 mt-0.5">
+                {request.subDistrict}, {request.district}, {request.division}
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Phone className="h-4 w-4" />
