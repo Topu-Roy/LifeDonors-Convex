@@ -67,6 +67,9 @@ export default defineSchema({
       v.literal("Pending"),
       v.literal("Donated"),
       v.literal("No Show"),
+      v.literal("Withdrawn"),
+      v.literal("Rejected"),
+      v.literal("Cancelled"),
     ),
     acceptedAt: v.optional(v.number()),
   })

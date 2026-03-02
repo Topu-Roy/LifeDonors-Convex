@@ -21,12 +21,13 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Id } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 
 export default function DashboardPage() {
   const myRequests = useQuery(api.users.getMyRequests);
   const myDonations = useQuery(api.users.getMyDonations);
   const updateDonationStatus = useMutation(api.users.updateDonationStatus);
+  const withdrawDonation = useMutation(api.users.withdrawDonation);
 
   const handleUpdateStatus = async (
     donationId: Id<"donations">,
@@ -41,6 +42,19 @@ export default function DashboardPage() {
       } else {
         toast.error("Failed to update status");
       }
+    }
+  };
+
+  const handleWithdraw = async (donationId: Id<"donations">) => {
+    try {
+      if (confirm("Are you sure you want to withdraw your commitment?")) {
+        await withdrawDonation({ donationId });
+        toast.success("Engagement withdrawn");
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to withdraw",
+      );
     }
   };
 
@@ -79,10 +93,17 @@ export default function DashboardPage() {
                   className="h-64 bg-muted animate-pulse rounded-xl"
                 />
               ))
-            ) : myRequests.length > 0 ? (
-              myRequests.map((request) => (
-                <RequestCard key={request._id} request={request} isOwner />
-              ))
+            ) : myRequests && myRequests.length > 0 ? (
+              myRequests.map(
+                (
+                  request: Doc<"requests"> & {
+                    donation?: Doc<"donations">;
+                    donor?: Doc<"profiles"> | null;
+                  },
+                ) => (
+                  <RequestCard key={request._id} request={request} isOwner />
+                ),
+              )
             ) : (
               <Card className="col-span-full border-dashed">
                 <CardHeader className="text-center py-12">
@@ -111,7 +132,13 @@ export default function DashboardPage() {
               myDonations.map((donation) => (
                 <Card
                   key={donation._id}
-                  className="overflow-hidden border-l-4 border-l-emerald-500 shadow-sm transition-all hover:shadow-md"
+                  className={`overflow-hidden border-l-4 ${
+                    donation.status === "Donated"
+                      ? "border-l-emerald-500"
+                      : donation.status === "Pending"
+                        ? "border-l-amber-500"
+                        : "border-l-slate-400 opacity-75"
+                  } shadow-sm transition-all hover:shadow-md`}
                 >
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-start">
@@ -128,7 +155,9 @@ export default function DashboardPage() {
                         className={
                           donation.status === "Donated"
                             ? "bg-emerald-100 text-emerald-800"
-                            : ""
+                            : donation.status === "Pending"
+                              ? "bg-amber-100 text-amber-800"
+                              : ""
                         }
                       >
                         {donation.status}
@@ -139,13 +168,13 @@ export default function DashboardPage() {
                     <p className="text-sm text-muted-foreground">
                       Patient:{" "}
                       <span className="text-foreground font-medium">
-                        {donation.request?.patientName}
+                        {donation.request?.patientName || "Unknown"}
                       </span>
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Hospital:{" "}
                       <span className="text-foreground font-medium">
-                        {donation.request?.hospitalName}
+                        {donation.request?.hospitalName || "Unknown"}
                       </span>
                     </p>
                     <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
@@ -156,34 +185,37 @@ export default function DashboardPage() {
                         : "--"}
                     </p>
                   </CardContent>
-                  <CardFooter className="pt-2 bg-slate-50/50 flex gap-2">
+                  <CardFooter className="pt-2 bg-slate-50/50 flex flex-col gap-2">
                     {donation.status === "Pending" && (
-                      <>
+                      <div className="flex gap-2 w-full">
                         <Button
                           onClick={() =>
                             handleUpdateStatus(donation._id, "Donated")
                           }
                           size="sm"
-                          className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                          className="flex-2 bg-emerald-600 hover:bg-emerald-700 font-bold"
                         >
-                          Mark as Completed
+                          I Have Donated
                         </Button>
                         <Button
-                          onClick={() =>
-                            handleUpdateStatus(donation._id, "No Show")
-                          }
+                          onClick={() => handleWithdraw(donation._id)}
                           size="sm"
                           variant="outline"
-                          className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+                          className="flex-1 text-slate-600 border-slate-200"
                         >
-                          Did Not Show
+                          Withdraw
                         </Button>
-                      </>
+                      </div>
                     )}
                     {donation.status === "Donated" && (
                       <div className="w-full flex items-center justify-center gap-2 py-1 text-emerald-600 font-medium text-sm">
                         <CheckCircle2 className="h-4 w-4" />
                         Thank you for your life-saving gift!
+                      </div>
+                    )}
+                    {donation.status === "Withdrawn" && (
+                      <div className="w-full flex items-center justify-center gap-2 py-1 text-slate-500 font-medium text-sm italic">
+                        Commitment Withdrawn
                       </div>
                     )}
                   </CardFooter>

@@ -222,11 +222,45 @@ export const getMyRequests = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
 
-    return await ctx.db
+    const requests = await ctx.db
       .query("requests")
       .withIndex("by_requesterId", (q) => q.eq("requesterId", identity.subject))
       .order("desc")
       .collect();
+
+    return await Promise.all(
+      requests.map(async (request) => {
+        if (request.status === "Accepted" || request.status === "Completed") {
+          const donation = await ctx.db
+            .query("donations")
+            .withIndex("by_requestId", (q) => q.eq("requestId", request._id))
+            .filter((q) =>
+              q.or(
+                q.eq(q.field("status"), "Pending"),
+                q.eq(q.field("status"), "Donated"),
+              ),
+            )
+            .first();
+
+          if (donation) {
+            const donorProfile = await ctx.db
+              .query("profiles")
+              .withIndex("by_userId", (q) => q.eq("userId", donation.donorId))
+              .first();
+            return {
+              ...request,
+              donation,
+              donor: donorProfile,
+            };
+          }
+        }
+        return {
+          ...request,
+          donation: undefined,
+          donor: undefined,
+        };
+      }),
+    );
   },
 });
 
@@ -266,7 +300,14 @@ export const updateDonationStatus = mutation({
 
     const donation = await ctx.db.get(args.donationId);
     if (!donation) throw new Error("Donation record not found");
-    if (donation.donorId !== identity.subject) throw new Error("Forbidden");
+
+    const request = await ctx.db.get(donation.requestId);
+    if (!request) throw new Error("Request not found");
+
+    const isDonor = donation.donorId === identity.subject;
+    const isRequester = request.requesterId === identity.subject;
+
+    if (!isDonor && !isRequester) throw new Error("Forbidden");
 
     await ctx.db.patch(args.donationId, {
       status: args.status,
@@ -277,6 +318,75 @@ export const updateDonationStatus = mutation({
       await ctx.db.patch(donation.requestId, {
         status: "Completed",
       });
+    } else if (args.status === "No Show") {
+      // If donor didn't show up, put request back to Open
+      await ctx.db.patch(donation.requestId, {
+        status: "Open",
+      });
     }
+  },
+});
+
+export const cancelRequest = mutation({
+  args: { requestId: v.id("requests") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const request = await ctx.db.get(args.requestId);
+    if (!request) throw new Error("Request not found");
+    if (request.requesterId !== identity.subject) throw new Error("Forbidden");
+
+    await ctx.db.patch(args.requestId, { status: "Cancelled" });
+
+    // Cancel any pending donation
+    const pendingDonation = await ctx.db
+      .query("donations")
+      .withIndex("by_requestId", (q) => q.eq("requestId", args.requestId))
+      .filter((q) => q.eq(q.field("status"), "Pending"))
+      .first();
+
+    if (pendingDonation) {
+      await ctx.db.patch(pendingDonation._id, { status: "Cancelled" });
+    }
+  },
+});
+
+export const rejectDonor = mutation({
+  args: { donationId: v.id("donations") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const donation = await ctx.db.get(args.donationId);
+    if (!donation) throw new Error("Donation not found");
+
+    const request = await ctx.db.get(donation.requestId);
+    if (!request || request.requesterId !== identity.subject) {
+      throw new Error("Forbidden");
+    }
+
+    await ctx.db.patch(args.donationId, { status: "Rejected" });
+    await ctx.db.patch(donation.requestId, { status: "Open" });
+  },
+});
+
+export const withdrawDonation = mutation({
+  args: { donationId: v.id("donations") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const donation = await ctx.db.get(args.donationId);
+    if (!donation || donation.donorId !== identity.subject) {
+      throw new Error("Forbidden");
+    }
+
+    if (donation.status !== "Pending") {
+      throw new Error("Can only withdraw pending donations");
+    }
+
+    await ctx.db.patch(args.donationId, { status: "Withdrawn" });
+    await ctx.db.patch(donation.requestId, { status: "Open" });
   },
 });
