@@ -165,7 +165,9 @@ export default function DashboardPage() {
                                 : ""
                         }
                       >
-                        {donation.status}
+                        {donation.status === "Rejected"
+                          ? "Fulfilled"
+                          : donation.status}
                       </Badge>
                     </div>
                   </CardHeader>
@@ -229,6 +231,12 @@ export default function DashboardPage() {
                     {donation.status === "Withdrawn" && (
                       <div className="w-full flex items-center justify-center gap-2 py-1 text-slate-500 font-medium text-sm italic">
                         Commitment Withdrawn
+                      </div>
+                    )}
+                    {donation.status === "Rejected" && (
+                      <div className="w-full text-center py-2 text-slate-500 text-xs italic px-4">
+                        Thank you for your willingness to help! This request has
+                        been fulfilled by other donors.
                       </div>
                     )}
                   </CardFooter>
