@@ -1,0 +1,527 @@
+"use client";
+
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldDescription,
+  FieldError,
+} from "@/components/ui/field";
+import { useForm } from "@tanstack/react-form";
+import * as z from "zod";
+import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { ShieldCheck, Loader2 } from "lucide-react";
+import { Id } from "@/convex/_generated/dataModel";
+import {
+  getAllDivisions,
+  getDistrictsByDivision,
+  getSubDistrictsByDistrict,
+} from "@/constants/bangladeshAdministrativeAreas";
+
+export const bloodTypes = [
+  "A+",
+  "A-",
+  "B+",
+  "B-",
+  "AB+",
+  "AB-",
+  "O+",
+  "O-",
+] as const;
+
+const formSchema = z.object({
+  age: z.number().min(18, "Must be at least 18").max(65, "Must be under 65"),
+  bmi: z.number().min(18.5, "BMI too low").max(30, "BMI too high"),
+  bloodType: z.enum(bloodTypes),
+  hemoglobinLevel: z
+    .number()
+    .min(12.5, "Hemoglobin too low")
+    .max(18, "Hemoglobin too high"),
+  phoneNumber: z.string().min(10, "Valid phone number required"),
+  diseases: z.string(),
+  lastDonationDate: z.string(),
+  division: z.string().min(1, "Division is required"),
+  district: z.string().min(1, "District is required"),
+  subDistrict: z.string().min(1, "Sub-district is required"),
+});
+
+export function ProfileForm() {
+  const profile = useQuery(api.users.getMyProfile);
+  const updateProfile = useMutation(api.users.updateProfile);
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const isProfileComplete = (
+    p:
+      | {
+          _id: Id<"profiles">;
+          _creationTime: number;
+          age: number;
+          bmi: number;
+          bloodType: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
+          hemoglobinLevel: number;
+          phoneNumber: string;
+          diseases: string[];
+          lastDonationDate: number;
+          userId: string;
+          division?: string;
+          district?: string;
+          subDistrict?: string;
+        }
+      | null
+      | undefined,
+  ) => {
+    if (!p) return false;
+    return !!(
+      p.age > 0 &&
+      p.bloodType &&
+      p.bmi > 0 &&
+      p.hemoglobinLevel > 0 &&
+      p.phoneNumber &&
+      p.division &&
+      p.district &&
+      p.subDistrict
+    );
+  };
+
+  const form = useForm({
+    defaultValues: {
+      age: 0,
+      bmi: 0,
+      bloodType: "A+" as (typeof bloodTypes)[number],
+      hemoglobinLevel: 0,
+      phoneNumber: "",
+      diseases: "",
+      lastDonationDate: "",
+      division: "",
+      district: "",
+      subDistrict: "",
+    } satisfies z.infer<typeof formSchema>,
+    validators: {
+      onChange: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      try {
+        await updateProfile({
+          ...value,
+          diseases: value.diseases
+            ? value.diseases
+                .split(",")
+                .map((d) => d.trim())
+                .filter(Boolean)
+            : [],
+          lastDonationDate: value.lastDonationDate
+            ? new Date(value.lastDonationDate).getTime()
+            : 0,
+        });
+        toast.success("Profile updated successfully!");
+        setIsDialogOpen(false);
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Failed to update profile");
+        }
+      }
+    },
+  });
+
+  if (profile) {
+    if (!isProfileComplete(profile)) {
+      setIsDialogOpen(true);
+    }
+  } else if (profile === null) {
+    setIsDialogOpen(true);
+  }
+
+  useEffect(() => {
+    if (profile) {
+      form.reset({
+        age: profile.age,
+        bmi: profile.bmi,
+        bloodType: profile.bloodType as (typeof bloodTypes)[number],
+        hemoglobinLevel: profile.hemoglobinLevel,
+        phoneNumber: profile.phoneNumber,
+        diseases: profile.diseases.join(", "),
+        lastDonationDate: profile.lastDonationDate
+          ? new Date(profile.lastDonationDate).toISOString().split("T")[0]
+          : "",
+        division: profile.division || "",
+        district: profile.district || "",
+        subDistrict: profile.subDistrict || "",
+      });
+    }
+  }, [form, profile, isDialogOpen]);
+
+  if (profile === undefined) {
+    return (
+      <div className="flex h-[80vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-red-600" />
+      </div>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+      className="space-y-6 pt-4"
+    >
+      <FieldGroup>
+        <div className="grid grid-cols-2 gap-4">
+          <form.Field name="age">
+            {(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !!field.state.meta.errors.length;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>Age</FieldLabel>
+                  <Input
+                    id={field.name}
+                    type="number"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      field.handleChange(Number(e.target.value))
+                    }
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
+          <form.Field name="bloodType">
+            {(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !!field.state.meta.errors.length;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>Blood Type</FieldLabel>
+                  <Select
+                    onValueChange={(val) => {
+                      if (val)
+                        field.handleChange(val as (typeof bloodTypes)[number]);
+                    }}
+                    value={field.state.value}
+                  >
+                    <SelectTrigger id={field.name}>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {bloodTypes.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <form.Field name="bmi">
+            {(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !!field.state.meta.errors.length;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>BMI</FieldLabel>
+                  <Input
+                    id={field.name}
+                    type="number"
+                    step="0.1"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      field.handleChange(Number(e.target.value))
+                    }
+                  />
+                  <FieldDescription className="text-[10px]">
+                    Weight(kg) / Height(m)²
+                  </FieldDescription>
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
+          <form.Field name="hemoglobinLevel">
+            {(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !!field.state.meta.errors.length;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    Hemoglobin (g/dL)
+                  </FieldLabel>
+                  <Input
+                    id={field.name}
+                    type="number"
+                    step="0.1"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      field.handleChange(Number(e.target.value))
+                    }
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
+        </div>
+
+        <form.Field name="phoneNumber">
+          {(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !!field.state.meta.errors.length;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Phone Number</FieldLabel>
+                <Input
+                  id={field.name}
+                  placeholder="Your primary phone number"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    field.handleChange(e.target.value)
+                  }
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
+
+        <form.Field name="lastDonationDate">
+          {(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !!field.state.meta.errors.length;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Last Donation Date</FieldLabel>
+                <Input
+                  id={field.name}
+                  type="date"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    field.handleChange(e.target.value)
+                  }
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
+
+        <div className="space-y-4 border-y py-4 my-2">
+          <h4 className="text-sm font-semibold text-slate-700">
+            Preferred Donation Location
+          </h4>
+          <div className="grid grid-cols-1 gap-4">
+            <form.Field name="division">
+              {(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched &&
+                  !!field.state.meta.errors.length;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Division</FieldLabel>
+                    <Select
+                      onValueChange={(val) => {
+                        field.handleChange(val ?? "");
+                        form.setFieldValue("district", "");
+                        form.setFieldValue("subDistrict", "");
+                      }}
+                      value={field.state.value}
+                    >
+                      <SelectTrigger id={field.name}>
+                        <SelectValue placeholder="Select division" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getAllDivisions().map((div) => (
+                          <SelectItem key={div} value={div}>
+                            {div}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
+            </form.Field>
+
+            <div className="grid grid-cols-2 gap-4">
+              <form.Subscribe selector={(state) => state.values.division}>
+                {(division) => (
+                  <form.Field name="district">
+                    {(field) => {
+                      const isInvalid =
+                        field.state.meta.isTouched &&
+                        !!field.state.meta.errors.length;
+                      const districts = division
+                        ? getDistrictsByDivision({ division })
+                        : [];
+                      return (
+                        <Field data-invalid={isInvalid}>
+                          <FieldLabel htmlFor={field.name}>District</FieldLabel>
+                          <Select
+                            disabled={!division}
+                            onValueChange={(val) => {
+                              field.handleChange(val ?? "");
+                              form.setFieldValue("subDistrict", "");
+                            }}
+                            value={field.state.value}
+                          >
+                            <SelectTrigger id={field.name}>
+                              <SelectValue placeholder="District" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {districts.map((dist) => (
+                                <SelectItem key={dist} value={dist}>
+                                  {dist}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {isInvalid && (
+                            <FieldError errors={field.state.meta.errors} />
+                          )}
+                        </Field>
+                      );
+                    }}
+                  </form.Field>
+                )}
+              </form.Subscribe>
+
+              <form.Subscribe
+                selector={(state) => [
+                  state.values.division,
+                  state.values.district,
+                ]}
+              >
+                {([division, district]) => (
+                  <form.Field name="subDistrict">
+                    {(field) => {
+                      const isInvalid =
+                        field.state.meta.isTouched &&
+                        !!field.state.meta.errors.length;
+                      const subDistricts =
+                        division && district
+                          ? getSubDistrictsByDistrict({
+                              division,
+                              district,
+                            })
+                          : [];
+                      return (
+                        <Field data-invalid={isInvalid}>
+                          <FieldLabel htmlFor={field.name}>
+                            Sub-District
+                          </FieldLabel>
+                          <Select
+                            disabled={!district}
+                            onValueChange={(val) =>
+                              field.handleChange(val ?? "")
+                            }
+                            value={field.state.value}
+                          >
+                            <SelectTrigger id={field.name}>
+                              <SelectValue placeholder="Town/Area" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {subDistricts.map((sub) => (
+                                <SelectItem key={sub} value={sub}>
+                                  {sub}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {isInvalid && (
+                            <FieldError errors={field.state.meta.errors} />
+                          )}
+                        </Field>
+                      );
+                    }}
+                  </form.Field>
+                )}
+              </form.Subscribe>
+            </div>
+          </div>
+        </div>
+
+        <form.Field name="diseases">
+          {(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !!field.state.meta.errors.length;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>
+                  Pre-existing Conditions
+                </FieldLabel>
+                <Input
+                  id={field.name}
+                  placeholder="e.g., Diabetes, Hypertension (comma separated)"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    field.handleChange(e.target.value)
+                  }
+                />
+                <FieldDescription>
+                  Leave empty if none. Use commas to separate multiple.
+                </FieldDescription>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
+      </FieldGroup>
+
+      <div className="bg-slate-50 p-4 rounded-lg flex items-start gap-3 border">
+        <ShieldCheck className="h-5 w-5 text-emerald-600 mt-0.5" />
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Your data is private and only used to ensure safe donation practices.
+        </p>
+      </div>
+
+      <form.Subscribe
+        selector={(state) => [state.canSubmit, state.isSubmitting]}
+      >
+        {(state) => {
+          const [canSubmit, isSubmitting] = state;
+          return (
+            <Button
+              type="submit"
+              disabled={!canSubmit}
+              className="w-full bg-red-600 hover:bg-red-700 font-bold"
+            >
+              {isSubmitting ? "Saving..." : "Save Profile Updates"}
+            </Button>
+          );
+        }}
+      </form.Subscribe>
+    </form>
+  );
+}
