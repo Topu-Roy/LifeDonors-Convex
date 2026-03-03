@@ -9,9 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export function EligibilityStatus() {
   const eligibility = useQuery(api.users.checkEligibility);
@@ -29,7 +30,7 @@ export function EligibilityStatus() {
 
   if (!profile) {
     return (
-      <Card className="border-dashed border-red-200 bg-red-50/30">
+      <Card className="border-dashed border-border bg-muted/30">
         <CardHeader>
           <CardTitle className="text-lg">Become a Donor</CardTitle>
           <CardDescription>
@@ -38,9 +39,12 @@ export function EligibilityStatus() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button className="w-full bg-red-600 hover:bg-red-700">
-            <Link href="/profile">Complete Profile</Link>
-          </Button>
+          <Link
+            href="/profile"
+            className={cn(buttonVariants({ variant: "default" }), "w-full")}
+          >
+            Complete Profile
+          </Link>
         </CardContent>
       </Card>
     );
@@ -50,16 +54,16 @@ export function EligibilityStatus() {
     <Card
       className={
         eligibility.eligible
-          ? "border-emerald-200 bg-emerald-50/30"
-          : "border-amber-200 bg-amber-50/30"
+          ? "border-primary/20 bg-primary/5"
+          : "border-border bg-muted/30"
       }
     >
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           {eligibility.eligible ? (
-            <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+            <CheckCircle2 className="h-5 w-5 text-primary" />
           ) : (
-            <AlertCircle className="h-5 w-5 text-amber-600" />
+            <AlertCircle className="h-5 w-5 text-muted-foreground" />
           )}
           {eligibility.eligible ? "You are Eligible!" : "Not Eligible Yet"}
         </CardTitle>
@@ -71,16 +75,22 @@ export function EligibilityStatus() {
       </CardHeader>
       <CardContent>
         {eligibility.eligible ? (
-          <Button
-            variant="outline"
-            className="w-full border-emerald-600 text-emerald-700 hover:bg-emerald-50"
+          <Link
+            href="/requests"
+            className={cn(buttonVariants({ variant: "outline" }), "w-full")}
           >
-            <Link href="/requests">View Urgent Requests</Link>
-          </Button>
+            View Urgent Requests
+          </Link>
         ) : (
-          <Button variant="link" className="w-full text-amber-700">
-            <Link href="/profile">Update Profile Info</Link>
-          </Button>
+          <Link
+            href="/profile"
+            className={cn(
+              buttonVariants({ variant: "link" }),
+              "w-full text-muted-foreground",
+            )}
+          >
+            Update Profile Info
+          </Link>
         )}
       </CardContent>
     </Card>

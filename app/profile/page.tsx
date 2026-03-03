@@ -37,21 +37,23 @@ export default function ProfilePage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <div className="flex items-center gap-4 mb-8">
-        <div className="bg-red-100 p-3 rounded-full">
-          <User className="h-8 w-8 text-red-600" />
+        <div className="bg-primary/10 p-3 rounded-full">
+          <User className="h-8 w-8 text-primary" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold">Donor Profile</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Donor Profile</h1>
           <p className="text-muted-foreground">
             Keep your health metrics updated for eligibility.
           </p>
         </div>
       </div>
 
-      <Card className="border-t-4 border-t-red-600">
+      <Card className="border-t-4 border-t-primary shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <div>
-            <CardTitle className="text-xl">Health Information</CardTitle>
+            <CardTitle className="text-xl font-bold">
+              Health Information
+            </CardTitle>
             <CardDescription>
               Your current donor profile and eligibility metrics.
             </CardDescription>
@@ -71,23 +73,23 @@ export default function ProfilePage() {
         <CardContent>
           <div className="space-y-8">
             <div className="grid grid-cols-2 gap-6">
-              <div className="bg-slate-50 p-4 rounded-xl border flex flex-col items-center justify-center text-center">
-                <div className="bg-red-100 p-2 rounded-full mb-2">
-                  <Droplet className="h-6 w-6 text-red-600" />
+              <div className="bg-muted/50 p-4 rounded-xl border border-border flex flex-col items-center justify-center text-center">
+                <div className="bg-primary/10 p-2 rounded-full mb-2">
+                  <Droplet className="h-6 w-6 text-primary" />
                 </div>
                 <span className="text-sm text-muted-foreground">
                   Blood Type
                 </span>
-                <span className="text-2xl font-bold text-red-600">
+                <span className="text-2xl font-bold text-primary">
                   {profile?.bloodType || "--"}
                 </span>
               </div>
-              <div className="bg-slate-50 p-4 rounded-xl border flex flex-col items-center justify-center text-center">
-                <div className="bg-blue-100 p-2 rounded-full mb-2">
-                  <Activity className="h-6 w-6 text-blue-600" />
+              <div className="bg-muted/50 p-4 rounded-xl border border-border flex flex-col items-center justify-center text-center">
+                <div className="bg-muted p-2 rounded-full mb-2">
+                  <Activity className="h-6 w-6 text-foreground" />
                 </div>
                 <span className="text-sm text-muted-foreground">BMI</span>
-                <span className="text-2xl font-bold text-blue-600">
+                <span className="text-2xl font-bold text-foreground">
                   {profile?.bmi || "--"}
                 </span>
               </div>
@@ -131,7 +133,7 @@ export default function ProfilePage() {
                   <MapPin className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-xs text-muted-foreground">Location</p>
-                    <p className="font-medium">
+                    <p className="font-medium text-sm">
                       {profile?.division
                         ? `${profile.subDistrict}, ${profile.district}, ${profile.division}`
                         : "Not set"}

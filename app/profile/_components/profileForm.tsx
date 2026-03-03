@@ -168,7 +168,7 @@ export function ProfileForm() {
   if (profile === undefined) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-red-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -334,7 +334,7 @@ export function ProfileForm() {
         </form.Field>
 
         <div className="space-y-4 border-y py-4 my-2">
-          <h4 className="text-sm font-semibold text-slate-700">
+          <h4 className="text-sm font-semibold text-foreground">
             Preferred Donation Location
           </h4>
           <div className="grid grid-cols-1 gap-4">
@@ -499,8 +499,8 @@ export function ProfileForm() {
         </form.Field>
       </FieldGroup>
 
-      <div className="bg-slate-50 p-4 rounded-lg flex items-start gap-3 border">
-        <ShieldCheck className="h-5 w-5 text-emerald-600 mt-0.5" />
+      <div className="bg-muted/50 p-4 rounded-lg flex items-start gap-3 border border-border">
+        <ShieldCheck className="h-5 w-5 text-primary mt-0.5" />
         <p className="text-xs text-muted-foreground leading-relaxed">
           Your data is private and only used to ensure safe donation practices.
         </p>
@@ -515,7 +515,7 @@ export function ProfileForm() {
             <Button
               type="submit"
               disabled={!canSubmit}
-              className="w-full bg-red-600 hover:bg-red-700 font-bold"
+              className="w-full font-bold"
             >
               {isSubmitting ? "Saving..." : "Save Profile Updates"}
             </Button>

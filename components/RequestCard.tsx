@@ -14,15 +14,16 @@ import { Doc, Id } from "@/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
-interface RequestCardProps {
+type RequestCardProps = {
   request: Doc<"requests"> & {
     volunteers?: (Doc<"donations"> & {
       donor?: Doc<"profiles"> | null;
     })[];
   };
   isOwner?: boolean;
-}
+};
 
 export function RequestCard({ request, isOwner }: RequestCardProps) {
   const acceptRequest = useMutation(api.users.acceptRequest);
@@ -32,10 +33,10 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
   const updateDonationStatus = useMutation(api.users.updateDonationStatus);
 
   const urgencyColors = {
-    Low: "bg-blue-100 text-blue-800",
-    Medium: "bg-yellow-100 text-yellow-800",
-    High: "bg-orange-100 text-orange-800",
-    Critical: "bg-red-100 text-red-800 animate-pulse",
+    Low: "bg-muted text-muted-foreground",
+    Medium: "bg-secondary text-secondary-foreground",
+    High: "bg-primary/20 text-primary border-primary/30",
+    Critical: "bg-destructive text-destructive-foreground animate-pulse",
   };
 
   const handleAccept = async () => {
@@ -99,13 +100,18 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
 
   return (
     <Card
-      className={`overflow-hidden border-l-4 ${request.status === "Cancelled" ? "border-l-slate-400 opacity-75" : "border-l-red-600"} shadow-md hover:shadow-lg transition-shadow`}
+      className={cn(
+        "overflow-hidden border-l-4 shadow-sm hover:shadow-md transition-shadow",
+        request.status === "Cancelled"
+          ? "border-l-muted-foreground/30 opacity-75"
+          : "border-l-primary",
+      )}
     >
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-xl font-bold flex flex-col">
+          <CardTitle className="text-xl font-bold flex flex-col tracking-tight">
             <div className="flex items-center gap-2">
-              <span className="text-red-600">{request.bloodTypeNeeded}</span>
+              <span className="text-primary">{request.bloodTypeNeeded}</span>
               <span>Blood Needed</span>
             </div>
             <span className="text-xs font-normal text-muted-foreground mt-1">
@@ -114,7 +120,7 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
               {isOwner && ` (${acceptedCount} secured)`}
             </span>
           </CardTitle>
-          <Badge className={urgencyColors[request.urgency]}>
+          <Badge className={urgencyColors[request.urgency]} variant="secondary">
             {request.urgency}
           </Badge>
         </div>
@@ -137,7 +143,7 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
             </span>
             <span>{request.hospitalLocation}</span>
             {request.division && (
-              <span className="text-[10px] italic text-slate-500 mt-0.5">
+              <span className="text-[10px] italic text-muted-foreground mt-0.5">
                 {request.subDistrict}, {request.district}, {request.division}
               </span>
             )}
@@ -150,18 +156,19 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
 
         {isOwner && request.volunteers && request.volunteers.length > 0 && (
           <div className="mt-4 space-y-3">
-            <h4 className="text-xs font-bold uppercase text-slate-500 tracking-wider">
+            <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-wider">
               Volunteers ({request.volunteers.length})
             </h4>
             <div className="space-y-2">
               {request.volunteers.map((v) => (
                 <div
                   key={v._id}
-                  className={`p-3 rounded-lg border text-sm ${
+                  className={cn(
+                    "p-3 rounded-lg border text-sm",
                     v.status === "Accepted" || v.status === "Donated"
-                      ? "bg-emerald-50 border-emerald-100"
-                      : "bg-slate-50 border-slate-100"
-                  }`}
+                      ? "bg-primary/5 border-primary/10"
+                      : "bg-muted/50 border-border",
+                  )}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div>
@@ -178,7 +185,7 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
                           <Button
                             size="xs"
                             variant="ghost"
-                            className="h-7 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100"
+                            className="h-7 text-primary hover:text-primary hover:bg-primary/10"
                             onClick={() => handleSelectDonor(v._id)}
                           >
                             Select
@@ -186,7 +193,7 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
                           <Button
                             size="xs"
                             variant="ghost"
-                            className="h-7 text-red-600 hover:bg-red-100"
+                            className="h-7 text-destructive hover:bg-destructive/10"
                             onClick={() => handleRejectDonor(v._id)}
                           >
                             Reject
@@ -198,7 +205,7 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
                           <Button
                             size="xs"
                             variant="ghost"
-                            className="h-7 text-emerald-600 hover:bg-emerald-100"
+                            className="h-7 text-primary hover:bg-primary/10"
                             onClick={() => handleUpdateStatus(v._id, "Donated")}
                           >
                             Donated
@@ -206,7 +213,7 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
                           <Button
                             size="xs"
                             variant="ghost"
-                            className="h-7 text-red-600 hover:bg-red-100"
+                            className="h-7 text-destructive hover:bg-destructive/10"
                             onClick={() => handleUpdateStatus(v._id, "No Show")}
                           >
                             NoShow
@@ -216,7 +223,7 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
                     </div>
                   </div>
                   {(v.status === "Accepted" || v.status === "Donated") && (
-                    <p className="text-[10px] text-emerald-600 italic">
+                    <p className="text-[10px] text-primary italic">
                       Coordinating for bag fulfillment.
                     </p>
                   )}
@@ -235,10 +242,7 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
       </CardContent>
       <CardFooter className="pt-2 flex flex-col gap-2">
         {!isOwner && request.status === "Open" && (
-          <Button
-            onClick={handleAccept}
-            className="w-full bg-red-600 hover:bg-red-700 font-bold"
-          >
+          <Button onClick={handleAccept} className="w-full font-bold">
             Volunteer Blood
           </Button>
         )}
@@ -248,7 +252,12 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
             <div className="flex justify-between items-center w-full">
               <Badge
                 variant={request.status === "Open" ? "outline" : "default"}
-                className={`w-full justify-center py-1 ${request.status === "Accepted" || request.status === "Completed" ? "bg-emerald-100 text-emerald-800" : ""}`}
+                className={cn(
+                  "w-full justify-center py-1",
+                  (request.status === "Accepted" ||
+                    request.status === "Completed") &&
+                    "bg-primary/10 text-primary border-primary/20",
+                )}
               >
                 Status: {request.status}
               </Badge>
@@ -259,7 +268,7 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleCancel}
-                className="w-full text-red-600 border-red-200 hover:bg-red-50 text-xs"
+                className="w-full text-destructive border-destructive/20 hover:bg-destructive/5 text-xs"
               >
                 Cancel Entire Request
               </Button>

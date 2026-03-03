@@ -4,9 +4,10 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { RequestCard } from "@/components/RequestCard";
 import { EligibilityStatus } from "@/components/EligibilityStatus";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Droplet, Heart, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
   const requests = useQuery(api.users.getAllRequests, {});
@@ -14,36 +15,36 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-12 pb-20">
       {/* Hero Section */}
-      <section className="relative bg-red-600 text-white py-20 overflow-hidden">
+      <section className="relative bg-muted py-24 overflow-hidden border-b">
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-6xl font-extrabold mb-6">
+            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
               Give Blood, <br />
-              <span className="text-red-200">Save a Life Today.</span>
+              <span className="text-primary">Save a Life Today.</span>
             </h1>
-            <p className="text-lg md:text-xl text-red-50 mb-8 leading-relaxed">
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
               Every drop counts. Join our community of life-savers and help
               those in urgent need of blood across the city.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Button
-                size="lg"
-                className="bg-white text-red-600 hover:bg-red-50 font-bold border-none"
+              <Link
+                href="/requests"
+                className={cn(buttonVariants({ size: "lg" }), "font-bold")}
               >
-                <Link href="/requests">View Urgent Requests</Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white/10 font-bold"
+                View Urgent Requests
+              </Link>
+              <Link
+                href="/profile"
+                className={cn(
+                  buttonVariants({ size: "lg", variant: "outline" }),
+                  "font-bold",
+                )}
               >
-                <Link href="/profile">Become a Donor</Link>
-              </Button>
+                Become a Donor
+              </Link>
             </div>
           </div>
         </div>
-        {/* Abstract background shape */}
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-red-700/50 -skew-x-12 translate-x-1/4" />
       </section>
 
       <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -51,13 +52,13 @@ export default function Home() {
         <div className="lg:col-span-1 space-y-8">
           <EligibilityStatus />
 
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
-            <h3 className="font-bold text-slate-900 border-b pb-2">
+          <div className="bg-card border border-border rounded-xl p-6 space-y-6">
+            <h3 className="font-bold text-foreground border-b pb-2">
               Why Donate?
             </h3>
             <div className="flex gap-4">
-              <div className="bg-red-100 p-2 rounded-lg shrink-0">
-                <Heart className="h-5 w-5 text-red-600" />
+              <div className="bg-primary/10 p-2 rounded-lg shrink-0">
+                <Heart className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <h4 className="font-semibold text-sm">Save Lives</h4>
@@ -67,8 +68,8 @@ export default function Home() {
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="bg-emerald-100 p-2 rounded-lg shrink-0">
-                <ShieldCheck className="h-5 w-5 text-emerald-600" />
+              <div className="bg-primary/10 p-2 rounded-lg shrink-0">
+                <ShieldCheck className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <h4 className="font-semibold text-sm">Free Health Check</h4>
@@ -78,8 +79,8 @@ export default function Home() {
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="bg-blue-100 p-2 rounded-lg shrink-0">
-                <Users className="h-5 w-5 text-blue-600" />
+              <div className="bg-primary/10 p-2 rounded-lg shrink-0">
+                <Users className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <h4 className="font-semibold text-sm">Community</h4>
@@ -95,12 +96,12 @@ export default function Home() {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Droplet className="h-6 w-6 text-red-600" />
+              <Droplet className="h-6 w-6 text-primary" />
               Urgent Requests
             </h2>
             <Link
               href="/requests"
-              className="text-sm font-medium text-red-600 hover:underline"
+              className="text-sm font-medium text-primary hover:underline"
             >
               See All
             </Link>
@@ -121,7 +122,7 @@ export default function Home() {
                   <RequestCard key={request._id} request={request} />
                 ))
             ) : (
-              <div className="col-span-2 py-12 text-center bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+              <div className="col-span-2 py-12 text-center bg-muted/30 rounded-xl border-2 border-dashed border-border">
                 <p className="text-muted-foreground">
                   No open blood requests at the moment.
                 </p>

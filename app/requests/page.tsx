@@ -30,6 +30,11 @@ import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
 import { Plus, Filter } from "lucide-react";
 import { toast } from "sonner";
+import {
+  getAllDivisions,
+  getDistrictsByDivision,
+  getSubDistrictsByDistrict,
+} from "@/constants/bangladeshAdministrativeAreas";
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] as const;
 const urgencies = ["Low", "Medium", "High", "Critical"] as const;
@@ -124,14 +129,16 @@ export default function RequestsPage() {
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger>
-            <Button className="bg-red-600 hover:bg-red-700 gap-2">
+            <Button className="gap-2 shadow-sm">
               <Plus className="h-4 w-4" />
               Post a Request
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Request Blood</DialogTitle>
+              <DialogTitle className="text-2xl font-bold">
+                Request Blood
+              </DialogTitle>
             </DialogHeader>
             <form
               onSubmit={(e) => {
@@ -139,7 +146,7 @@ export default function RequestsPage() {
                 e.stopPropagation();
                 form.handleSubmit();
               }}
-              className="space-y-4 pt-4"
+              className="space-y-6 pt-4"
             >
               <FieldGroup>
                 <form.Field name="patientName">
@@ -242,6 +249,147 @@ export default function RequestsPage() {
                     }}
                   </form.Field>
                 </div>
+
+                <div className="space-y-4 border rounded-lg p-4 bg-muted/30">
+                  <h4 className="text-sm font-semibold">Location Details</h4>
+                  <form.Field name="division">
+                    {(field) => {
+                      const isInvalid =
+                        field.state.meta.isTouched &&
+                        !!field.state.meta.errors.length;
+                      return (
+                        <Field data-invalid={isInvalid}>
+                          <FieldLabel htmlFor={field.name}>Division</FieldLabel>
+                          <Select
+                            onValueChange={(val) => {
+                              field.handleChange(val ?? "");
+                              form.setFieldValue("district", "");
+                              form.setFieldValue("subDistrict", "");
+                            }}
+                            value={field.state.value}
+                          >
+                            <SelectTrigger id={field.name}>
+                              <SelectValue placeholder="Select division" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {getAllDivisions().map((div) => (
+                                <SelectItem key={div} value={div}>
+                                  {div}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {isInvalid && (
+                            <FieldError errors={field.state.meta.errors} />
+                          )}
+                        </Field>
+                      );
+                    }}
+                  </form.Field>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <form.Subscribe selector={(state) => state.values.division}>
+                      {(division) => (
+                        <form.Field name="district">
+                          {(field) => {
+                            const isInvalid =
+                              field.state.meta.isTouched &&
+                              !!field.state.meta.errors.length;
+                            const districts = division
+                              ? getDistrictsByDivision({ division })
+                              : [];
+                            return (
+                              <Field data-invalid={isInvalid}>
+                                <FieldLabel htmlFor={field.name}>
+                                  District
+                                </FieldLabel>
+                                <Select
+                                  disabled={!division}
+                                  onValueChange={(val) => {
+                                    field.handleChange(val ?? "");
+                                    form.setFieldValue("subDistrict", "");
+                                  }}
+                                  value={field.state.value}
+                                >
+                                  <SelectTrigger id={field.name}>
+                                    <SelectValue placeholder="District" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {districts.map((dist) => (
+                                      <SelectItem key={dist} value={dist}>
+                                        {dist}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                {isInvalid && (
+                                  <FieldError
+                                    errors={field.state.meta.errors}
+                                  />
+                                )}
+                              </Field>
+                            );
+                          }}
+                        </form.Field>
+                      )}
+                    </form.Subscribe>
+
+                    <form.Subscribe
+                      selector={(state) => [
+                        state.values.division,
+                        state.values.district,
+                      ]}
+                    >
+                      {([division, district]) => (
+                        <form.Field name="subDistrict">
+                          {(field) => {
+                            const isInvalid =
+                              field.state.meta.isTouched &&
+                              !!field.state.meta.errors.length;
+                            const subDistricts =
+                              division && district
+                                ? getSubDistrictsByDistrict({
+                                    division,
+                                    district,
+                                  })
+                                : [];
+                            return (
+                              <Field data-invalid={isInvalid}>
+                                <FieldLabel htmlFor={field.name}>
+                                  Sub-District
+                                </FieldLabel>
+                                <Select
+                                  disabled={!district}
+                                  onValueChange={(val) =>
+                                    field.handleChange(val ?? "")
+                                  }
+                                  value={field.state.value}
+                                >
+                                  <SelectTrigger id={field.name}>
+                                    <SelectValue placeholder="Town/Area" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {subDistricts.map((sub) => (
+                                      <SelectItem key={sub} value={sub}>
+                                        {sub}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                {isInvalid && (
+                                  <FieldError
+                                    errors={field.state.meta.errors}
+                                  />
+                                )}
+                              </Field>
+                            );
+                          }}
+                        </form.Field>
+                      )}
+                    </form.Subscribe>
+                  </div>
+                </div>
+
                 <form.Field name="hospitalName">
                   {(field) => {
                     const isInvalid =
@@ -276,7 +424,7 @@ export default function RequestsPage() {
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor={field.name}>
-                          Hospital Location
+                          Hospital Location Details
                         </FieldLabel>
                         <Input
                           id={field.name}
@@ -285,7 +433,7 @@ export default function RequestsPage() {
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
                           aria-invalid={isInvalid}
-                          placeholder="e.g., Downtown, Block A"
+                          placeholder="e.g., Floor 3, Room 302"
                         />
                         {isInvalid && (
                           <FieldError errors={field.state.meta.errors} />
@@ -369,7 +517,7 @@ export default function RequestsPage() {
                             field.handleChange(Number(e.target.value))
                           }
                           aria-invalid={isInvalid}
-                          placeholder="How many bags of blood?"
+                          placeholder="How many bags?"
                         />
                         {isInvalid && (
                           <FieldError errors={field.state.meta.errors} />
@@ -389,7 +537,7 @@ export default function RequestsPage() {
                     <Button
                       type="submit"
                       disabled={!canSubmit}
-                      className="w-full bg-red-600 hover:bg-red-700 font-bold"
+                      className="w-full font-bold"
                     >
                       {isSubmitting ? "Posting..." : "Post Request"}
                     </Button>
@@ -401,13 +549,13 @@ export default function RequestsPage() {
         </Dialog>
       </div>
 
-      <div className="flex items-center gap-4 bg-white p-4 rounded-xl border shadow-sm">
+      <div className="flex items-center gap-4 bg-muted/30 p-4 rounded-xl border border-border">
         <Filter className="h-5 w-5 text-muted-foreground" />
         <Select
           onValueChange={(val) => setFilterBloodType(val as string)}
           defaultValue="ALL"
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] bg-background">
             <SelectValue placeholder="All Blood Types" />
           </SelectTrigger>
           <SelectContent>
@@ -431,7 +579,7 @@ export default function RequestsPage() {
             <RequestCard key={request._id} request={request} />
           ))
         ) : (
-          <div className="col-span-full py-20 text-center bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+          <div className="col-span-full py-20 text-center bg-muted/20 rounded-xl border-2 border-dashed border-border">
             <h3 className="text-xl font-semibold mb-2">No Requests Found</h3>
             <p className="text-muted-foreground">
               Try selecting a different blood type or check back later.

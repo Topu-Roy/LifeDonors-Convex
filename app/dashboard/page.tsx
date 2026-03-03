@@ -9,10 +9,12 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   CheckCircle2,
   Clock,
@@ -63,7 +65,7 @@ export default function DashboardPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
-            <LayoutDashboard className="h-8 w-8 text-red-600" />
+            <LayoutDashboard className="h-8 w-8 text-primary" />
             My Dashboard
           </h1>
           <p className="text-muted-foreground">
@@ -133,20 +135,21 @@ export default function DashboardPage() {
               myDonations.map((donation) => (
                 <Card
                   key={donation._id}
-                  className={`overflow-hidden border-l-4 ${
+                  className={cn(
+                    "overflow-hidden border-l-4 shadow-sm transition-all hover:shadow-md",
                     donation.status === "Donated"
-                      ? "border-l-emerald-500"
+                      ? "border-l-primary"
                       : donation.status === "Accepted"
-                        ? "border-l-blue-500"
+                        ? "border-l-primary/60"
                         : donation.status === "Offered"
-                          ? "border-l-amber-500"
-                          : "border-l-slate-400 opacity-75"
-                  } shadow-sm transition-all hover:shadow-md`}
+                          ? "border-l-secondary"
+                          : "border-l-muted-foreground/30 opacity-75",
+                  )}
                 >
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-lg font-bold flex items-center gap-2">
-                        <span className="text-red-600">
+                        <span className="text-primary">
                           {donation.request?.bloodTypeNeeded}
                         </span>{" "}
                         Donation
@@ -155,15 +158,14 @@ export default function DashboardPage() {
                         variant={
                           donation.status === "Donated" ? "default" : "outline"
                         }
-                        className={
-                          donation.status === "Donated"
-                            ? "bg-emerald-100 text-emerald-800"
-                            : donation.status === "Accepted"
-                              ? "bg-blue-100 text-blue-800"
-                              : donation.status === "Offered"
-                                ? "bg-amber-100 text-amber-800 animate-pulse"
-                                : ""
-                        }
+                        className={cn(
+                          donation.status === "Donated" &&
+                            "bg-primary/20 text-primary border-primary/30",
+                          donation.status === "Accepted" &&
+                            "bg-secondary text-secondary-foreground",
+                          donation.status === "Offered" &&
+                            "bg-accent text-accent-foreground animate-pulse",
+                        )}
                       >
                         {donation.status === "Rejected"
                           ? "Fulfilled"
@@ -192,7 +194,7 @@ export default function DashboardPage() {
                         : "--"}
                     </p>
                   </CardContent>
-                  <CardFooter className="pt-2 bg-slate-50/50 flex flex-col gap-2">
+                  <CardFooter className="pt-2 flex flex-col gap-2">
                     {(donation.status === "Offered" ||
                       donation.status === "Accepted") && (
                       <div className="flex gap-2 w-full">
@@ -202,13 +204,13 @@ export default function DashboardPage() {
                               handleUpdateStatus(donation._id, "Donated")
                             }
                             size="sm"
-                            className="flex-2 bg-emerald-600 hover:bg-emerald-700 font-bold"
+                            className="flex-2 font-bold"
                           >
                             I Have Donated
                           </Button>
                         )}
                         {donation.status === "Offered" && (
-                          <div className="flex-1 text-xs text-amber-700 bg-amber-50 p-2 rounded border border-amber-100 italic">
+                          <div className="flex-1 text-xs text-muted-foreground bg-muted p-2 rounded border border-border italic">
                             Waiting for requester to select you...
                           </div>
                         )}
@@ -216,25 +218,25 @@ export default function DashboardPage() {
                           onClick={() => handleWithdraw(donation._id)}
                           size="sm"
                           variant="outline"
-                          className="flex-1 text-slate-600 border-slate-200"
+                          className="flex-1"
                         >
                           Withdraw
                         </Button>
                       </div>
                     )}
                     {donation.status === "Donated" && (
-                      <div className="w-full flex items-center justify-center gap-2 py-1 text-emerald-600 font-medium text-sm">
+                      <div className="w-full flex items-center justify-center gap-2 py-1 text-primary font-medium text-sm">
                         <CheckCircle2 className="h-4 w-4" />
                         Thank you for your life-saving gift!
                       </div>
                     )}
                     {donation.status === "Withdrawn" && (
-                      <div className="w-full flex items-center justify-center gap-2 py-1 text-slate-500 font-medium text-sm italic">
+                      <div className="w-full flex items-center justify-center gap-2 py-1 text-muted-foreground font-medium text-sm italic">
                         Commitment Withdrawn
                       </div>
                     )}
                     {donation.status === "Rejected" && (
-                      <div className="w-full text-center py-2 text-slate-500 text-xs italic px-4">
+                      <div className="w-full text-center py-2 text-muted-foreground text-xs italic px-4">
                         Thank you for your willingness to help! This request has
                         been fulfilled by other donors.
                       </div>
@@ -259,18 +261,5 @@ export default function DashboardPage() {
         </TabsContent>
       </Tabs>
     </div>
-  );
-}
-
-// Helper to avoid build component issues with CardFooter
-function CardFooter({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={`flex items-center p-6 pt-0 ${className}`}>{children}</div>
   );
 }
