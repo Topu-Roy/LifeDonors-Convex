@@ -52,10 +52,17 @@ export const getMyProfile = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
 
-    return await ctx.db
+    const profile = await ctx.db
       .query("profiles")
       .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
       .first();
+
+    return {
+      ...profile,
+      name: identity.name,
+      imageUrl: identity.pictureUrl,
+      email: identity.email,
+    };
   },
 });
 
