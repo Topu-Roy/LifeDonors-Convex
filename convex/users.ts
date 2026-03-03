@@ -88,29 +88,28 @@ export const checkEligibility = query({
     if (age < 18 || age > 65) {
       return {
         eligible: false,
-        reason: "Age must be between 18 and 65 years.",
+        reason: `Your age is ${age}. Donors must be between 18 and 65 years old.`,
       };
     }
 
     if (bmi < 18.5 || bmi > 30) {
       return {
         eligible: false,
-        reason: "BMI must be between 18.5 and 30 for safe donation.",
+        reason: `Your BMI is ${bmi.toFixed(1)}. It must be between 18.5 and 30 for a safe donation.`,
       };
     }
 
     if (hemoglobinLevel < 12.5) {
       return {
         eligible: false,
-        reason: "Hemoglobin level must be at least 12.5 g/dL.",
+        reason: `Your Hemoglobin level is ${hemoglobinLevel} g/dL. It must be at least 12.5 g/dL.`,
       };
     }
 
     if (diseases && diseases.length > 0) {
       return {
         eligible: false,
-        reason:
-          "You listed conditions that may prevent donation. Please consult a doctor.",
+        reason: `Your medical conditions (${diseases.join(", ")}) may prevent donation. Please consult a doctor for a safe hematological evaluation.`,
       };
     }
 

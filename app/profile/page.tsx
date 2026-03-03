@@ -23,7 +23,10 @@ import {
   Heart,
   Loader2,
   User,
+  AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ProfileForm } from "./_components/profileForm";
 import { Doc } from "@/convex/_generated/dataModel";
 
@@ -42,6 +45,7 @@ const isProfileComplete = (p: Doc<"profiles"> | null | undefined) =>
 
 export default function ProfilePage() {
   const profile = useQuery(api.users.getMyProfile);
+  const eligibility = useQuery(api.users.checkEligibility);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
 
@@ -132,6 +136,35 @@ export default function ProfilePage() {
           Edit
         </Button>
       </div>
+
+      {/* Eligibility Alert */}
+      {eligibility && (
+        <div className="mb-8">
+          {eligibility.eligible ? (
+            <Alert className="bg-primary/5 border-primary/20">
+              <CheckCircle2 className="h-4 w-4 text-primary" />
+              <AlertTitle className="text-primary font-bold">
+                You are eligible!
+              </AlertTitle>
+              <AlertDescription className="text-primary/80 text-sm italic font-medium">
+                You are ready to save lives. Check for urgent requests near you.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <Alert
+              variant="destructive"
+              className="bg-destructive/5 border-destructive/20 text-destructive"
+            >
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle className="font-bold">Not Eligible Yet</AlertTitle>
+              <AlertDescription className="text-sm font-medium">
+                {eligibility.reason ??
+                  "You do not meet the health criteria at this moment."}
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+      )}
 
       {/* Info rows */}
       <div className="space-y-5">
