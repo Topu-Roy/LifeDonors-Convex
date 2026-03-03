@@ -25,7 +25,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -55,8 +54,8 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-      <div className="container flex h-14 items-center mx-auto px-4">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
+      <div className="container flex justify-between h-14 items-center mx-auto px-4">
+        <Link href="/" className="flex items-center space-x-2">
           <Droplet className="h-6 w-6 text-primary" />
           <span className="hidden font-bold sm:inline-block">LifeDonors</span>
         </Link>
@@ -76,9 +75,7 @@ export function Navbar() {
             </Link>
           ))}
         </nav>
-        <div className="ml-auto flex items-center space-x-4">
-          <UserMenu />
-        </div>
+        <UserMenu />
       </div>
     </header>
   );
@@ -129,20 +126,15 @@ function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        render={
-          <Button
-            variant="ghost"
-            className="relative h-8 w-8 rounded-full p-0"
-          />
-        }
-      >
-        <Avatar className="h-8 w-8 border border-border/50 transition-transform hover:scale-105">
-          <AvatarImage src={user.imageUrl} alt={user.name} />
-          <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
-            {initials}
-          </AvatarFallback>
-        </Avatar>
-      </DropdownMenuTrigger>
+        render={(props) => (
+          <Avatar {...props} className="h-8 w-8 border border-border/50">
+            <AvatarImage src={user.imageUrl} alt={user.name} />
+            <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+        )}
+      />
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuGroup>
           <DropdownMenuLabel className="font-normal">
