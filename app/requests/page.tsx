@@ -3,7 +3,7 @@
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { RequestCard } from "@/components/RequestCard";
-import { Filter } from "lucide-react";
+import { Filter } from "./_components/filters";
 import { CreateRequest } from "./_components/createRequest";
 import { useAtomValue } from "jotai";
 import {

@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 
 import { bloodTypes } from "@/app/profile/_components/profileForm";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import {
   filterDivisionAtom,
   filterDistrictAtom,
   filterSubDistrictAtom,
+  filterHasInitializedAtom,
 } from "@/state/requests/store";
 import { useQuery } from "convex/react";
 import { useAtom } from "jotai";
@@ -34,12 +36,23 @@ export function Filter() {
   );
 
   const profile = useQuery(api.users.getMyProfile);
+  const [hasInitialized, setHasInitialized] = useAtom(filterHasInitializedAtom);
 
-  if (profile && !filterDivision) {
-    setFilterDivision(profile.division);
-    setFilterDistrict(profile.district);
-    setFilterSubDistrict(profile.subDistrict);
-  }
+  useEffect(() => {
+    if (profile && !hasInitialized) {
+      if (profile.division) setFilterDivision(profile.division);
+      if (profile.district) setFilterDistrict(profile.district);
+      if (profile.subDistrict) setFilterSubDistrict(profile.subDistrict);
+      setHasInitialized(true);
+    }
+  }, [
+    profile,
+    hasInitialized,
+    setFilterDivision,
+    setFilterDistrict,
+    setFilterSubDistrict,
+    setHasInitialized,
+  ]);
 
   return (
     <>
