@@ -10,7 +10,7 @@ const Page = () => {
         onClick={async () => {
           await authClient.signIn.social({
             provider: "github",
-            callbackURL: "/dashboard",
+            callbackURL: "/profile/setup",
           });
         }}
       >

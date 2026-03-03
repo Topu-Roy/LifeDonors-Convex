@@ -11,10 +11,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
-  User,
   Edit2,
   Calendar,
   Activity,
@@ -22,188 +21,179 @@ import {
   Droplet,
   MapPin,
   Heart,
+  Loader2,
+  User,
 } from "lucide-react";
 import { ProfileForm } from "./_components/profileForm";
+import { Doc } from "@/convex/_generated/dataModel";
+
+const isProfileComplete = (p: Doc<"profiles"> | null | undefined) =>
+  !!(
+    p &&
+    p.age > 0 &&
+    p.bmi > 0 &&
+    p.bloodType &&
+    p.hemoglobinLevel > 0 &&
+    p.phoneNumber &&
+    p.division &&
+    p.district &&
+    p.subDistrict
+  );
 
 export default function ProfilePage() {
   const profile = useQuery(api.users.getMyProfile);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (
+      profile === null ||
+      (profile !== undefined && !isProfileComplete(profile))
+    ) {
+      router.push("/profile/setup");
+    }
+  }, [profile, router]);
+
+  if (profile === undefined) {
+    return (
+      <div className="flex h-[80vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!profile) return null;
+
+  const rows: {
+    icon: React.ReactNode;
+    label: string;
+    value: string;
+    highlight?: boolean;
+  }[] = [
+    {
+      icon: <Droplet className="h-4 w-4" />,
+      label: "Blood Type",
+      value: profile.bloodType,
+      highlight: true,
+    },
+    {
+      icon: <User className="h-4 w-4" />,
+      label: "Age",
+      value: `${profile.age} years`,
+    },
+    {
+      icon: <Activity className="h-4 w-4" />,
+      label: "BMI",
+      value: String(profile.bmi),
+    },
+    {
+      icon: <Heart className="h-4 w-4" />,
+      label: "Hemoglobin",
+      value: `${profile.hemoglobinLevel} g/dL`,
+    },
+    {
+      icon: <Phone className="h-4 w-4" />,
+      label: "Phone",
+      value: profile.phoneNumber,
+    },
+    {
+      icon: <MapPin className="h-4 w-4" />,
+      label: "Location",
+      value: `${profile.subDistrict}, ${profile.district}, ${profile.division}`,
+    },
+    {
+      icon: <Calendar className="h-4 w-4" />,
+      label: "Last Donation",
+      value: profile.lastDonationDate
+        ? new Date(profile.lastDonationDate).toLocaleDateString(undefined, {
+            dateStyle: "long",
+          })
+        : "No record",
+    },
+  ];
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-3xl">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-        <div className="flex items-center gap-5">
-          <div className="bg-primary/10 p-4 rounded-2xl">
-            <User className="h-10 w-10 text-primary" />
+    <div className="container mx-auto px-4 py-10 max-w-xl">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">My Profile</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Your donor health details
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsDialogOpen(true)}
+          className="gap-1.5"
+        >
+          <Edit2 className="h-3.5 w-3.5" />
+          Edit
+        </Button>
+      </div>
+
+      {/* Info rows */}
+      <div className="space-y-5">
+        {rows.map((row) => (
+          <div
+            key={row.label}
+            className="flex items-center justify-between border-b pb-5 last:border-0 last:pb-0"
+          >
+            <div className="flex items-center gap-2.5 text-muted-foreground">
+              {row.icon}
+              <span className="text-sm text-foreground font-medium">
+                {row.label}
+              </span>
+            </div>
+            <span
+              className={
+                row.highlight
+                  ? "text-sm font-bold text-primary"
+                  : "text-sm text-foreground"
+              }
+            >
+              {row.value}
+            </span>
           </div>
-          <div>
-            <h1 className="text-4xl font-extrabold tracking-tight">Profile</h1>
-            <p className="text-lg text-muted-foreground">
-              Manage your health metrics and donor status.
-            </p>
+        ))}
+      </div>
+
+      {/* Conditions */}
+      {profile.diseases && profile.diseases.length > 0 && (
+        <div className="mt-8">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+            Conditions
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {profile.diseases.map((d) => (
+              <Badge key={d} variant="secondary" className="text-xs">
+                {d}
+              </Badge>
+            ))}
           </div>
         </div>
-        {profile && (
-          <Button
-            variant="outline"
-            onClick={() => setIsDialogOpen(true)}
-            className="rounded-full px-6 shadow-sm hover:bg-muted transition-colors"
-          >
-            <Edit2 className="h-4 w-4 mr-2" />
-            Edit Profile
-          </Button>
-        )}
-      </div>
+      )}
 
-      <div className="space-y-12">
-        {/* Core Stats Section */}
-        <section>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-            <div className="flex items-center gap-4 p-2">
-              <div className="bg-primary/10 p-3 rounded-full">
-                <Droplet className="h-7 w-7 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                  Blood Type
-                </p>
-                <p className="text-3xl font-black text-primary">
-                  {profile?.bloodType || "--"}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 p-2">
-              <div className="bg-muted p-3 rounded-full">
-                <Activity className="h-7 w-7 text-foreground" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                  Current BMI
-                </p>
-                <p className="text-3xl font-black text-foreground">
-                  {profile?.bmi || "--"}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <Separator />
-
-        {/* Detailed Info Section */}
-        <section>
-          <div className="flex items-center gap-2 mb-6">
-            <Heart className="h-5 w-5 text-primary/70" />
-            <h2 className="text-xl font-bold">Health Details</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-12">
-            <InfoItem
-              icon={<User className="h-5 w-5" />}
-              label="Age"
-              value={
-                profile?.age ? `${profile.age} years old` : "Not specified"
-              }
-            />
-            <InfoItem
-              icon={<Activity className="h-5 w-5" />}
-              label="Hemoglobin"
-              value={
-                profile?.hemoglobinLevel
-                  ? `${profile.hemoglobinLevel} g/dL`
-                  : "Not specified"
-              }
-            />
-            <InfoItem
-              icon={<Phone className="h-5 w-5" />}
-              label="Phone Number"
-              value={profile?.phoneNumber || "Not specified"}
-            />
-            <InfoItem
-              icon={<MapPin className="h-5 w-5" />}
-              label="Preferred Location"
-              value={
-                profile?.division
-                  ? `${profile.subDistrict}, ${profile.district}, ${profile.division}`
-                  : "Not specified"
-              }
-            />
-            <InfoItem
-              icon={<Calendar className="h-5 w-5" />}
-              label="Last Donation"
-              value={
-                profile?.lastDonationDate
-                  ? new Date(profile.lastDonationDate).toLocaleDateString(
-                      undefined,
-                      { dateStyle: "long" },
-                    )
-                  : "No prior donations recorded"
-              }
-            />
-          </div>
-        </section>
-
-        {profile?.diseases && profile.diseases.length > 0 && (
-          <>
-            <Separator />
-            <section>
-              <h2 className="text-xl font-bold mb-4">Conditions & Remarks</h2>
-              <div className="flex flex-wrap gap-2">
-                {profile.diseases.map((disease) => (
-                  <Badge
-                    key={disease}
-                    variant="secondary"
-                    className="px-3 py-1 text-sm font-medium rounded-md"
-                  >
-                    {disease}
-                  </Badge>
-                ))}
-              </div>
-            </section>
-          </>
-        )}
-      </div>
-
+      {/* Edit Dialog — pass profile for pre-fill, remount on open via key */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">
-              Update Profile
+            <DialogTitle className="text-xl font-bold">
+              Edit Profile
             </DialogTitle>
             <DialogDescription>
-              Accurate information helps us match you with urgent needs safely.
+              Accurate info helps match you with urgent needs safely.
             </DialogDescription>
           </DialogHeader>
-          <ProfileForm />
+          {isDialogOpen && (
+            <ProfileForm
+              profile={profile}
+              onSuccess={() => setIsDialogOpen(false)}
+            />
+          )}
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
-
-function InfoItem({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="flex items-start gap-4 group">
-      <div className="text-muted-foreground mt-1 group-hover:text-primary transition-colors">
-        {icon}
-      </div>
-      <div className="space-y-1">
-        <p className="text-sm font-semibold text-muted-foreground uppercase tracking-tight">
-          {label}
-        </p>
-        <p className="text-lg font-medium text-foreground tracking-tight">
-          {value}
-        </p>
-      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useMutation } from "convex/react";
+import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,9 +21,7 @@ import {
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
-import { ShieldCheck, Loader2 } from "lucide-react";
-import { Id } from "@/convex/_generated/dataModel";
+import { ShieldCheck } from "lucide-react";
 import {
   getAllDivisions,
   getDistrictsByDivision,
@@ -57,57 +55,42 @@ const formSchema = z.object({
   subDistrict: z.string().min(1, "Sub-district is required"),
 });
 
-export function ProfileForm() {
-  const profile = useQuery(api.users.getMyProfile);
+type ProfileData = {
+  age: number;
+  bmi: number;
+  bloodType: string;
+  hemoglobinLevel: number;
+  phoneNumber: string;
+  diseases: string[];
+  lastDonationDate: number;
+  division?: string;
+  district?: string;
+  subDistrict?: string;
+};
+
+export function ProfileForm({
+  profile,
+  onSuccess,
+}: {
+  profile?: ProfileData | null;
+  onSuccess: () => void;
+}) {
   const updateProfile = useMutation(api.users.updateProfile);
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const isProfileComplete = (
-    p:
-      | {
-          _id: Id<"profiles">;
-          _creationTime: number;
-          age: number;
-          bmi: number;
-          bloodType: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
-          hemoglobinLevel: number;
-          phoneNumber: string;
-          diseases: string[];
-          lastDonationDate: number;
-          userId: string;
-          division?: string;
-          district?: string;
-          subDistrict?: string;
-        }
-      | null
-      | undefined,
-  ) => {
-    if (!p) return false;
-    return !!(
-      p.age > 0 &&
-      p.bloodType &&
-      p.bmi > 0 &&
-      p.hemoglobinLevel > 0 &&
-      p.phoneNumber &&
-      p.division &&
-      p.district &&
-      p.subDistrict
-    );
-  };
 
   const form = useForm({
     defaultValues: {
-      age: 0,
-      bmi: 0,
-      bloodType: "A+" as (typeof bloodTypes)[number],
-      hemoglobinLevel: 0,
-      phoneNumber: "",
-      diseases: "",
-      lastDonationDate: "",
-      division: "",
-      district: "",
-      subDistrict: "",
+      age: profile?.age ?? 0,
+      bmi: profile?.bmi ?? 0,
+      bloodType: (profile?.bloodType ?? "A+") as (typeof bloodTypes)[number],
+      hemoglobinLevel: profile?.hemoglobinLevel ?? 0,
+      phoneNumber: profile?.phoneNumber ?? "",
+      diseases: profile?.diseases?.join(", ") ?? "",
+      lastDonationDate: profile?.lastDonationDate
+        ? new Date(profile.lastDonationDate).toISOString().split("T")[0]
+        : "",
+      division: profile?.division ?? "",
+      district: profile?.district ?? "",
+      subDistrict: profile?.subDistrict ?? "",
     } satisfies z.infer<typeof formSchema>,
     validators: {
       onChange: formSchema,
@@ -127,7 +110,7 @@ export function ProfileForm() {
             : 0,
         });
         toast.success("Profile updated successfully!");
-        setIsDialogOpen(false);
+        onSuccess();
       } catch (error) {
         if (error instanceof Error) {
           toast.error(error.message);
@@ -137,41 +120,6 @@ export function ProfileForm() {
       }
     },
   });
-
-  if (profile) {
-    if (!isProfileComplete(profile)) {
-      setIsDialogOpen(true);
-    }
-  } else if (profile === null) {
-    setIsDialogOpen(true);
-  }
-
-  useEffect(() => {
-    if (profile) {
-      form.reset({
-        age: profile.age,
-        bmi: profile.bmi,
-        bloodType: profile.bloodType as (typeof bloodTypes)[number],
-        hemoglobinLevel: profile.hemoglobinLevel,
-        phoneNumber: profile.phoneNumber,
-        diseases: profile.diseases.join(", "),
-        lastDonationDate: profile.lastDonationDate
-          ? new Date(profile.lastDonationDate).toISOString().split("T")[0]
-          : "",
-        division: profile.division || "",
-        district: profile.district || "",
-        subDistrict: profile.subDistrict || "",
-      });
-    }
-  }, [form, profile, isDialogOpen]);
-
-  if (profile === undefined) {
-    return (
-      <div className="flex h-[80vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   return (
     <form
