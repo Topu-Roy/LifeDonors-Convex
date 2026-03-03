@@ -14,6 +14,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   CheckCircle2,
@@ -26,6 +27,9 @@ import { toast } from "sonner";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 
 export default function DashboardPage() {
+  const searchParams = useSearchParams();
+  const defaultTab = searchParams.get("tab") || "requests";
+
   const myRequests = useQuery(api.users.getMyRequests);
   const myDonations = useQuery(api.users.getMyDonations);
   const updateDonationStatus = useMutation(api.users.updateDonationStatus);
@@ -74,7 +78,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="requests" className="space-y-6">
+      <Tabs defaultValue={defaultTab} className="space-y-6">
         <TabsList className="grid w-full max-w-[400px] grid-cols-2">
           <TabsTrigger value="requests" className="gap-2">
             <MessageSquare className="h-4 w-4" />

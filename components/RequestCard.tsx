@@ -24,14 +24,18 @@ type RequestCardProps = {
       donor?: Doc<"profiles"> | null;
     })[];
   };
+  isOwner?: boolean;
 };
 
-export function RequestCard({ request }: RequestCardProps) {
+export function RequestCard({
+  request,
+  isOwner: isOwnerProp,
+}: RequestCardProps) {
   const user = useQuery(api.users.getMyProfile);
   const acceptRequest = useMutation(api.users.acceptRequest);
   const cancelRequest = useMutation(api.users.cancelRequest);
 
-  const isOwner = user?._id === request.requesterId;
+  const isOwner = isOwnerProp ?? user?._id === request.requesterId;
 
   const urgencyColors = {
     Low: "bg-muted text-muted-foreground",
