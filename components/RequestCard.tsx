@@ -10,11 +10,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, User, Clock } from "lucide-react";
-import { Doc, Id } from "@/convex/_generated/dataModel";
-import { useMutation } from "convex/react";
+import { Doc } from "@/convex/_generated/dataModel";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 
 type RequestCardProps = {
   request: Doc<"requests"> & {
@@ -22,15 +24,14 @@ type RequestCardProps = {
       donor?: Doc<"profiles"> | null;
     })[];
   };
-  isOwner?: boolean;
 };
 
-export function RequestCard({ request, isOwner }: RequestCardProps) {
+export function RequestCard({ request }: RequestCardProps) {
+  const user = useQuery(api.users.getMyProfile);
   const acceptRequest = useMutation(api.users.acceptRequest);
   const cancelRequest = useMutation(api.users.cancelRequest);
-  const selectDonor = useMutation(api.users.selectDonor);
-  const rejectDonor = useMutation(api.users.rejectDonor);
-  const updateDonationStatus = useMutation(api.users.updateDonationStatus);
+
+  const isOwner = user?._id === request.requesterId;
 
   const urgencyColors = {
     Low: "bg-muted text-muted-foreground",
@@ -56,40 +57,6 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
       }
     } catch {
       toast.error("Failed to cancel request");
-    }
-  };
-
-  const handleSelectDonor = async (donationId: Id<"donations">) => {
-    try {
-      await selectDonor({ donationId });
-      toast.success("Donor selected!");
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : "Failed to select donor",
-      );
-    }
-  };
-
-  const handleRejectDonor = async (donationId: Id<"donations">) => {
-    try {
-      if (confirm("Reject this donor?")) {
-        await rejectDonor({ donationId });
-        toast.success("Donor rejected");
-      }
-    } catch {
-      toast.error("Failed to reject donor");
-    }
-  };
-
-  const handleUpdateStatus = async (
-    donationId: Id<"donations">,
-    status: "Donated" | "No Show",
-  ) => {
-    try {
-      await updateDonationStatus({ donationId, status });
-      toast.success(`Marked as ${status}`);
-    } catch {
-      toast.error("Failed to update status");
     }
   };
 
@@ -155,81 +122,19 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
         </div>
 
         {isOwner && request.volunteers && request.volunteers.length > 0 && (
-          <div className="mt-4 space-y-3">
-            <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-wider">
-              Volunteers ({request.volunteers.length})
-            </h4>
-            <div className="space-y-2">
-              {request.volunteers.map((v) => (
-                <div
-                  key={v._id}
-                  className={cn(
-                    "p-3 rounded-lg border text-sm",
-                    v.status === "Accepted" || v.status === "Donated"
-                      ? "bg-primary/5 border-primary/10"
-                      : "bg-muted/50 border-border",
-                  )}
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <p className="font-semibold text-xs">
-                        {v.donor?.phoneNumber || "Anonymous"}
-                      </p>
-                      <Badge variant="outline" className="text-[10px] h-4 px-1">
-                        {v.status}
-                      </Badge>
-                    </div>
-                    <div className="flex gap-1">
-                      {v.status === "Offered" && (
-                        <>
-                          <Button
-                            size="xs"
-                            variant="ghost"
-                            className="h-7 text-primary hover:text-primary hover:bg-primary/10"
-                            onClick={() => handleSelectDonor(v._id)}
-                          >
-                            Select
-                          </Button>
-                          <Button
-                            size="xs"
-                            variant="ghost"
-                            className="h-7 text-destructive hover:bg-destructive/10"
-                            onClick={() => handleRejectDonor(v._id)}
-                          >
-                            Reject
-                          </Button>
-                        </>
-                      )}
-                      {v.status === "Accepted" && (
-                        <>
-                          <Button
-                            size="xs"
-                            variant="ghost"
-                            className="h-7 text-primary hover:bg-primary/10"
-                            onClick={() => handleUpdateStatus(v._id, "Donated")}
-                          >
-                            Donated
-                          </Button>
-                          <Button
-                            size="xs"
-                            variant="ghost"
-                            className="h-7 text-destructive hover:bg-destructive/10"
-                            onClick={() => handleUpdateStatus(v._id, "No Show")}
-                          >
-                            NoShow
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  {(v.status === "Accepted" || v.status === "Donated") && (
-                    <p className="text-[10px] text-primary italic">
-                      Coordinating for bag fulfillment.
-                    </p>
-                  )}
-                </div>
-              ))}
+          <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/10">
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-medium text-primary">
+                {request.volunteers.length} volunteer
+                {request.volunteers.length > 1 ? "s" : ""}
+              </span>
+              <Badge variant="outline" className="text-[10px] h-4 px-1">
+                {acceptedCount} secured
+              </Badge>
             </div>
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Manage volunteers on the review page.
+            </p>
           </div>
         )}
 
@@ -249,18 +154,13 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
 
         {isOwner && (
           <div className="w-full space-y-2 pt-2 border-t">
-            <div className="flex justify-between items-center w-full">
-              <Badge
-                variant={request.status === "Open" ? "outline" : "default"}
-                className={cn(
-                  "w-full justify-center py-1",
-                  (request.status === "Accepted" ||
-                    request.status === "Completed") &&
-                    "bg-primary/10 text-primary border-primary/20",
-                )}
+            <div className="flex gap-2">
+              <Link
+                href={`/requests/${request._id}`}
+                className={cn(buttonVariants(), "w-full font-bold")}
               >
-                Status: {request.status}
-              </Badge>
+                Review Request
+              </Link>
             </div>
 
             {request.status === "Open" && (
@@ -268,7 +168,7 @@ export function RequestCard({ request, isOwner }: RequestCardProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleCancel}
-                className="w-full text-destructive border-destructive/20 hover:bg-destructive/5 text-xs"
+                className="w-full text-destructive border-destructive/20 hover:bg-destructive/5 text-[10px] h-7"
               >
                 Cancel Entire Request
               </Button>

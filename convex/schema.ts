@@ -28,7 +28,7 @@ export default defineSchema({
     .index("by_userId", ["userId"]),
 
   requests: defineTable({
-    requesterId: v.string(), // Better Auth userId
+    requesterId: v.id("profiles"),
     phoneNumber: v.string(),
     patientName: v.string(),
     hospitalName: v.string(),

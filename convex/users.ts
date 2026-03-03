@@ -168,9 +168,16 @@ export const createBloodRequest = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
 
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .first();
+
+    if (!profile) throw new Error("Profile not found");
+
     return await ctx.db.insert("requests", {
       ...args,
-      requesterId: identity.subject,
+      requesterId: profile._id,
       status: "Open",
       createdAt: Date.now(),
     });
@@ -246,9 +253,16 @@ export const getMyRequests = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
 
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .first();
+
+    if (!profile) throw new Error("Profile not found");
+
     const requests = await ctx.db
       .query("requests")
-      .withIndex("by_requesterId", (q) => q.eq("requesterId", identity.subject))
+      .withIndex("by_requesterId", (q) => q.eq("requesterId", profile._id))
       .order("desc")
       .collect();
 
@@ -506,5 +520,39 @@ export const withdrawDonation = mutation({
         }
       }
     }
+  },
+});
+
+export const getRequestById = query({
+  args: { requestId: v.id("requests") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    const request = await ctx.db.get(args.requestId);
+    if (!request || request.requesterId !== identity.subject) return null;
+
+    const donations = await ctx.db
+      .query("donations")
+      .withIndex("by_requestId", (q) => q.eq("requestId", args.requestId))
+      .collect();
+
+    const volunteers = await Promise.all(
+      donations.map(async (donation) => {
+        const donorProfile = await ctx.db
+          .query("profiles")
+          .withIndex("by_userId", (q) => q.eq("userId", donation.donorId))
+          .first();
+        return {
+          ...donation,
+          donor: donorProfile,
+        };
+      }),
+    );
+
+    return {
+      ...request,
+      volunteers,
+    };
   },
 });
