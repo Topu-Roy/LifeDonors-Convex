@@ -335,8 +335,13 @@ export const updateDonationStatus = mutation({
     const request = await ctx.db.get(donation.requestId);
     if (!request) throw new Error("Request not found");
 
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .first();
+
     const isDonor = donation.donorId === identity.subject;
-    const isRequester = request.requesterId === identity.subject;
+    const isRequester = profile && request.requesterId === profile._id;
 
     if (!isDonor && !isRequester) throw new Error("Forbidden");
 
@@ -386,7 +391,12 @@ export const selectDonor = mutation({
     if (!donation) throw new Error("Donation not found");
 
     const request = await ctx.db.get(donation.requestId);
-    if (!request || request.requesterId !== identity.subject) {
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .first();
+
+    if (!request || !profile || request.requesterId !== profile._id) {
       throw new Error("Forbidden");
     }
 
@@ -421,8 +431,14 @@ export const cancelRequest = mutation({
     if (!identity) throw new Error("Unauthorized");
 
     const request = await ctx.db.get(args.requestId);
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .first();
+
     if (!request) throw new Error("Request not found");
-    if (request.requesterId !== identity.subject) throw new Error("Forbidden");
+    if (!profile || request.requesterId !== profile._id)
+      throw new Error("Forbidden");
 
     await ctx.db.patch(args.requestId, { status: "Cancelled" });
 
@@ -445,7 +461,7 @@ export const cancelRequest = mutation({
 });
 
 export const rejectDonor = mutation({
-  args: { donationId: v.id("donations") },
+  args: { donationId: v.id("donations"), requestId: v.id("requests") },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
@@ -453,8 +469,13 @@ export const rejectDonor = mutation({
     const donation = await ctx.db.get(args.donationId);
     if (!donation) throw new Error("Donation not found");
 
-    const request = await ctx.db.get(donation.requestId);
-    if (!request || request.requesterId !== identity.subject) {
+    const request = await ctx.db.get(args.requestId);
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .first();
+
+    if (!request || !profile || request.requesterId !== profile._id) {
       throw new Error("Forbidden");
     }
 
@@ -529,8 +550,14 @@ export const getRequestById = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
 
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .first();
+
     const request = await ctx.db.get(args.requestId);
-    if (!request || request.requesterId !== identity.subject) return null;
+    if (!request || !profile || request.requesterId !== profile._id)
+      return null;
 
     const donations = await ctx.db
       .query("donations")

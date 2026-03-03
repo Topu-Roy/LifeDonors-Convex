@@ -70,11 +70,13 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
   const handleRejectDonor = async (donationId: Id<"donations">) => {
     try {
       if (confirm("Reject this donor?")) {
-        await rejectDonor({ donationId });
+        await rejectDonor({ donationId, requestId });
         toast.success("Donor rejected");
       }
-    } catch {
-      toast.error("Failed to reject donor");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to reject donor",
+      );
     }
   };
 
