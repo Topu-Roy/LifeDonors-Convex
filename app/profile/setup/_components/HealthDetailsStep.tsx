@@ -72,14 +72,14 @@ export function HealthDetailsStep() {
                     {field.state.value}
                   </span>
                 </div>
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {bloodTypes.map((type) => (
                     <button
                       key={type}
                       type="button"
                       onClick={() => field.handleChange(type)}
                       className={cn(
-                        "h-14 rounded-3xl flex items-center justify-center text-lg font-black transition-all border-2",
+                        "h-12 md:h-14 rounded-3xl flex items-center justify-center text-base md:text-lg font-black transition-all border-2",
                         field.state.value === type
                           ? "bg-primary border-primary text-white shadow-lg shadow-primary/25 scale-105"
                           : "bg-background border-primary/5 text-foreground hover:border-primary/20 hover:bg-primary/5",
@@ -115,7 +115,7 @@ export function HealthDetailsStep() {
                     onChange={(e) =>
                       field.handleChange(parseFloat(e.target.value) || 0)
                     }
-                    className="w-full h-20 rounded-3xl border-2 border-primary/5 bg-primary/5 px-6 pt-8 pb-3 text-2xl font-black focus:outline-none focus:border-primary/20 transition-all"
+                    className="w-full h-16 md:h-20 rounded-3xl border-2 border-primary/5 bg-primary/5 px-6 pt-6 md:pt-8 pb-3 text-xl md:text-2xl font-black focus:outline-none focus:border-primary/20 transition-all text-center md:text-left"
                   />
                   <span className="absolute top-3 left-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                     Current Weight
@@ -144,7 +144,7 @@ export function HealthDetailsStep() {
                     onChange={(e) =>
                       field.handleChange(parseFloat(e.target.value) || 0)
                     }
-                    className="w-full h-20 rounded-3xl border-2 border-primary/5 bg-primary/5 px-6 pt-8 pb-3 text-2xl font-black focus:outline-none focus:border-primary/20 transition-all"
+                    className="w-full h-16 md:h-20 rounded-3xl border-2 border-primary/5 bg-primary/5 px-6 pt-6 md:pt-8 pb-3 text-xl md:text-2xl font-black focus:outline-none focus:border-primary/20 transition-all text-center md:text-left"
                   />
                   <span className="absolute top-3 left-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                     Your Height
@@ -205,12 +205,12 @@ export function HealthDetailsStep() {
         </div>
       </FieldGroup>
 
-      <div className="pt-8 border-t flex justify-between gap-4">
+      <div className="pt-8 border-t flex flex-col-reverse sm:flex-row justify-between gap-4">
         <Button
           type="button"
           variant="outline"
           onClick={() => setCurrentStep(1)}
-          className="h-14 px-8 rounded-3xl font-bold border-2"
+          className="h-12 md:h-14 px-8 rounded-3xl font-bold border-2 w-full sm:w-auto"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
@@ -222,7 +222,7 @@ export function HealthDetailsStep() {
             <Button
               type="submit"
               disabled={!canSubmit || isSubmitting}
-              className="h-14 px-10 rounded-3xl font-black shadow-xl shadow-primary/20 gap-2 transition-all hover:scale-105 active:scale-95"
+              className="h-12 md:h-14 px-10 rounded-3xl font-black shadow-xl shadow-primary/20 gap-2 transition-all hover:scale-105 active:scale-95 w-full sm:w-auto"
             >
               Continue
               <ArrowRight className="h-5 w-5" />

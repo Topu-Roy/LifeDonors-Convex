@@ -71,29 +71,29 @@ export default function DashboardPage() {
       <Container className="py-12 space-y-8">
         {/* Header Section */}
         <div className="flex flex-col gap-2">
-          <h1 className="text-4xl font-black tracking-tight flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-primary/10">
-              <LayoutDashboard className="h-8 w-8 text-primary" />
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-primary/10 shrink-0">
+              <LayoutDashboard className="h-6 w-6 md:h-8 md:w-8 text-primary" />
             </div>
-            Dashboard Overview
+            <span>Dashboard Overview</span>
           </h1>
-          <p className="text-muted-foreground font-medium text-lg">
+          <p className="text-muted-foreground font-medium text-base md:text-lg leading-relaxed">
             Manage your blood donation requests and commitments in one place.
           </p>
         </div>
 
         <Tabs defaultValue={defaultTab} className="w-full space-y-8">
-          <TabsList className="bg-background border p-1 h-14 rounded-full w-full max-w-md shadow-sm">
+          <TabsList className="bg-background border p-1 h-12 md:h-14 rounded-full w-full max-w-md shadow-sm">
             <TabsTrigger
               value="requests"
-              className="rounded-full px-8 h-full font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all gap-2"
+              className="rounded-full px-4 md:px-8 h-full font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all gap-2 text-xs md:text-sm"
             >
               <MessageSquare className="h-4 w-4" />
               My Requests
             </TabsTrigger>
             <TabsTrigger
               value="donations"
-              className="rounded-full px-8 h-full font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all gap-2"
+              className="rounded-full px-4 md:px-8 h-full font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all gap-2 text-xs md:text-sm"
             >
               <History className="h-4 w-4" />
               My Donations
@@ -104,11 +104,14 @@ export default function DashboardPage() {
             value="requests"
             className="space-y-6 focus-visible:outline-none"
           >
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-black tracking-tight flex items-center gap-2">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2">
                 Active Requests
                 {myRequests && (
-                  <Badge variant="secondary" className="rounded-full px-2 py-0">
+                  <Badge
+                    variant="secondary"
+                    className="rounded-full px-2 py-0 text-[10px]"
+                  >
                     {myRequests.length}
                   </Badge>
                 )}
@@ -117,11 +120,12 @@ export default function DashboardPage() {
                 href="/requests"
                 className={cn(
                   buttonVariants({ size: "sm" }),
-                  "font-bold rounded-xl shadow-lg shadow-primary/20 gap-2",
+                  "font-bold rounded-xl shadow-lg shadow-primary/20 gap-2 shrink-0 h-10 px-4",
                 )}
               >
                 <Plus className="h-4 w-4" />
-                New Request
+                <span className="hidden sm:inline">New Request</span>
+                <span className="sm:hidden">New</span>
               </Link>
             </div>
 

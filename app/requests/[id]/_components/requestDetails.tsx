@@ -154,27 +154,31 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
         <div className="flex items-center justify-between">
           <Link
             href="/requests"
-            className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white dark:bg-slate-900 border border-primary/10 text-sm font-bold text-slate-600 hover:text-primary transition-all shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white dark:bg-slate-900 border border-primary/10 text-xs sm:text-sm font-bold text-slate-600 hover:text-primary transition-all shadow-sm w-fit"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Explorer
+            <span className="hidden xs:inline">Back to Explorer</span>
+            <span className="xs:hidden">Back</span>
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Badge
               className={cn(
-                "rounded-full px-4 py-1.5 text-[10px] font-black uppercase tracking-widest border-none",
+                "rounded-full px-3 sm:px-4 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-widest border-none",
                 urgencyBadgeStyles[request.urgency],
               )}
             >
-              {request.urgency} Priority
+              <span className="hidden xs:inline">
+                {request.urgency} Priority
+              </span>
+              <span className="xs:inline">{request.urgency}</span>
             </Badge>
             <Badge
               variant={request.status === "Completed" ? "default" : "outline"}
               className={cn(
-                "rounded-full px-4 py-1.5 text-[10px] font-black uppercase tracking-widest",
+                "rounded-full px-3 sm:px-4 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-widest",
                 request.status === "Completed" &&
-                  "bg-green-500 hover:bg-green-600 border-none",
+                  "bg-green-500 hover:bg-green-600 border-none text-white",
                 request.status === "Cancelled" &&
                   "bg-slate-200 text-slate-500 dark:bg-slate-800 border-none",
                 request.status === "Open" && "border-primary/20 text-primary",
@@ -198,10 +202,10 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
 
             <div className="space-y-4 flex-1">
               <div className="space-y-1">
-                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-slate-900 dark:text-slate-100">
                   {request.bloodTypeNeeded} Blood Required
                 </h1>
-                <p className="text-xl text-slate-500 dark:text-slate-400 font-medium">
+                <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 font-medium">
                   Patient Name:{" "}
                   <span className="text-slate-900 dark:text-slate-100 font-bold">
                     {request.patientName}
@@ -268,12 +272,12 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
                       <CardContent className="p-6 md:p-8">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                           <div className="flex items-center gap-6">
-                            <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 shrink-0">
-                              <User className="h-8 w-8" />
+                            <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 shrink-0">
+                              <User className="h-6 w-6 sm:h-8 sm:w-8" />
                             </div>
                             <div className="space-y-1">
                               <div className="flex items-center gap-3">
-                                <span className="font-black text-xl tracking-tight">
+                                <span className="font-black text-lg sm:text-xl tracking-tight">
                                   {v.donor?.phoneNumber || "Private Donor"}
                                 </span>
                                 <Badge
@@ -300,28 +304,31 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
                             </div>
                           </div>
 
-                          <div className="flex gap-3 w-full md:w-auto">
+                          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                             {v.status === "Offered" && (
                               <>
                                 <Button
-                                  className="flex-1 md:flex-none h-12 rounded-xl font-bold bg-primary text-slate-900 hover:scale-105 transition-transform"
+                                  className="w-full sm:w-auto h-12 rounded-xl font-bold bg-primary text-slate-900 hover:scale-105 transition-transform"
                                   onClick={() => handleSelectDonor(v._id)}
                                 >
                                   Select Donor
                                 </Button>
                                 <Button
                                   variant="ghost"
-                                  className="h-12 w-12 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
+                                  className="h-12 w-full sm:w-12 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center justify-center gap-2 sm:gap-0"
                                   onClick={() => handleRejectDonor(v._id)}
                                 >
                                   <XCircle className="h-6 w-6" />
+                                  <span className="sm:hidden font-bold">
+                                    Reject Donor
+                                  </span>
                                 </Button>
                               </>
                             )}
                             {v.status === "Accepted" && (
                               <>
                                 <Button
-                                  className="flex-1 md:flex-none h-12 rounded-xl font-bold bg-green-600 text-white hover:bg-green-700 hover:scale-105 transition-transform gap-2"
+                                  className="w-full sm:w-auto h-12 rounded-xl font-bold bg-green-600 text-white hover:bg-green-700 hover:scale-105 transition-transform gap-2"
                                   onClick={() =>
                                     handleUpdateStatus(v._id, "Donated")
                                   }
@@ -331,7 +338,7 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
                                 </Button>
                                 <Button
                                   variant="outline"
-                                  className="h-12 rounded-xl font-bold border-red-200 text-red-600 hover:bg-red-50 transition-all"
+                                  className="w-full sm:w-auto h-12 rounded-xl font-bold border-red-200 text-red-600 hover:bg-red-50 transition-all"
                                   onClick={() =>
                                     handleUpdateStatus(v._id, "No Show")
                                   }

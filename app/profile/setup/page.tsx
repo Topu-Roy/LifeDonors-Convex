@@ -72,16 +72,18 @@ export default function ProfileSetupPage() {
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-primary/10 shadow-sm border border-primary/20">
+              <div className="p-2 rounded-xl bg-primary/10 shadow-sm border border-primary/20 shrink-0">
                 <Droplet className="h-6 w-6 text-primary" />
               </div>
-              <h1 className="text-4xl font-black tracking-tight text-foreground">
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">
                 Profile Setup
               </h1>
             </div>
-            <p className="text-muted-foreground font-medium text-lg ml-1">
+            <p className="text-muted-foreground font-medium text-base md:text-lg ml-1">
               {steps[currentStep - 1].title}:{" "}
-              {steps[currentStep - 1].description}
+              <span className="md:inline hidden">
+                {steps[currentStep - 1].description}
+              </span>
             </p>
           </div>
 
@@ -99,7 +101,7 @@ export default function ProfileSetupPage() {
         </header>
 
         {/* Step Indicator (Visual) */}
-        <div className="hidden md:flex justify-between relative px-2">
+        <div className="flex justify-between relative px-2">
           <div className="absolute top-1/2 left-0 w-full h-1 bg-primary/5 -translate-y-1/2 z-0" />
           {steps.map((step) => (
             <div
@@ -108,7 +110,7 @@ export default function ProfileSetupPage() {
             >
               <div
                 className={cn(
-                  "size-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 border-4",
+                  "size-8 md:size-10 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-all duration-300 border-2 md:border-4",
                   currentStep > step.id
                     ? "bg-primary border-primary/20 text-white shadow-lg shadow-primary/20"
                     : currentStep === step.id
@@ -117,14 +119,14 @@ export default function ProfileSetupPage() {
                 )}
               >
                 {currentStep > step.id ? (
-                  <Check className="h-5 w-5" />
+                  <Check className="h-4 w-4 md:h-5 md:w-5" />
                 ) : (
                   step.id
                 )}
               </div>
               <span
                 className={cn(
-                  "text-[10px] font-black uppercase tracking-widest",
+                  "text-[8px] md:text-[10px] font-black uppercase tracking-widest",
                   currentStep === step.id
                     ? "text-primary"
                     : "text-muted-foreground",
@@ -137,7 +139,7 @@ export default function ProfileSetupPage() {
         </div>
 
         {/* Form Container */}
-        <div className="bg-background border-2 border-primary/5 rounded-3xl p-8 md:p-12 shadow-2xl shadow-primary/5">
+        <div className="bg-background border border-primary/5 rounded-3xl p-6 md:p-12 shadow-2xl shadow-primary/5">
           {currentStep === 1 && <BasicInfoStep />}
           {currentStep === 2 && <HealthDetailsStep />}
           {currentStep === 3 && <EligibilityStep />}

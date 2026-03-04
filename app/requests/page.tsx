@@ -4,7 +4,6 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { RequestCard } from "@/components/RequestCard";
 import { Filter } from "./_components/filters";
-import { CreateRequest } from "./_components/createRequest";
 import { Container } from "@/components/Container";
 import { useAtom } from "jotai";
 import {
@@ -14,11 +13,19 @@ import {
   filterSubDistrictAtom,
   filterUrgencyAtom,
 } from "@/state/requests/store";
-import { Search, X, Filter as FilterIcon } from "lucide-react";
+import { Search, X, Filter as FilterIcon, Plus } from "lucide-react";
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export default function RequestsPage() {
   const [filterBloodType, setFilterBloodType] = useAtom(filterBloodTypeAtom);
@@ -45,38 +52,87 @@ export default function RequestsPage() {
       r.bloodTypeNeeded.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  const activeFiltersCount = [
+    filterBloodType,
+    filterDivision,
+    filterDistrict,
+    filterSubDistrict,
+    filterUrgency,
+  ].filter((f) => f && f !== "ALL").length;
+
   return (
     <div className="min-h-screen bg-[#f6f8f6] dark:bg-[#102216]">
       <Container className="py-8">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div className="space-y-1">
-            <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-slate-100">
               Blood Requests Explorer
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 font-medium">
+            <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
               Find and respond to urgent blood needs in your area.
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-            <div className="relative group flex-1 sm:w-80">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-              <Input
-                placeholder="Search requests..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-11 h-12 rounded-full border-primary/10 bg-white/50 dark:bg-white/5 focus-visible:ring-primary/20 focus-visible:border-primary transition-all font-medium"
-              />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
+            <div className="flex items-center gap-2">
+              <div className="relative group flex-1 md:w-80">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+                <Input
+                  placeholder="Search requests..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-11 h-12 rounded-full border-primary/10 bg-white/50 dark:bg-white/5 focus-visible:ring-primary/20 focus-visible:border-primary transition-all font-medium text-base"
+                />
+              </div>
+
+              <Sheet>
+                <SheetTrigger
+                  render={(props) => (
+                    <Button
+                      {...props}
+                      variant="outline"
+                      size="icon"
+                      className="lg:hidden h-12 w-12 rounded-full border-primary/10 bg-white/50 dark:bg-white/5 relative shrink-0"
+                    >
+                      <FilterIcon className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+                      {activeFiltersCount > 0 && (
+                        <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center rounded-full bg-primary text-white text-[10px] border-2 border-background">
+                          {activeFiltersCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  )}
+                />
+                <SheetContent
+                  side="right"
+                  className="w-[85vw] sm:w-[400px] p-0"
+                >
+                  <SheetHeader className="p-6 border-b">
+                    <SheetTitle className="text-xl font-black flex items-center gap-2">
+                      <FilterIcon className="h-5 w-5 text-primary" />
+                      Filter Requests
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="p-6">
+                    <Filter />
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
-            <CreateRequest />
+            <Link href="/requests/new">
+              <Button className="gap-2 shadow-sm w-full sm:w-auto h-12 rounded-full px-6">
+                <Plus className="h-4 w-4" />
+                Post a Request
+              </Button>
+            </Link>
           </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Sidebar Filters */}
-          <aside className="w-full lg:w-72 shrink-0 space-y-8">
-            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-primary/10 shadow-sm">
+          <aside className="hidden lg:block w-72 shrink-0 space-y-8">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-primary/10 shadow-sm sticky top-24">
               <div className="flex items-center gap-2 mb-6">
                 <FilterIcon className="h-5 w-5 text-primary" />
                 <h2 className="text-xl font-black tracking-tight">Filters</h2>

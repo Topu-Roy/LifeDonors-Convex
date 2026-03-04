@@ -117,36 +117,40 @@ export default function ProfilePage() {
             <Droplet className="h-64 w-64 text-primary" />
           </div>
 
-          <div className="flex items-center gap-6 relative z-10">
-            <Avatar className="h-24 w-24 border-4 border-primary/20 shadow-lg">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10 text-center sm:text-left">
+            <Avatar className="h-24 w-24 border-4 border-primary/20 shadow-lg shrink-0">
               <AvatarImage src={profile.imageUrl} alt={profile.name} />
               <AvatarFallback className="bg-primary/10 text-primary font-bold text-2xl">
                 {initials}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col justify-center">
-              <h1 className="text-4xl font-black tracking-tight text-foreground">
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground line-clamp-2">
                 {profile.name}
               </h1>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-1">
                 <Badge
                   variant="secondary"
                   className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors gap-1 px-2 py-0.5"
                 >
                   <Verified className="h-3 w-3" />
-                  Dedicated Blood Donor
+                  <span className="text-[10px] sm:text-xs">
+                    Dedicated Blood Donor
+                  </span>
                 </Badge>
               </div>
-              <p className="text-muted-foreground font-medium mt-2 flex items-center gap-1.5 text-sm">
-                <MapPin className="h-4 w-4 text-primary" />
-                {profile.subDistrict}, {profile.district}, {profile.division}
+              <p className="text-muted-foreground font-medium mt-3 flex items-center justify-center sm:justify-start gap-1.5 text-sm">
+                <MapPin className="h-4 w-4 text-primary shrink-0" />
+                <span className="truncate">
+                  {profile.subDistrict}, {profile.district}
+                </span>
               </p>
             </div>
           </div>
 
           <Button
             onClick={() => setIsDialogOpen(true)}
-            className="rounded-2xl h-12 px-6 font-bold shadow-lg shadow-primary/20 gap-2 relative z-10"
+            className="rounded-2xl h-12 px-6 font-bold shadow-lg shadow-primary/20 gap-2 relative z-10 w-full md:w-auto"
           >
             <Edit2 className="h-4 w-4" />
             Edit Profile
@@ -166,16 +170,15 @@ export default function ProfilePage() {
             <div className="flex flex-col gap-2 relative z-10">
               <div className="flex items-center gap-2">
                 {eligibility.eligible ? (
-                  <CheckCircle2 className="h-6 w-6 text-primary" />
+                  <CheckCircle2 className="h-6 w-6 text-primary shrink-0" />
                 ) : (
-                  <AlertCircle className="h-6 w-6 text-amber-500" />
+                  <AlertCircle className="h-6 w-6 text-amber-500 shrink-0" />
                 )}
-                <h3 className="text-2xl font-black tracking-tight">
-                  Eligibility Status:{" "}
-                  {eligibility.eligible ? "Eligible" : "Pending"}
+                <h3 className="text-xl md:text-2xl font-black tracking-tight">
+                  Eligibility: {eligibility.eligible ? "Eligible" : "Pending"}
                 </h3>
               </div>
-              <p className="text-muted-foreground font-medium text-lg leading-relaxed max-w-2xl">
+              <p className="text-muted-foreground font-medium text-base md:text-lg leading-relaxed max-w-2xl">
                 {eligibility.eligible
                   ? "Great news! You are currently eligible to make a life-saving blood donation today. Your community needs you."
                   : (eligibility.reason ??

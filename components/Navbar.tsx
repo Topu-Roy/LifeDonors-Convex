@@ -15,6 +15,7 @@ import {
   LifeBuoy,
   PlusCircle,
   LogOut,
+  Menu,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "convex/react";
@@ -29,6 +30,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
 import { Container } from "./Container";
@@ -62,11 +70,13 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <Container className="flex justify-between h-14 items-center">
-        <Link href="/" className="flex items-center space-x-2">
+        <Link href="/" className="flex items-center space-x-2 shrink-0">
           <Droplet className="h-6 w-6 text-primary" />
-          <span className="hidden font-bold sm:inline-block">LifeDonors</span>
+          <span className="font-bold sm:inline-block">LifeDonors</span>
         </Link>
-        <nav className="flex items-center space-x-6 text-sm font-medium">
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
           {routes.map((route) => (
             <Link
               key={route.href}
@@ -82,7 +92,67 @@ export function Navbar() {
             </Link>
           ))}
         </nav>
-        <UserMenu />
+
+        <div className="flex items-center gap-4">
+          <UserMenu />
+
+          {/* Mobile Navigation */}
+          <Sheet>
+            <SheetTrigger
+              render={(props) => (
+                <Button
+                  {...props}
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden rounded-xl border border-border/50 bg-background/50 hover:bg-background"
+                >
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle Menu</span>
+                </Button>
+              )}
+            />
+            <SheetContent
+              side="right"
+              className="w-[300px] p-0 border-l border-border/50 bg-background/95 backdrop-blur-xl"
+            >
+              <SheetHeader className="p-6 border-b border-border/50">
+                <SheetTitle className="flex items-center gap-2">
+                  <Droplet className="h-6 w-6 text-primary" />
+                  <span className="font-black tracking-tighter text-xl">
+                    LifeDonors
+                  </span>
+                </SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col gap-2 p-4">
+                {routes.map((route) => (
+                  <Link
+                    key={route.href}
+                    href={route.href}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-4 rounded-2xl text-base font-bold transition-all hover:translate-x-1",
+                      pathname === route.href
+                        ? "bg-primary text-white shadow-lg shadow-primary/20"
+                        : "text-muted-foreground hover:bg-muted font-black",
+                    )}
+                  >
+                    <route.icon
+                      className={cn(
+                        "h-5 w-5",
+                        pathname === route.href ? "text-white" : "text-primary",
+                      )}
+                    />
+                    {route.label}
+                  </Link>
+                ))}
+              </div>
+              <div className="mt-auto p-4 border-t border-border/50 bg-muted/30">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground text-center">
+                  v1.0.4 • Giving Life Together
+                </p>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </Container>
     </header>
   );
@@ -213,7 +283,7 @@ function UserMenu() {
           </DropdownMenuItem>
           <DropdownMenuItem className="rounded-md text-foreground/80">
             <Link
-              href="/requests/_components/createRequest"
+              href="/requests/new"
               className="flex items-center w-full cursor-pointer py-1"
             >
               <PlusCircle className="mr-2 h-4 w-4" />

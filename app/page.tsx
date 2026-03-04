@@ -53,7 +53,7 @@ export default function Home() {
             }}
           >
             <div className="relative z-10 flex flex-col gap-4 text-center max-w-3xl">
-              <h1 className="text-white text-5xl md:text-7xl font-black leading-[1.1] tracking-tighter animate-in fade-in slide-in-from-top-4 duration-1000">
+              <h1 className="text-white text-4xl sm:text-5xl md:text-7xl font-black leading-[1.1] tracking-tighter animate-in fade-in slide-in-from-top-4 duration-1000">
                 Give Blood.
                 <br />
                 <span className="text-primary italic">Save a Life.</span>
@@ -64,12 +64,12 @@ export default function Home() {
                 your community.
               </p>
             </div>
-            <div className="relative z-10 flex flex-wrap gap-4 justify-center mt-4">
+            <div className="relative z-10 flex flex-col sm:flex-row gap-4 justify-center mt-4 w-full sm:w-auto">
               <Link
                 href="/requests"
                 className={cn(
                   buttonVariants({ size: "lg" }),
-                  "h-14 px-8 text-lg font-bold shadow-xl hover:scale-105 transition-all gap-2",
+                  "h-14 px-8 text-lg font-bold shadow-xl hover:scale-105 transition-all gap-2 w-full sm:w-auto",
                 )}
               >
                 <Search className="h-5 w-5" />
@@ -79,7 +79,7 @@ export default function Home() {
                 href="/profile"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
-                  "h-14 px-8 text-lg font-bold shadow-xl bg-white text-slate-900 hover:bg-slate-100 hover:scale-105 transition-all gap-2",
+                  "h-14 px-8 text-lg font-bold shadow-xl bg-white text-slate-900 hover:bg-slate-100 hover:scale-105 transition-all gap-2 w-full sm:w-auto",
                 )}
               >
                 <HandHeart className="h-5 w-5" />
@@ -123,14 +123,14 @@ export default function Home() {
         <Container className="py-12 flex flex-col lg:flex-row gap-12">
           {/* Left Column: Urgent Needs */}
           <div className="flex-1 flex flex-col gap-6">
-            <div className="flex items-center justify-between pb-2 border-b border-border">
-              <h2 className="text-2xl font-black tracking-tight flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border">
+              <h2 className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2">
                 <AlertCircle className="h-6 w-6 text-primary" />
                 Urgent Needs
               </h2>
               <Link
                 href="/requests"
-                className="text-sm font-bold text-primary hover:underline flex items-center gap-1"
+                className="text-sm font-bold text-primary hover:underline flex items-center gap-1 w-fit"
               >
                 View All
                 <ArrowRight className="h-4 w-4" />
