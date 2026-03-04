@@ -15,7 +15,8 @@ import { ArrowRight, ArrowLeft, Activity, Ruler, Weight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
-import { bloodTypes } from "../page";
+
+const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] as const;
 
 const step2Schema = z.object({
   bloodType: z.enum(bloodTypes),
@@ -174,7 +175,10 @@ export function HealthDetailsStep() {
                 </div>
                 <Slider
                   value={[field.state.value]}
-                  onValueChange={(v) => field.handleChange((v as number[])[0])}
+                  onValueChange={(v) => {
+                    const val = Array.isArray(v) ? v[0] : v;
+                    field.handleChange(Math.round(val * 10) / 10);
+                  }}
                   min={10}
                   max={20}
                   step={0.1}
