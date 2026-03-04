@@ -1,15 +1,15 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Phone, User, Clock } from "lucide-react";
+import {
+  MapPin,
+  User,
+  Clock,
+  Hospital,
+  ChevronRight,
+  TrendingUp,
+} from "lucide-react";
 import { Doc } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -27,159 +27,168 @@ type RequestCardProps = {
   isOwner?: boolean;
 };
 
+function timeAgo(date: number) {
+  const seconds = Math.floor((Date.now() - date) / 1000);
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
+
 export function RequestCard({
   request,
   isOwner: isOwnerProp,
 }: RequestCardProps) {
   const user = useQuery(api.users.getMyProfile);
   const acceptRequest = useMutation(api.users.acceptRequest);
-  const cancelRequest = useMutation(api.users.cancelRequest);
 
   const isOwner = isOwnerProp ?? user?._id === request.requesterId;
 
-  const urgencyColors = {
-    Low: "bg-muted text-muted-foreground",
-    Medium: "bg-secondary text-secondary-foreground",
-    High: "bg-primary/20 text-primary border-primary/30",
-    Critical: "bg-destructive text-destructive-foreground animate-pulse",
-  };
-
-  const handleAccept = async () => {
+  const handleAccept = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     try {
       await acceptRequest({ requestId: request._id });
       toast.success("You have volunteered to help!");
-    } catch {
-      toast.error("Failed to volunteer");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to volunteer");
     }
   };
 
-  const handleCancel = async () => {
-    try {
-      if (confirm("Are you sure you want to cancel this request?")) {
-        await cancelRequest({ requestId: request._id });
-        toast.success("Request cancelled");
-      }
-    } catch {
-      toast.error("Failed to cancel request");
-    }
+  const urgencyStyles = {
+    Low: "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900",
+    Medium:
+      "border-orange-200 dark:border-orange-900/50 bg-white dark:bg-slate-900",
+    High: "border-red-200 dark:border-red-900/50 bg-white dark:bg-slate-900",
+    Critical:
+      "border-red-400 dark:border-red-800 bg-red-50/30 dark:bg-red-950/20",
   };
 
-  const acceptedCount =
-    request.volunteers?.filter(
-      (v) => v.status === "Accepted" || v.status === "Donated",
-    ).length || 0;
+  const urgencyBadgeStyles = {
+    Low: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
+    Medium:
+      "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300",
+    High: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300",
+    Critical: "bg-red-600 text-white animate-pulse",
+  };
 
   return (
-    <Card
+    <div
       className={cn(
-        "overflow-hidden border-l-4 shadow-sm hover:shadow-md transition-shadow",
-        request.status === "Cancelled"
-          ? "border-l-muted-foreground/30 opacity-75"
-          : "border-l-primary",
+        "flex flex-col rounded-[2.5rem] border-2 p-1 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden group",
+        urgencyStyles[request.urgency],
       )}
     >
-      <CardHeader className="pb-2">
+      <div className="p-7 flex flex-col h-full gap-5">
+        {/* Card Top: Blood Type & Urgency */}
         <div className="flex justify-between items-start">
-          <CardTitle className="text-xl font-bold flex flex-col tracking-tight">
-            <div className="flex items-center gap-2">
-              <span className="text-primary">{request.bloodTypeNeeded}</span>
-              <span>Blood Needed</span>
+          <div className="flex items-center gap-4">
+            <div
+              className={cn(
+                "flex h-16 w-16 items-center justify-center rounded-3xl font-black text-2xl shadow-inner",
+                request.urgency === "Critical" || request.urgency === "High"
+                  ? "bg-red-600 text-white shadow-red-900/20"
+                  : "bg-primary text-slate-900 shadow-primary-900/10",
+              )}
+            >
+              {request.bloodTypeNeeded}
             </div>
-            <span className="text-xs font-normal text-muted-foreground mt-1">
-              Goal: {request.numberOfBags} bag
-              {request.numberOfBags > 1 ? "s" : ""}
-              {isOwner && ` (${acceptedCount} secured)`}
-            </span>
-          </CardTitle>
-          <Badge className={urgencyColors[request.urgency]} variant="secondary">
-            {request.urgency}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <User className="h-4 w-4" />
-          <span>
-            Patient:{" "}
-            <span className="text-foreground font-medium">
-              {request.patientName}
-            </span>
-          </span>
-        </div>
-        <div className="flex items-start gap-2 text-sm text-muted-foreground">
-          <MapPin className="h-4 w-4 mt-0.5" />
-          <div className="flex flex-col">
-            <span className="text-foreground font-medium">
-              {request.hospitalName}
-            </span>
-            <span>{request.hospitalLocation}</span>
-            {request.division && (
-              <span className="text-[10px] italic text-muted-foreground mt-0.5">
-                {request.subDistrict}, {request.district}, {request.division}
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Phone className="h-4 w-4" />
-          <span>Contact: {request.contactNumber}</span>
-        </div>
-
-        {isOwner && request.volunteers && request.volunteers.length > 0 && (
-          <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/10">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-medium text-primary">
-                {request.volunteers.length} volunteer
-                {request.volunteers.length > 1 ? "s" : ""}
-              </span>
-              <Badge variant="outline" className="text-[10px] h-4 px-1">
-                {acceptedCount} secured
+            <div>
+              <Badge
+                className={cn(
+                  "rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border-none mb-1.5",
+                  urgencyBadgeStyles[request.urgency],
+                )}
+              >
+                {request.urgency}
               </Badge>
+              <p className="font-bold text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <TrendingUp className="h-3 w-3 text-primary" />
+                {request.numberOfBags}{" "}
+                {request.numberOfBags > 1 ? "Bags" : "Bag"} Needed
+              </p>
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1">
-              Manage volunteers on the review page.
-            </p>
           </div>
-        )}
-
-        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-4">
-          <Clock className="h-3 w-3" />
-          <span>
-            Requested {new Date(request.createdAt).toLocaleDateString()}
+          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800/50 px-3 py-1 rounded-full uppercase tracking-tighter">
+            {timeAgo(request.createdAt)}
           </span>
         </div>
-      </CardContent>
-      <CardFooter className="pt-2 flex flex-col gap-2">
-        {!isOwner && request.status === "Open" && (
-          <Button onClick={handleAccept} className="w-full font-bold">
-            Volunteer Blood
-          </Button>
-        )}
 
-        {isOwner && (
-          <div className="w-full space-y-2 pt-2 border-t">
+        {/* Card Body: Details */}
+        <div className="flex-1 space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-400 shrink-0">
+              <Hospital className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-black text-slate-900 dark:text-slate-100 truncate text-lg tracking-tight">
+                {request.hospitalName}
+              </p>
+              <p className="text-slate-500 dark:text-slate-400 text-xs font-medium truncate flex items-center gap-1">
+                <MapPin className="h-3 w-3 shrink-0" />
+                {request.hospitalLocation}, {request.district}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+              <User className="h-4 w-4 text-primary shrink-0" />
+              <p className="text-[11px] font-bold text-slate-600 dark:text-slate-400 truncate">
+                {request.patientName}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+              <Clock className="h-4 w-4 text-primary shrink-0" />
+              <p className="text-[11px] font-bold text-slate-600 dark:text-slate-400 truncate">
+                By{" "}
+                {new Date(request.createdAt + 86400000).toLocaleDateString([], {
+                  month: "short",
+                  day: "numeric",
+                })}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Card Action */}
+        <div className="pt-2">
+          {isOwner ? (
+            <Link
+              href={`/requests/${request._id}`}
+              className={cn(
+                buttonVariants({ variant: "default" }),
+                "w-full h-14 rounded-2xl font-black text-base shadow-lg shadow-primary/20 gap-2 transition-all hover:scale-[1.02] active:scale-95 bg-primary text-slate-900 group",
+              )}
+            >
+              Review Request
+              <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          ) : (
             <div className="flex gap-2">
               <Link
                 href={`/requests/${request._id}`}
-                className={cn(buttonVariants(), "w-full font-bold")}
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "flex-1 h-14 rounded-2xl font-bold border-primary/20 hover:bg-primary/5 text-slate-600 dark:text-slate-300",
+                )}
               >
-                Review Request
+                Details
               </Link>
-            </div>
-
-            {request.status === "Open" && (
               <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCancel}
-                className="w-full text-destructive border-destructive/20 hover:bg-destructive/5 text-[10px] h-7"
+                onClick={handleAccept}
+                className={cn(
+                  "flex-2 h-14 rounded-2xl font-black text-base shadow-lg shadow-primary/20 gap-2 transition-all hover:scale-[1.02] active:scale-95 bg-primary text-slate-900",
+                )}
               >
-                Cancel Entire Request
+                Volunteer Now
               </Button>
-            )}
-          </div>
-        )}
-      </CardFooter>
-    </Card>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

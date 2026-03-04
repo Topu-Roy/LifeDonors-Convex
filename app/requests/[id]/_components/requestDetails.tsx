@@ -6,14 +6,20 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   MapPin,
   Phone,
   User,
-  Clock,
   ArrowLeft,
   AlertCircle,
+  Hospital,
+  Droplets,
+  CheckCircle2,
+  XCircle,
+  ShieldAlert,
+  Calendar,
+  TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -30,27 +36,40 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
 
   if (request === undefined) {
     return (
-      <div className="container mx-auto px-4 py-8 animate-pulse space-y-6">
-        <div className="h-8 w-48 bg-muted rounded" />
-        <div className="h-64 w-full bg-muted rounded-xl" />
-        <div className="h-96 w-full bg-muted rounded-xl" />
+      <div className="container mx-auto px-6 py-12 max-w-5xl space-y-8 animate-pulse">
+        <div className="h-10 w-48 bg-muted rounded-2xl" />
+        <div className="h-64 w-full bg-muted rounded-[2.5rem]" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="md:col-span-2 h-96 bg-muted rounded-[2.5rem]" />
+          <div className="h-96 bg-muted rounded-[2.5rem]" />
+        </div>
       </div>
     );
   }
 
   if (request === null) {
     return (
-      <div className="container mx-auto px-4 py-20 text-center space-y-4">
-        <h1 className="text-2xl font-bold">Request Not Found</h1>
-        <p className="text-muted-foreground">
-          This request doesn&apos;t exist or you don&apos;t have permission to
-          view it.
-        </p>
+      <div className="container mx-auto px-6 py-24 text-center space-y-6 max-w-md">
+        <div className="bg-red-100 dark:bg-red-900/20 h-24 w-24 rounded-[2rem] flex items-center justify-center mx-auto">
+          <AlertCircle className="h-12 w-12 text-red-600" />
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-3xl font-black tracking-tight">
+            Request Not Found
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+            This request doesn&apos;t exist or you don&apos;t have permission to
+            view it.
+          </p>
+        </div>
         <Link
           href="/requests"
-          className={cn(buttonVariants({ variant: "outline" }))}
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "rounded-2xl h-12 px-8 font-bold border-primary/20",
+          )}
         >
-          Back to Requests
+          Back to All Requests
         </Link>
       </div>
     );
@@ -119,261 +138,356 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
     100,
   );
 
-  const urgencyColors = {
-    Low: "bg-muted text-muted-foreground",
-    Medium: "bg-secondary text-secondary-foreground",
-    High: "bg-primary/20 text-primary border-primary/30",
-    Critical: "bg-destructive text-destructive-foreground animate-pulse",
+  const urgencyBadgeStyles = {
+    Low: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
+    Medium:
+      "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300",
+    High: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300",
+    Critical: "bg-red-600 text-white animate-pulse",
   };
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8">
-      <Link
-        href="/requests"
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-2"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to All Requests
-      </Link>
 
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b pb-6">
-        <div className="space-y-2">
+  return (
+    <div className="min-h-screen bg-[#f6f8f6] dark:bg-[#102216]">
+      <div className="max-w-[1280px] mx-auto px-6 py-10 md:px-10 space-y-10">
+        {/* Top Navbar/Back */}
+        <div className="flex items-center justify-between">
+          <Link
+            href="/requests"
+            className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white dark:bg-slate-900 border border-primary/10 text-sm font-bold text-slate-600 hover:text-primary transition-all shadow-sm"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Explorer
+          </Link>
+
           <div className="flex items-center gap-3">
-            <h1 className="text-4xl font-black tracking-tight">
-              {request.bloodTypeNeeded} Needed
-            </h1>
-            <Badge className={urgencyColors[request.urgency]}>
-              {request.urgency}
+            <Badge
+              className={cn(
+                "rounded-full px-4 py-1.5 text-[10px] font-black uppercase tracking-widest border-none",
+                urgencyBadgeStyles[request.urgency],
+              )}
+            >
+              {request.urgency} Priority
             </Badge>
             <Badge
               variant={request.status === "Completed" ? "default" : "outline"}
               className={cn(
+                "rounded-full px-4 py-1.5 text-[10px] font-black uppercase tracking-widest",
                 request.status === "Completed" &&
-                  "bg-green-500 hover:bg-green-600",
+                  "bg-green-500 hover:bg-green-600 border-none",
                 request.status === "Cancelled" &&
-                  "bg-destructive/10 text-destructive",
+                  "bg-slate-200 text-slate-500 dark:bg-slate-800 border-none",
+                request.status === "Open" && "border-primary/20 text-primary",
               )}
             >
               {request.status}
             </Badge>
           </div>
-          <p className="text-xl text-muted-foreground">
-            Patient:{" "}
-            <span className="text-foreground font-semibold">
-              {request.patientName}
-            </span>
-          </p>
         </div>
-        <div className="text-sm text-muted-foreground flex items-center gap-2">
-          <Clock className="h-4 w-4" />
-          Requested on {new Date(request.createdAt).toLocaleDateString()}
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2 space-y-8">
-          <section className="space-y-4">
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              Volunteers
-              <Badge variant="secondary" className="rounded-full">
-                {request.volunteers.length}
-              </Badge>
-            </h2>
+        {/* Hero Section */}
+        <section className="bg-white dark:bg-slate-900 rounded-[3rem] p-8 md:p-12 border border-primary/10 shadow-xl shadow-primary/5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-12 opacity-5 dark:opacity-10 pointer-events-none">
+            <Droplets className="h-48 w-48 text-primary" />
+          </div>
 
-            {request.volunteers.length === 0 ? (
-              <div className="py-12 text-center rounded-xl border-2 border-dashed border-border bg-muted/20">
-                <AlertCircle className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
-                <p className="text-muted-foreground font-medium">
-                  No volunteers yet.
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Once someone offers to help, they will appear here.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {request.volunteers.map((v) => (
-                  <Card
-                    key={v._id}
-                    className={cn(
-                      "overflow-hidden transition-all",
-                      v.status === "Accepted" || v.status === "Donated"
-                        ? "border-primary/50 shadow-md"
-                        : "border-border",
-                    )}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-lg">
-                              {v.donor?.phoneNumber || "Private Donor"}
-                            </span>
-                            <Badge
-                              variant={
-                                v.status === "Donated"
-                                  ? "default"
-                                  : v.status === "Accepted"
-                                    ? "secondary"
-                                    : v.status === "Offered"
-                                      ? "outline"
-                                      : "ghost"
-                              }
-                              className={cn(
-                                v.status === "Donated" && "bg-green-500",
-                                v.status === "Accepted" &&
-                                  "bg-primary/20 text-primary border-primary/30",
-                              )}
-                            >
-                              {v.status}
-                            </Badge>
-                          </div>
-                          {v.donor && (
-                            <p className="text-xs text-muted-foreground">
-                              {v.donor.division &&
-                                `${v.donor.subDistrict}, ${v.donor.district}`}
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="flex gap-2">
-                          {v.status === "Offered" && (
-                            <>
-                              <Button
-                                size="sm"
-                                onClick={() => handleSelectDonor(v._id)}
-                              >
-                                Select Donor
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="text-destructive hover:bg-destructive/10"
-                                onClick={() => handleRejectDonor(v._id)}
-                              >
-                                Reject
-                              </Button>
-                            </>
-                          )}
-                          {v.status === "Accepted" && (
-                            <>
-                              <Button
-                                size="sm"
-                                onClick={() =>
-                                  handleUpdateStatus(v._id, "Donated")
-                                }
-                                className="bg-green-600 hover:bg-green-700"
-                              >
-                                Mark Donated
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-destructive border-destructive/20 hover:bg-destructive/5"
-                                onClick={() =>
-                                  handleUpdateStatus(v._id, "No Show")
-                                }
-                              >
-                                No Show
-                              </Button>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </section>
-
-          {request.status !== "Cancelled" && request.status !== "Completed" && (
-            <div className="pt-8 border-t">
-              <h3 className="text-sm font-bold uppercase text-muted-foreground tracking-widest mb-4">
-                Danger Zone
-              </h3>
-              <Card className="border-destructive/30 bg-destructive/5">
-                <CardContent className="p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-                  <div>
-                    <p className="font-bold text-destructive">
-                      Cancel this blood request
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      This will cancel all volunteer commitments and mark the
-                      request as inactive.
-                    </p>
-                  </div>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleCancelRequest}
-                  >
-                    Cancel Request
-                  </Button>
-                </CardContent>
-              </Card>
+          <div className="relative z-10 flex flex-col md:flex-row gap-10 items-start md:items-center">
+            <div className="flex h-28 w-28 items-center justify-center rounded-[2.5rem] bg-primary text-slate-900 font-black text-5xl shadow-2xl shadow-primary/20 shrink-0">
+              {request.bloodTypeNeeded}
             </div>
-          )}
-        </div>
 
-        <div className="space-y-6">
-          <Card className="shadow-lg border-primary/10">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-bold">
-                Fulfillment Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm font-bold">
-                  <span>Progress</span>
-                  <span>
-                    {securedBags} / {request.numberOfBags} bags
+            <div className="space-y-4 flex-1">
+              <div className="space-y-1">
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+                  {request.bloodTypeNeeded} Blood Required
+                </h1>
+                <p className="text-xl text-slate-500 dark:text-slate-400 font-medium">
+                  Patient Name:{" "}
+                  <span className="text-slate-900 dark:text-slate-100 font-bold">
+                    {request.patientName}
                   </span>
-                </div>
-                <div className="h-4 w-full bg-muted rounded-full overflow-hidden border">
-                  <div
-                    className={cn(
-                      "h-full transition-all duration-500 ease-in-out",
-                      donatedBags === request.numberOfBags
-                        ? "bg-green-500"
-                        : "bg-primary",
-                    )}
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-                <div className="flex justify-between text-[10px] text-muted-foreground italic">
-                  <span>{donatedBags} donated</span>
-                  <span>{securedBags - donatedBags} committed</span>
-                </div>
+                </p>
               </div>
 
-              <div className="space-y-4 pt-4 border-t">
-                <div className="flex items-start gap-3 text-sm">
-                  <MapPin className="h-4 w-4 mt-1 text-primary shrink-0" />
-                  <div>
-                    <p className="font-bold">{request.hospitalName}</p>
-                    <p className="text-muted-foreground text-xs">
-                      {request.hospitalLocation}
-                    </p>
-                    <p className="text-[10px] italic text-muted-foreground mt-1">
-                      {request.subDistrict}, {request.district},{" "}
-                      {request.division}
-                    </p>
+              <div className="flex flex-wrap gap-6 pt-2">
+                <div className="flex items-center gap-2 text-slate-500 font-bold text-sm">
+                  <Calendar className="h-5 w-5 text-primary" />
+                  Requested{" "}
+                  {new Date(request.createdAt).toLocaleDateString([], {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </div>
+                <div className="flex items-center gap-2 text-slate-500 font-bold text-sm">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  {request.numberOfBags}{" "}
+                  {request.numberOfBags > 1 ? "Bags" : "Bag"} Needed
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          {/* Main Content: Volunteers */}
+          <div className="lg:col-span-2 space-y-10">
+            <section className="space-y-6">
+              <div className="flex items-center justify-between px-2">
+                <h2 className="text-2xl font-black tracking-tight flex items-center gap-3">
+                  Potential Volunteers
+                  <span className="h-8 w-8 rounded-full bg-primary/10 text-primary text-sm flex items-center justify-center font-black">
+                    {request.volunteers.length}
+                  </span>
+                </h2>
+              </div>
+
+              {request.volunteers.length === 0 ? (
+                <div className="py-20 text-center bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-dashed border-primary/10">
+                  <div className="bg-slate-100 dark:bg-slate-800 h-20 w-20 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                    <User className="h-10 w-10 text-slate-400" />
                   </div>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <Phone className="h-4 w-4 text-primary shrink-0" />
-                  <p className="font-bold">{request.contactNumber}</p>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <User className="h-4 w-4 text-primary shrink-0" />
-                  <p className="font-medium text-xs">
-                    Requester ID: {request.requesterId.substring(0, 8)}...
+                  <h3 className="text-xl font-black mb-2">No volunteers yet</h3>
+                  <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xs mx-auto">
+                    As soon as donors respond to this request, they will appear
+                    here for your review.
                   </p>
                 </div>
+              ) : (
+                <div className="space-y-4">
+                  {request.volunteers.map((v) => (
+                    <Card
+                      key={v._id}
+                      className={cn(
+                        "rounded-[2rem] border-2 overflow-hidden transition-all duration-300 group",
+                        v.status === "Accepted" || v.status === "Donated"
+                          ? "border-primary/40 shadow-lg shadow-primary/5 scale-100"
+                          : "border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900",
+                      )}
+                    >
+                      <CardContent className="p-6 md:p-8">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                          <div className="flex items-center gap-6">
+                            <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 shrink-0">
+                              <User className="h-8 w-8" />
+                            </div>
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-3">
+                                <span className="font-black text-xl tracking-tight">
+                                  {v.donor?.phoneNumber || "Private Donor"}
+                                </span>
+                                <Badge
+                                  className={cn(
+                                    "rounded-full px-3 py-0.5 text-[9px] font-black uppercase tracking-widest border-none",
+                                    v.status === "Donated" &&
+                                      "bg-green-500 text-white",
+                                    v.status === "Accepted" &&
+                                      "bg-primary text-slate-900",
+                                    v.status === "Offered" &&
+                                      "bg-slate-100 text-slate-500",
+                                  )}
+                                >
+                                  {v.status}
+                                </Badge>
+                              </div>
+                              {v.donor && (
+                                <p className="text-xs text-slate-500 font-bold flex items-center gap-1">
+                                  <MapPin className="h-3 w-3" />
+                                  {v.donor.district &&
+                                    `${v.donor.subDistrict}, ${v.donor.district}`}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex gap-3 w-full md:w-auto">
+                            {v.status === "Offered" && (
+                              <>
+                                <Button
+                                  className="flex-1 md:flex-none h-12 rounded-xl font-bold bg-primary text-slate-900 hover:scale-105 transition-transform"
+                                  onClick={() => handleSelectDonor(v._id)}
+                                >
+                                  Select Donor
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  className="h-12 w-12 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
+                                  onClick={() => handleRejectDonor(v._id)}
+                                >
+                                  <XCircle className="h-6 w-6" />
+                                </Button>
+                              </>
+                            )}
+                            {v.status === "Accepted" && (
+                              <>
+                                <Button
+                                  className="flex-1 md:flex-none h-12 rounded-xl font-bold bg-green-600 text-white hover:bg-green-700 hover:scale-105 transition-transform gap-2"
+                                  onClick={() =>
+                                    handleUpdateStatus(v._id, "Donated")
+                                  }
+                                >
+                                  <CheckCircle2 className="h-5 w-5" />
+                                  Mark Donated
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  className="h-12 rounded-xl font-bold border-red-200 text-red-600 hover:bg-red-50 transition-all"
+                                  onClick={() =>
+                                    handleUpdateStatus(v._id, "No Show")
+                                  }
+                                >
+                                  No Show
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Danger Zone */}
+            {request.status !== "Cancelled" &&
+              request.status !== "Completed" && (
+                <section className="pt-10 border-t border-red-100 dark:border-red-900/20">
+                  <div className="bg-red-50/50 dark:bg-red-950/10 rounded-[2.5rem] p-8 md:p-10 border-2 border-dashed border-red-200 dark:border-red-900/40 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div className="space-y-2 text-center md:text-left">
+                      <div className="flex items-center gap-2 justify-center md:justify-start">
+                        <ShieldAlert className="h-6 w-6 text-red-600" />
+                        <h3 className="text-xl font-black text-red-600 italic uppercase tracking-tighter">
+                          Danger Zone
+                        </h3>
+                      </div>
+                      <p className="text-sm font-bold text-slate-500 dark:text-slate-400 max-w-sm">
+                        Cancel this blood request. This will notify all
+                        volunteers and mark request as inactive.
+                      </p>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      className="h-14 px-10 rounded-2xl font-black text-base shadow-xl shadow-red-500/20 active:scale-95 transition-all"
+                      onClick={handleCancelRequest}
+                    >
+                      Cancel Entire Request
+                    </Button>
+                  </div>
+                </section>
+              )}
+          </div>
+
+          {/* Sidebar Area: Fulfillment & Logistics */}
+          <aside className="space-y-8">
+            {/* Fulfillment Status Card */}
+            <Card className="rounded-[3rem] border-2 border-primary/10 bg-white dark:bg-slate-900 p-8 shadow-xl shadow-primary/5">
+              <div className="space-y-8">
+                <div className="space-y-2">
+                  <h3 className="text-xl font-black tracking-tight">
+                    Fulfillment Status
+                  </h3>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest italic">
+                    Live Progress Tracking
+                  </p>
+                </div>
+
+                <div className="space-y-5">
+                  <div className="flex justify-between items-end">
+                    <div className="space-y-1">
+                      <p className="text-4xl font-black text-primary">
+                        {securedBags}
+                      </p>
+                      <p className="text-[10px] font-black uppercase text-slate-400 tracking-tighter">
+                        Bags Secured
+                      </p>
+                    </div>
+                    <div className="text-right space-y-1">
+                      <p className="text-2xl font-black text-slate-300 dark:text-slate-700">
+                        / {request.numberOfBags}
+                      </p>
+                      <p className="text-[10px] font-black uppercase text-slate-400 tracking-tighter">
+                        Target
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden p-1.5 border-2 border-slate-50 dark:border-slate-800 shadow-inner">
+                    <div
+                      className={cn(
+                        "h-full rounded-full transition-all duration-1000 ease-out",
+                        donatedBags === request.numberOfBags
+                          ? "bg-green-500 shadow-[0_0_20px_rgba(34,197,94,0.4)]"
+                          : "bg-primary shadow-[0_0_20px_rgba(43,238,108,0.3)]",
+                      )}
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </div>
+
+                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                    <span className="text-green-600">
+                      {donatedBags} Donated
+                    </span>
+                    <span className="text-primary">
+                      {securedBags - donatedBags} Committed
+                    </span>
+                  </div>
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </Card>
+
+            {/* Logistics Card */}
+            <Card className="rounded-[3rem] border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-md">
+              <div className="space-y-8">
+                <h3 className="text-xl font-black tracking-tight flex items-center gap-2 italic">
+                  Hospital Details
+                </h3>
+
+                <div className="space-y-6">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-primary/10 h-10 w-10 rounded-xl flex items-center justify-center shrink-0">
+                      <Hospital className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="space-y-1 min-w-0">
+                      <p className="font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none wrap-break-word">
+                        {request.hospitalName}
+                      </p>
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter">
+                        Hospital Name
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="bg-primary/10 h-10 w-10 rounded-xl flex items-center justify-center shrink-0">
+                      <MapPin className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="space-y-1 min-w-0">
+                      <p className="font-bold text-slate-700 dark:text-slate-300 text-sm leading-tight italic">
+                        {request.hospitalLocation}
+                      </p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
+                        {request.subDistrict}, {request.district}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4 py-4 border-t border-slate-50 dark:border-slate-800">
+                    <div className="bg-primary/10 h-10 w-10 rounded-xl flex items-center justify-center shrink-0">
+                      <Phone className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-black text-2xl text-slate-900 dark:text-slate-100 tracking-tighter">
+                        {request.contactNumber}
+                      </p>
+                      <p className="text-xs font-black uppercase tracking-widest text-primary/80">
+                        Primary Contact
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </aside>
         </div>
       </div>
     </div>

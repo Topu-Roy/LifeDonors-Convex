@@ -196,6 +196,7 @@ export const getAllRequests = query({
     division: v.optional(v.string()),
     district: v.optional(v.string()),
     subDistrict: v.optional(v.string()),
+    urgency: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     let requests = ctx.db
@@ -206,6 +207,10 @@ export const getAllRequests = query({
       requests = requests.filter((q) =>
         q.eq(q.field("bloodTypeNeeded"), args.bloodType),
       );
+    }
+
+    if (args.urgency) {
+      requests = requests.filter((q) => q.eq(q.field("urgency"), args.urgency));
     }
 
     if (args.division) {

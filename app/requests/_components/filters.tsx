@@ -21,11 +21,14 @@ import {
   filterDivisionAtom,
   filterDistrictAtom,
   filterSubDistrictAtom,
+  filterUrgencyAtom,
   filterHasInitializedAtom,
 } from "@/state/requests/store";
 import { useQuery } from "convex/react";
 import { useAtom } from "jotai";
-import { FilterIcon } from "lucide-react";
+import { RotateCcw } from "lucide-react";
+
+const urgencyLevels = ["Low", "Medium", "High", "Critical"];
 
 export function Filter() {
   const [filterBloodType, setFilterBloodType] = useAtom(filterBloodTypeAtom);
@@ -34,6 +37,7 @@ export function Filter() {
   const [filterSubDistrict, setFilterSubDistrict] = useAtom(
     filterSubDistrictAtom,
   );
+  const [filterUrgency, setFilterUrgency] = useAtom(filterUrgencyAtom);
 
   const profile = useQuery(api.users.getMyProfile);
   const [hasInitialized, setHasInitialized] = useAtom(filterHasInitializedAtom);
@@ -54,120 +58,169 @@ export function Filter() {
     setHasInitialized,
   ]);
 
+  const resetFilters = () => {
+    setFilterBloodType(undefined);
+    setFilterDivision(undefined);
+    setFilterDistrict(undefined);
+    setFilterSubDistrict(undefined);
+    setFilterUrgency(undefined);
+  };
+
+  const hasActiveFilters =
+    (filterBloodType && filterBloodType !== "ALL") ||
+    (filterDivision && filterDivision !== "ALL") ||
+    (filterDistrict && filterDistrict !== "ALL") ||
+    (filterSubDistrict && filterSubDistrict !== "ALL") ||
+    (filterUrgency && filterUrgency !== "ALL");
+
   return (
-    <>
-      <FilterIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-
-      {/* Blood type */}
-      <Select
-        value={filterBloodType ?? "ALL"}
-        onValueChange={(val) => setFilterBloodType(val as string)}
-      >
-        <SelectTrigger className="w-[140px] bg-background">
-          <SelectValue placeholder="All Blood Types" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="ALL">All Blood Types</SelectItem>
-          {bloodTypes.map((type) => (
-            <SelectItem key={type} value={type}>
-              {type}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* Division */}
-      <Select
-        value={filterDivision ?? "ALL"}
-        onValueChange={(val) => {
-          setFilterDivision(val as string);
-          setFilterDistrict(undefined);
-          setFilterSubDistrict(undefined);
-        }}
-      >
-        <SelectTrigger className="w-[160px] bg-background">
-          <SelectValue placeholder="All Divisions" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="ALL">All Divisions</SelectItem>
-          {getAllDivisions().map((div) => (
-            <SelectItem key={div} value={div}>
-              {div}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* District — only shown when division picked */}
-      {filterDivision && filterDivision !== "ALL" && (
-        <Select
-          value={filterDistrict ?? "ALL"}
-          onValueChange={(val) => {
-            setFilterDistrict(val as string);
-            setFilterSubDistrict(undefined);
-          }}
-        >
-          <SelectTrigger className="w-[160px] bg-background">
-            <SelectValue placeholder="All Districts" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">All Districts</SelectItem>
-            {getDistrictsByDivision({ division: filterDivision }).map((d) => (
-              <SelectItem key={d} value={d}>
-                {d}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
-
-      {/* Sub-district — only shown when district picked */}
-      {filterDistrict &&
-        filterDistrict !== "ALL" &&
-        filterDivision &&
-        filterDivision !== "ALL" && (
+    <div className="flex flex-col gap-6">
+      <div className="space-y-4">
+        {/* Blood Type */}
+        <div className="space-y-2">
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Blood Type
+          </label>
           <Select
-            value={filterSubDistrict ?? "ALL"}
-            onValueChange={(val) => {
-              setFilterSubDistrict(val as string);
-            }}
+            value={filterBloodType ?? "ALL"}
+            onValueChange={(val) =>
+              setFilterBloodType(val === "ALL" ? undefined : val)
+            }
           >
-            <SelectTrigger className="w-[160px] bg-background">
-              <SelectValue placeholder="All Sub-Districts" />
+            <SelectTrigger className="w-full h-12 rounded-xl bg-slate-50 dark:bg-slate-800 border-primary/10 transition-all focus:ring-primary/20">
+              <SelectValue placeholder="All Blood Types" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Sub-Districts</SelectItem>
-              {getSubDistrictsByDistrict({
-                division: filterDivision,
-                district: filterDistrict,
-              }).map((s) => (
-                <SelectItem key={s} value={s}>
-                  {s}
+            <SelectContent className="rounded-xl border-primary/10">
+              <SelectItem value="ALL">All Blood Types</SelectItem>
+              {bloodTypes.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-        )}
+        </div>
 
-      {/* Clear filters */}
-      {(filterBloodType ||
-        filterDivision ||
-        filterDistrict ||
-        filterSubDistrict) && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="ml-auto text-muted-foreground h-8 px-2 text-xs"
-          onClick={() => {
-            setFilterBloodType(undefined);
-            setFilterDivision(undefined);
-            setFilterDistrict(undefined);
-            setFilterSubDistrict(undefined);
-          }}
-        >
-          Clear filters
-        </Button>
-      )}
-    </>
+        {/* Urgency */}
+        <div className="space-y-2">
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Urgency Level
+          </label>
+          <Select
+            value={filterUrgency ?? "ALL"}
+            onValueChange={(val) =>
+              setFilterUrgency(val === "ALL" ? undefined : val)
+            }
+          >
+            <SelectTrigger className="w-full h-12 rounded-xl bg-slate-50 dark:bg-slate-800 border-primary/10 transition-all focus:ring-primary/20">
+              <SelectValue placeholder="All Levels" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-primary/10">
+              <SelectItem value="ALL">All Levels</SelectItem>
+              {urgencyLevels.map((level) => (
+                <SelectItem key={level} value={level}>
+                  {level}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Location Section */}
+        <div className="pt-4 border-t border-primary/5 space-y-4">
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Location
+          </label>
+
+          <div className="space-y-3">
+            {/* Division */}
+            <Select
+              value={filterDivision ?? "ALL"}
+              onValueChange={(val) => {
+                setFilterDivision(val === "ALL" ? undefined : val);
+                setFilterDistrict(undefined);
+                setFilterSubDistrict(undefined);
+              }}
+            >
+              <SelectTrigger className="w-full h-11 rounded-xl bg-slate-50 dark:bg-slate-800 border-primary/10 transition-all focus:ring-primary/20 text-sm">
+                <SelectValue placeholder="All Divisions" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-primary/10">
+                <SelectItem value="ALL">All Divisions</SelectItem>
+                {getAllDivisions().map((div) => (
+                  <SelectItem key={div} value={div}>
+                    {div}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* District */}
+            <Select
+              value={filterDistrict ?? "ALL"}
+              onValueChange={(val) => {
+                setFilterDistrict(val === "ALL" ? undefined : val);
+                setFilterSubDistrict(undefined);
+              }}
+              disabled={!filterDivision || filterDivision === "ALL"}
+            >
+              <SelectTrigger className="w-full h-11 rounded-xl bg-slate-50 dark:bg-slate-800 border-primary/10 transition-all focus:ring-primary/20 text-sm disabled:opacity-50">
+                <SelectValue placeholder="All Districts" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-primary/10">
+                <SelectItem value="ALL">All Districts</SelectItem>
+                {filterDivision &&
+                  filterDivision !== "ALL" &&
+                  getDistrictsByDivision({ division: filterDivision }).map(
+                    (d) => (
+                      <SelectItem key={d} value={d}>
+                        {d}
+                      </SelectItem>
+                    ),
+                  )}
+              </SelectContent>
+            </Select>
+
+            {/* Sub-district */}
+            <Select
+              value={filterSubDistrict ?? "ALL"}
+              onValueChange={(val) =>
+                setFilterSubDistrict(val === "ALL" ? undefined : val)
+              }
+              disabled={!filterDistrict || filterDistrict === "ALL"}
+            >
+              <SelectTrigger className="w-full h-11 rounded-xl bg-slate-50 dark:bg-slate-800 border-primary/10 transition-all focus:ring-primary/20 text-sm disabled:opacity-50">
+                <SelectValue placeholder="All Sub-Districts" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-primary/10">
+                <SelectItem value="ALL">All Sub-Districts</SelectItem>
+                {filterDistrict &&
+                  filterDistrict !== "ALL" &&
+                  filterDivision &&
+                  filterDivision !== "ALL" &&
+                  getSubDistrictsByDistrict({
+                    division: filterDivision,
+                    district: filterDistrict,
+                  }).map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      <Button
+        variant="outline"
+        className="w-full h-12 rounded-2xl font-bold border-primary/20 text-primary hover:bg-primary/5 transition-all gap-2"
+        onClick={resetFilters}
+        disabled={!hasActiveFilters}
+      >
+        <RotateCcw className="h-4 w-4" />
+        Reset Filters
+      </Button>
+    </div>
   );
 }

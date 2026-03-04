@@ -5,62 +5,171 @@ import { api } from "@/convex/_generated/api";
 import { RequestCard } from "@/components/RequestCard";
 import { Filter } from "./_components/filters";
 import { CreateRequest } from "./_components/createRequest";
-import { useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import {
   filterBloodTypeAtom,
   filterDivisionAtom,
   filterDistrictAtom,
   filterSubDistrictAtom,
+  filterUrgencyAtom,
 } from "@/state/requests/store";
+import { Search, X, Filter as FilterIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function RequestsPage() {
-  const filterBloodType = useAtomValue(filterBloodTypeAtom);
-  const filterDivision = useAtomValue(filterDivisionAtom);
-  const filterDistrict = useAtomValue(filterDistrictAtom);
-  const filterSubDistrict = useAtomValue(filterSubDistrictAtom);
+  const [filterBloodType, setFilterBloodType] = useAtom(filterBloodTypeAtom);
+  const [filterDivision, setFilterDivision] = useAtom(filterDivisionAtom);
+  const [filterDistrict, setFilterDistrict] = useAtom(filterDistrictAtom);
+  const [filterSubDistrict, setFilterSubDistrict] = useAtom(
+    filterSubDistrictAtom,
+  );
+  const [filterUrgency, setFilterUrgency] = useAtom(filterUrgencyAtom);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const requests = useQuery(api.users.getAllRequests, {
     bloodType: filterBloodType === "ALL" ? undefined : filterBloodType,
     division: filterDivision === "ALL" ? undefined : filterDivision,
     district: filterDistrict === "ALL" ? undefined : filterDistrict,
     subDistrict: filterSubDistrict === "ALL" ? undefined : filterSubDistrict,
+    urgency: filterUrgency === "ALL" ? undefined : filterUrgency,
   });
 
+  const filteredRequests = requests?.filter(
+    (r) =>
+      r.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      r.hospitalName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      r.bloodTypeNeeded.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Blood Requests</h1>
-          <p className="text-muted-foreground">
-            Help people in need of life-saving blood donations.
-          </p>
-        </div>
-
-        <CreateRequest />
-      </div>
-
-      {/* Filter bar */}
-      <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl border bg-muted/30">
-        <Filter />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {requests === undefined ? (
-          Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-64 bg-muted animate-pulse rounded-xl" />
-          ))
-        ) : requests.length > 0 ? (
-          requests.map((request) => (
-            <RequestCard key={request._id} request={request} />
-          ))
-        ) : (
-          <div className="col-span-full py-20 text-center bg-muted/20 rounded-xl border-2 border-dashed border-border">
-            <h3 className="text-xl font-semibold mb-2">No Requests Found</h3>
-            <p className="text-muted-foreground">
-              Try selecting a different blood type or check back later.
+    <div className="min-h-screen bg-[#f6f8f6] dark:bg-[#102216]">
+      <div className="max-w-[1440px] mx-auto px-6 py-8 md:px-10">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+              Blood Requests Explorer
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 font-medium">
+              Find and respond to urgent blood needs in your area.
             </p>
           </div>
-        )}
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <div className="relative group flex-1 sm:w-80">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+              <Input
+                placeholder="Search requests..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-11 h-12 rounded-full border-primary/10 bg-white/50 dark:bg-white/5 focus-visible:ring-primary/20 focus-visible:border-primary transition-all font-medium"
+              />
+            </div>
+            <CreateRequest />
+          </div>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-10">
+          {/* Sidebar Filters */}
+          <aside className="w-full lg:w-72 shrink-0 space-y-8">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-primary/10 shadow-sm">
+              <div className="flex items-center gap-2 mb-6">
+                <FilterIcon className="h-5 w-5 text-primary" />
+                <h2 className="text-xl font-black tracking-tight">Filters</h2>
+              </div>
+              <Filter />
+            </div>
+          </aside>
+
+          {/* Main Content Area */}
+          <main className="flex-1 space-y-6">
+            {/* Active Filter Tags */}
+            <div className="flex flex-wrap gap-2">
+              {filterBloodType && filterBloodType !== "ALL" && (
+                <Badge
+                  variant="secondary"
+                  className="px-3 py-1.5 rounded-full bg-primary/10 text-primary border-primary/20 gap-2 font-bold text-xs"
+                >
+                  {filterBloodType}
+                  <button onClick={() => setFilterBloodType(undefined)}>
+                    <X className="h-3 w-3 hover:text-slate-900 transition-colors" />
+                  </button>
+                </Badge>
+              )}
+              {filterUrgency && filterUrgency !== "ALL" && (
+                <Badge
+                  variant="secondary"
+                  className="px-3 py-1.5 rounded-full bg-primary/10 text-primary border-primary/20 gap-2 font-bold text-xs"
+                >
+                  {filterUrgency}
+                  <button onClick={() => setFilterUrgency(undefined)}>
+                    <X className="h-3 w-3 hover:text-slate-900 transition-colors" />
+                  </button>
+                </Badge>
+              )}
+              {filterDivision && filterDivision !== "ALL" && (
+                <Badge
+                  variant="secondary"
+                  className="px-3 py-1.5 rounded-full bg-primary/10 text-primary border-primary/20 gap-2 font-bold text-xs"
+                >
+                  {filterDivision}
+                  <button
+                    onClick={() => {
+                      setFilterDivision(undefined);
+                      setFilterDistrict(undefined);
+                      setFilterSubDistrict(undefined);
+                    }}
+                  >
+                    <X className="h-3 w-3 hover:text-slate-900 transition-colors" />
+                  </button>
+                </Badge>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {requests === undefined ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-[320px] bg-white dark:bg-white/5 animate-pulse rounded-[2rem] border border-primary/5"
+                  />
+                ))
+              ) : filteredRequests && filteredRequests.length > 0 ? (
+                filteredRequests.map((request) => (
+                  <RequestCard key={request._id} request={request} />
+                ))
+              ) : (
+                <div className="col-span-full py-24 text-center bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-dashed border-primary/20">
+                  <div className="bg-primary/10 h-20 w-20 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                    <Search className="h-10 w-10 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-black tracking-tight mb-2">
+                    No Requests Found
+                  </h3>
+                  <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xs mx-auto">
+                    Try adjusting your filters or search query to find more
+                    results.
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="mt-8 rounded-2xl font-bold border-primary/20"
+                    onClick={() => {
+                      setFilterBloodType(undefined);
+                      setFilterDivision(undefined);
+                      setFilterUrgency(undefined);
+                      setSearchQuery("");
+                    }}
+                  >
+                    Clear All Filters
+                  </Button>
+                </div>
+              )}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );
