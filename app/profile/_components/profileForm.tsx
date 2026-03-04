@@ -27,6 +27,7 @@ import {
   getDistrictsByDivision,
   getSubDistrictsByDistrict,
 } from "@/constants/bangladeshAdministrativeAreas";
+import { ProfileType } from "../page";
 
 export const bloodTypes = [
   "A+",
@@ -55,24 +56,11 @@ const formSchema = z.object({
   subDistrict: z.string().min(1, "Sub-district is required"),
 });
 
-type ProfileData = {
-  age: number;
-  bmi: number;
-  bloodType: string;
-  hemoglobinLevel: number;
-  phoneNumber: string;
-  diseases: string[];
-  lastDonationDate: number;
-  division?: string;
-  district?: string;
-  subDistrict?: string;
-};
-
 export function ProfileForm({
   profile,
   onSuccess,
 }: {
-  profile?: ProfileData | null;
+  profile?: ProfileType;
   onSuccess: () => void;
 }) {
   const updateProfile = useMutation(api.users.updateProfile);
