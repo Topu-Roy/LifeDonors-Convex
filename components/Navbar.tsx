@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
+import { Container } from "./Container";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -60,7 +61,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-      <div className="container flex justify-between h-14 items-center mx-auto px-4">
+      <Container className="flex justify-between h-14 items-center">
         <Link href="/" className="flex items-center space-x-2">
           <Droplet className="h-6 w-6 text-primary" />
           <span className="hidden font-bold sm:inline-block">LifeDonors</span>
@@ -82,7 +83,7 @@ export function Navbar() {
           ))}
         </nav>
         <UserMenu />
-      </div>
+      </Container>
     </header>
   );
 }

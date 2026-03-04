@@ -90,7 +90,7 @@ export function BasicInfoStep() {
                     onChange={(e) =>
                       field.handleChange(parseInt(e.target.value) || 0)
                     }
-                    className="h-14 rounded-2xl border-primary/10 bg-background shadow-sm focus-visible:ring-primary/20 focus-visible:border-primary transition-all text-lg font-medium"
+                    className="h-14 rounded-3xl border-primary/10 bg-background shadow-sm focus-visible:ring-primary/20 focus-visible:border-primary transition-all text-lg font-medium"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -118,7 +118,7 @@ export function BasicInfoStep() {
                     value={field.state.value || ""}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className="h-14 rounded-2xl border-primary/10 bg-background shadow-sm focus-visible:ring-primary/20 focus-visible:border-primary transition-all text-lg font-medium"
+                    className="h-14 rounded-3xl border-primary/10 bg-background shadow-sm focus-visible:ring-primary/20 focus-visible:border-primary transition-all text-lg font-medium"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -149,10 +149,10 @@ export function BasicInfoStep() {
                       form.setFieldValue("subDistrict", "");
                     }}
                   >
-                    <SelectTrigger className="h-12 rounded-xl border-primary/10 bg-background shadow-sm focus:ring-primary/20">
+                    <SelectTrigger className="h-12 rounded-2xl border-primary/10 bg-background shadow-sm focus:ring-primary/20">
                       <SelectValue placeholder="Select Division" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-xl border-primary/10">
+                    <SelectContent className="rounded-2xl border-primary/10">
                       {divisions.map((d) => (
                         <SelectItem key={d} value={d}>
                           {d}
@@ -190,10 +190,10 @@ export function BasicInfoStep() {
                           }}
                           disabled={!division}
                         >
-                          <SelectTrigger className="h-12 rounded-xl border-primary/10 bg-background shadow-sm focus:ring-primary/20">
+                          <SelectTrigger className="h-12 rounded-2xl border-primary/10 bg-background shadow-sm focus:ring-primary/20">
                             <SelectValue placeholder="Select District" />
                           </SelectTrigger>
-                          <SelectContent className="rounded-xl border-primary/10">
+                          <SelectContent className="rounded-2xl border-primary/10">
                             {districts.map((d) => (
                               <SelectItem key={d} value={d}>
                                 {d}
@@ -238,10 +238,10 @@ export function BasicInfoStep() {
                           onValueChange={(v) => field.handleChange(v as string)}
                           disabled={!district}
                         >
-                          <SelectTrigger className="h-12 rounded-xl border-primary/10 bg-background shadow-sm focus:ring-primary/20">
+                          <SelectTrigger className="h-12 rounded-2xl border-primary/10 bg-background shadow-sm focus:ring-primary/20">
                             <SelectValue placeholder="Select Sub District" />
                           </SelectTrigger>
-                          <SelectContent className="rounded-xl border-primary/10">
+                          <SelectContent className="rounded-2xl border-primary/10">
                             {subDistricts.map((s) => (
                               <SelectItem key={s} value={s}>
                                 {s}
@@ -271,7 +271,7 @@ export function BasicInfoStep() {
             <Button
               type="submit"
               disabled={!canSubmit || isSubmitting}
-              className="h-14 px-10 rounded-2xl font-black shadow-xl shadow-primary/20 gap-2 transition-all hover:scale-105 active:scale-95"
+              className="h-14 px-10 rounded-3xl font-black shadow-xl shadow-primary/20 gap-2 transition-all hover:scale-105 active:scale-95"
             >
               Continue
               <ArrowRight className="h-5 w-5" />

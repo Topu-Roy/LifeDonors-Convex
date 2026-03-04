@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { Container } from "@/components/Container";
 
 export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
   const router = useRouter();
@@ -36,21 +37,21 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
 
   if (request === undefined) {
     return (
-      <div className="container mx-auto px-6 py-12 max-w-5xl space-y-8 animate-pulse">
+      <Container className="py-12 space-y-8 animate-pulse">
         <div className="h-10 w-48 bg-muted rounded-2xl" />
-        <div className="h-64 w-full bg-muted rounded-[2.5rem]" />
+        <div className="h-64 w-full bg-muted rounded-3xl" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2 h-96 bg-muted rounded-[2.5rem]" />
-          <div className="h-96 bg-muted rounded-[2.5rem]" />
+          <div className="md:col-span-2 h-96 bg-muted rounded-3xl" />
+          <div className="h-96 bg-muted rounded-3xl" />
         </div>
-      </div>
+      </Container>
     );
   }
 
   if (request === null) {
     return (
-      <div className="container mx-auto px-6 py-24 text-center space-y-6 max-w-md">
-        <div className="bg-red-100 dark:bg-red-900/20 h-24 w-24 rounded-[2rem] flex items-center justify-center mx-auto">
+      <Container className="py-24 text-center space-y-6 max-w-md">
+        <div className="bg-red-100 dark:bg-red-900/20 h-24 w-24 rounded-3xl flex items-center justify-center mx-auto">
           <AlertCircle className="h-12 w-12 text-red-600" />
         </div>
         <div className="space-y-2">
@@ -71,7 +72,7 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
         >
           Back to All Requests
         </Link>
-      </div>
+      </Container>
     );
   }
 
@@ -148,7 +149,7 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
 
   return (
     <div className="min-h-screen bg-[#f6f8f6] dark:bg-[#102216]">
-      <div className="max-w-[1280px] mx-auto px-6 py-10 md:px-10 space-y-10">
+      <Container className="py-10 space-y-10">
         {/* Top Navbar/Back */}
         <div className="flex items-center justify-between">
           <Link
@@ -185,13 +186,13 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
         </div>
 
         {/* Hero Section */}
-        <section className="bg-white dark:bg-slate-900 rounded-[3rem] p-8 md:p-12 border border-primary/10 shadow-xl shadow-primary/5 relative overflow-hidden">
+        <section className="bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 border border-primary/10 shadow-xl shadow-primary/5 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-12 opacity-5 dark:opacity-10 pointer-events-none">
             <Droplets className="h-48 w-48 text-primary" />
           </div>
 
           <div className="relative z-10 flex flex-col md:flex-row gap-10 items-start md:items-center">
-            <div className="flex h-28 w-28 items-center justify-center rounded-[2.5rem] bg-primary text-slate-900 font-black text-5xl shadow-2xl shadow-primary/20 shrink-0">
+            <div className="flex h-28 w-28 items-center justify-center rounded-3xl bg-primary text-slate-900 font-black text-5xl shadow-2xl shadow-primary/20 shrink-0">
               {request.bloodTypeNeeded}
             </div>
 
@@ -242,7 +243,7 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
               </div>
 
               {request.volunteers.length === 0 ? (
-                <div className="py-20 text-center bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-dashed border-primary/10">
+                <div className="py-20 text-center bg-white dark:bg-slate-900 rounded-3xl border-2 border-dashed border-primary/10">
                   <div className="bg-slate-100 dark:bg-slate-800 h-20 w-20 rounded-3xl flex items-center justify-center mx-auto mb-6">
                     <User className="h-10 w-10 text-slate-400" />
                   </div>
@@ -258,7 +259,7 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
                     <Card
                       key={v._id}
                       className={cn(
-                        "rounded-[2rem] border-2 overflow-hidden transition-all duration-300 group",
+                        "rounded-3xl border-2 overflow-hidden transition-all duration-300 group",
                         v.status === "Accepted" || v.status === "Donated"
                           ? "border-primary/40 shadow-lg shadow-primary/5 scale-100"
                           : "border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900",
@@ -352,7 +353,7 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
             {request.status !== "Cancelled" &&
               request.status !== "Completed" && (
                 <section className="pt-10 border-t border-red-100 dark:border-red-900/20">
-                  <div className="bg-red-50/50 dark:bg-red-950/10 rounded-[2.5rem] p-8 md:p-10 border-2 border-dashed border-red-200 dark:border-red-900/40 flex flex-col md:flex-row items-center justify-between gap-8">
+                  <div className="bg-red-50/50 dark:bg-red-950/10 rounded-3xl p-8 md:p-10 border-2 border-dashed border-red-200 dark:border-red-900/40 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div className="space-y-2 text-center md:text-left">
                       <div className="flex items-center gap-2 justify-center md:justify-start">
                         <ShieldAlert className="h-6 w-6 text-red-600" />
@@ -380,7 +381,7 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
           {/* Sidebar Area: Fulfillment & Logistics */}
           <aside className="space-y-8">
             {/* Fulfillment Status Card */}
-            <Card className="rounded-[3rem] border-2 border-primary/10 bg-white dark:bg-slate-900 p-8 shadow-xl shadow-primary/5">
+            <Card className="rounded-3xl border-2 border-primary/10 bg-white dark:bg-slate-900 p-8 shadow-xl shadow-primary/5">
               <div className="space-y-8">
                 <div className="space-y-2">
                   <h3 className="text-xl font-black tracking-tight">
@@ -436,7 +437,7 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
             </Card>
 
             {/* Logistics Card */}
-            <Card className="rounded-[3rem] border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-md">
+            <Card className="rounded-3xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-md">
               <div className="space-y-8">
                 <h3 className="text-xl font-black tracking-tight flex items-center gap-2 italic">
                   Hospital Details
@@ -489,7 +490,7 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
             </Card>
           </aside>
         </div>
-      </div>
+      </Container>
     </div>
   );
 }

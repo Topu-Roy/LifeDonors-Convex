@@ -33,6 +33,7 @@ import { ProfileForm } from "./_components/profileForm";
 import { Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
+import { Container } from "@/components/Container";
 
 export type ProfileType = {
   name: string | undefined;
@@ -109,7 +110,7 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-muted/30">
-      <main className="flex-1 w-full max-w-5xl mx-auto px-6 py-12 flex flex-col gap-8">
+      <Container as="main" className="flex-1 py-12 flex flex-col gap-8">
         {/* Profile Header */}
         <section className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 p-8 bg-background rounded-3xl shadow-xl border border-primary/10 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
@@ -312,7 +313,7 @@ export default function ProfilePage() {
             </div>
           </div>
         </section>
-      </main>
+      </Container>
 
       {/* Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

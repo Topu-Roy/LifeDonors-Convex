@@ -77,11 +77,11 @@ export function RequestCard({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-[2.5rem] border-2 p-1 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden group",
+        "flex flex-col rounded-3xl border-2 p-1 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden group",
         urgencyStyles[request.urgency],
       )}
     >
-      <div className="p-7 flex flex-col h-full gap-5">
+      <div className="p-6 flex flex-col h-full gap-6">
         {/* Card Top: Blood Type & Urgency */}
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-4">

@@ -52,11 +52,12 @@ export function EligibilityStatus() {
 
   return (
     <Card
-      className={
+      className={cn(
+        "rounded-3xl",
         eligibility.eligible
           ? "border-primary/20 bg-primary/5"
-          : "border-border bg-muted/30"
-      }
+          : "border-border bg-muted/30",
+      )}
     >
       <CardHeader>
         <CardTitle className="flex items-center gap-2">

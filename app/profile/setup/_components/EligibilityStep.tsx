@@ -140,7 +140,7 @@ export function EligibilityStep() {
                   {healthConditions.map((condition) => (
                     <label
                       key={condition}
-                      className="flex items-start gap-3 p-5 rounded-2xl border-2 border-primary/5 hover:border-primary/20 hover:bg-primary/5 transition-all cursor-pointer group"
+                      className="flex items-start gap-3 p-5 rounded-3xl border-2 border-primary/5 hover:border-primary/20 hover:bg-primary/5 transition-all cursor-pointer group"
                     >
                       <Checkbox
                         checked={field.state.value?.includes(condition)}
@@ -161,7 +161,7 @@ export function EligibilityStep() {
                       </span>
                     </label>
                   ))}
-                  <label className="flex items-start gap-3 p-5 rounded-2xl border-2 border-primary/5 hover:border-primary/20 hover:bg-primary/5 transition-all cursor-pointer group">
+                  <label className="flex items-start gap-3 p-5 rounded-3xl border-2 border-primary/5 hover:border-primary/20 hover:bg-primary/5 transition-all cursor-pointer group">
                     <Checkbox
                       checked={(field.state.value || []).length === 0}
                       onCheckedChange={(checked) => {
@@ -213,7 +213,7 @@ export function EligibilityStep() {
                         e.target.value ? new Date(e.target.value).getTime() : 0,
                       )
                     }
-                    className="h-14 rounded-2xl border-primary/10 bg-background shadow-sm focus-visible:ring-primary/20 focus-visible:border-primary transition-all text-lg font-medium"
+                    className="h-14 rounded-3xl border-primary/10 bg-background shadow-sm focus-visible:ring-primary/20 focus-visible:border-primary transition-all text-lg font-medium"
                   />
                 </div>
                 {field.state.meta.isTouched &&
@@ -226,7 +226,7 @@ export function EligibilityStep() {
         </section>
 
         {/* Initial Eligibility Status Preview */}
-        <div className="bg-primary/5 border-2 border-primary/20 rounded-[2rem] p-8 flex items-start gap-5 shadow-sm mt-8">
+        <div className="bg-primary/5 border-2 border-primary/20 rounded-3xl p-8 flex items-start gap-5 shadow-sm mt-8">
           <div className="p-3 bg-primary/20 rounded-2xl text-primary shrink-0 shadow-lg shadow-primary/10">
             <CheckCircle2 className="h-8 w-8" />
           </div>
@@ -250,7 +250,7 @@ export function EligibilityStep() {
           variant="outline"
           onClick={() => setCurrentStep(2)}
           disabled={isSubmitting}
-          className="h-14 px-8 rounded-2xl font-bold border-primary/10 bg-background shadow-sm hover:bg-primary/5 transition-all gap-2"
+          className="h-14 px-8 rounded-3xl font-bold border-primary/10 bg-background shadow-sm hover:bg-primary/5 transition-all gap-2"
         >
           <ArrowLeft className="h-5 w-5" />
           Back
@@ -262,7 +262,7 @@ export function EligibilityStep() {
             <Button
               type="submit"
               disabled={!canSubmit || isSubmitting}
-              className="h-14 px-10 flex-1 rounded-2xl font-black shadow-xl shadow-primary/20 gap-3 transition-all hover:scale-[1.02] active:scale-95 bg-primary text-white"
+              className="h-14 px-10 flex-1 rounded-3xl font-black shadow-xl shadow-primary/20 gap-3 transition-all hover:scale-[1.02] active:scale-95 bg-primary text-white"
             >
               {isSubmitting ? (
                 <Loader2 className="h-6 w-6 animate-spin" />

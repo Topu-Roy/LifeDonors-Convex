@@ -30,6 +30,7 @@ import {
 import { toast } from "sonner";
 import { Id } from "@/convex/_generated/dataModel";
 import Link from "next/link";
+import { Container } from "@/components/Container";
 
 export default function DashboardPage() {
   const searchParams = useSearchParams();
@@ -67,7 +68,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-muted/30">
-      <main className="flex-1 flex flex-col max-w-6xl w-full mx-auto px-6 py-12 gap-8">
+      <Container className="py-12 space-y-8">
         {/* Header Section */}
         <div className="flex flex-col gap-2">
           <h1 className="text-4xl font-black tracking-tight flex items-center gap-3">
@@ -82,17 +83,17 @@ export default function DashboardPage() {
         </div>
 
         <Tabs defaultValue={defaultTab} className="w-full space-y-8">
-          <TabsList className="bg-background border p-1 h-14 rounded-2xl w-full max-w-md shadow-sm">
+          <TabsList className="bg-background border p-1 h-14 rounded-full w-full max-w-md shadow-sm">
             <TabsTrigger
               value="requests"
-              className="rounded-xl px-8 h-full font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all gap-2"
+              className="rounded-full px-8 h-full font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all gap-2"
             >
               <MessageSquare className="h-4 w-4" />
               My Requests
             </TabsTrigger>
             <TabsTrigger
               value="donations"
-              className="rounded-xl px-8 h-full font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all gap-2"
+              className="rounded-full px-8 h-full font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all gap-2"
             >
               <History className="h-4 w-4" />
               My Donations
@@ -212,7 +213,7 @@ export default function DashboardPage() {
             </div>
           </TabsContent>
         </Tabs>
-      </main>
+      </Container>
     </div>
   );
 }

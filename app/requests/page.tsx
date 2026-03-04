@@ -5,6 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { RequestCard } from "@/components/RequestCard";
 import { Filter } from "./_components/filters";
 import { CreateRequest } from "./_components/createRequest";
+import { Container } from "@/components/Container";
 import { useAtom } from "jotai";
 import {
   filterBloodTypeAtom,
@@ -46,7 +47,7 @@ export default function RequestsPage() {
 
   return (
     <div className="min-h-screen bg-[#f6f8f6] dark:bg-[#102216]">
-      <div className="max-w-[1440px] mx-auto px-6 py-8 md:px-10">
+      <Container className="py-8">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div className="space-y-1">
@@ -170,7 +171,7 @@ export default function RequestsPage() {
             </div>
           </main>
         </div>
-      </div>
+      </Container>
     </div>
   );
 }

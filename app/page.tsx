@@ -3,6 +3,7 @@
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { RequestCard } from "@/components/RequestCard";
+import { Container } from "@/components/Container";
 import {
   Droplet,
   Search,
@@ -42,7 +43,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <main className="flex-1 flex flex-col items-center w-full pb-12">
         {/* Hero Section */}
-        <section className="w-full max-w-6xl px-6 py-8">
+        <Container as="section" className="py-8">
           <div
             className="relative flex min-h-[500px] flex-col gap-8 rounded-[2rem] items-center justify-center p-8 overflow-hidden bg-slate-900 shadow-2xl border border-white/10"
             style={{
@@ -86,10 +87,10 @@ export default function Home() {
               </Link>
             </div>
           </div>
-        </section>
+        </Container>
 
         {/* Live Impact Stats */}
-        <section className="w-full max-w-6xl px-6 -mt-16 z-20 relative">
+        <Container as="section" className="-mt-16 z-20 relative">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-background rounded-2xl shadow-xl border border-border">
             <ImpactCard
               icon={<Heart className="h-6 w-6" />}
@@ -116,10 +117,10 @@ export default function Home() {
               borderColor="border-orange-100"
             />
           </div>
-        </section>
+        </Container>
 
         {/* Main Content Area */}
-        <div className="w-full max-w-6xl px-6 py-12 flex flex-col lg:flex-row gap-12">
+        <Container className="py-12 flex flex-col lg:flex-row gap-12">
           {/* Left Column: Urgent Needs */}
           <div className="flex-1 flex flex-col gap-6">
             <div className="flex items-center justify-between pb-2 border-b border-border">
@@ -268,12 +269,12 @@ export default function Home() {
               />
             </div>
           </div>
-        </div>
+        </Container>
       </main>
 
       {/* Footer */}
-      <footer className="w-full bg-background border-t border-border py-12 px-6 mt-auto">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+      <footer className="w-full bg-background border-t border-border py-12 mt-auto">
+        <Container className="flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
               <Droplet className="h-6 w-6 text-white fill-current" />
@@ -301,7 +302,7 @@ export default function Home() {
               <Users className="h-5 w-5" />
             </Link>
           </div>
-        </div>
+        </Container>
       </footer>
     </div>
   );

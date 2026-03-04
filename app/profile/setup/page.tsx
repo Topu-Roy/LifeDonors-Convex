@@ -12,6 +12,7 @@ import { HealthDetailsStep } from "./_components/HealthDetailsStep";
 import { EligibilityStep } from "./_components/EligibilityStep";
 import { cn } from "@/lib/utils";
 import { ProfileType } from "../page";
+import { Container } from "@/components/Container";
 
 export const bloodTypes = [
   "A+",
@@ -66,7 +67,7 @@ export default function ProfileSetupPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-muted/30">
-      <main className="flex-1 w-full max-w-4xl mx-auto px-6 py-12 flex flex-col gap-10">
+      <Container as="main" className="flex-1 py-12 flex flex-col gap-10">
         {/* Header Section */}
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
@@ -136,7 +137,7 @@ export default function ProfileSetupPage() {
         </div>
 
         {/* Form Container */}
-        <div className="bg-background border-2 border-primary/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl shadow-primary/5">
+        <div className="bg-background border-2 border-primary/5 rounded-3xl p-8 md:p-12 shadow-2xl shadow-primary/5">
           {currentStep === 1 && <BasicInfoStep />}
           {currentStep === 2 && <HealthDetailsStep />}
           {currentStep === 3 && <EligibilityStep />}
@@ -149,7 +150,7 @@ export default function ProfileSetupPage() {
             hero.&quot;
           </p>
         </footer>
-      </main>
+      </Container>
     </div>
   );
 }
