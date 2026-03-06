@@ -27,7 +27,7 @@ import {
   getDistrictsByDivision,
   getSubDistrictsByDistrict,
 } from "@/constants/bangladeshAdministrativeAreas";
-import { type ProfileType } from "../page";
+import { type ProfileType } from "./ProfileView";
 
 export const bloodTypes = [
   "A+",
