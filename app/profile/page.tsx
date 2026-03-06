@@ -1,13 +1,11 @@
-import { ProfileView } from "./_components/ProfileView";
 import { Suspense } from "react";
+import { ProfileView } from "./_components/ProfileView";
 
 export default function ProfilePage() {
   return (
-    <div className="flex flex-col min-h-screen bg-muted/30">
+    <div className="bg-muted/30 flex min-h-screen flex-col">
       <Suspense
-        fallback={
-          <div className="h-screen w-full flex items-center justify-center animate-pulse bg-muted/50" />
-        }
+        fallback={<div className="bg-muted/50 flex h-screen w-full animate-pulse items-center justify-center" />}
       >
         <ProfileView />
       </Suspense>

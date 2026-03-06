@@ -1,38 +1,30 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { useState } from "react";
 import { api } from "@/convex/_generated/api";
-import { RequestCard } from "@/components/RequestCard";
-import { Filter } from "./filters";
-import { useAtom } from "jotai";
 import {
   filterBloodTypeAtom,
-  filterDivisionAtom,
   filterDistrictAtom,
+  filterDivisionAtom,
   filterSubDistrictAtom,
   filterUrgencyAtom,
 } from "@/state/requests/store";
-import { Search, X, Filter as FilterIcon, Plus } from "lucide-react";
+import { useQuery } from "convex/react";
+import { useAtom } from "jotai";
+import { Filter as FilterIcon, Plus, Search, X } from "lucide-react";
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { RequestCard } from "@/components/RequestCard";
 import { Badge } from "@/components/ui/badge";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Filter } from "./filters";
 
 export function RequestsExplorer() {
   const [filterBloodType, setFilterBloodType] = useAtom(filterBloodTypeAtom);
   const [filterDivision, setFilterDivision] = useAtom(filterDivisionAtom);
   const [filterDistrict, setFilterDistrict] = useAtom(filterDistrictAtom);
-  const [filterSubDistrict, setFilterSubDistrict] = useAtom(
-    filterSubDistrictAtom,
-  );
+  const [filterSubDistrict, setFilterSubDistrict] = useAtom(filterSubDistrictAtom);
   const [filterUrgency, setFilterUrgency] = useAtom(filterUrgencyAtom);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -45,10 +37,10 @@ export function RequestsExplorer() {
   });
 
   const filteredRequests = requests?.filter(
-    (r) =>
+    r =>
       r.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       r.hospitalName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.bloodTypeNeeded.toLowerCase().includes(searchQuery.toLowerCase()),
+      r.bloodTypeNeeded.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const activeFiltersCount = [
@@ -57,20 +49,20 @@ export function RequestsExplorer() {
     filterDistrict,
     filterSubDistrict,
     filterUrgency,
-  ].filter((f) => f && f !== "ALL").length;
+  ].filter(f => f && f !== "ALL").length;
 
   return (
-    <div className="flex flex-col lg:flex-row gap-10">
+    <div className="flex flex-col gap-10 lg:flex-row">
       {/* Search and Mobile Filters Section */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto absolute top-[-90px] right-0">
+      <div className="absolute top-[-90px] right-0 flex w-full flex-col items-stretch gap-4 sm:flex-row sm:items-center md:w-auto">
         <div className="flex items-center gap-2">
-          <div className="relative group flex-1 md:w-80">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+          <div className="group relative flex-1 md:w-80">
+            <Search className="group-focus-within:text-primary absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors" />
             <Input
               placeholder="Search requests..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-11 h-12 rounded-full border-primary/10 bg-white/50 dark:bg-white/5 focus-visible:ring-primary/20 focus-visible:border-primary transition-all font-medium text-base"
+              onChange={e => setSearchQuery(e.target.value)}
+              className="border-primary/10 focus-visible:ring-primary/20 focus-visible:border-primary h-12 rounded-full bg-white/50 pl-11 text-base font-medium transition-all dark:bg-white/5"
             />
           </div>
 
@@ -79,20 +71,20 @@ export function RequestsExplorer() {
               <Button
                 variant="outline"
                 size="icon"
-                className="lg:hidden h-12 w-12 rounded-full border-primary/10 bg-white/50 dark:bg-white/5 relative shrink-0"
+                className="border-primary/10 relative h-12 w-12 shrink-0 rounded-full bg-white/50 lg:hidden dark:bg-white/5"
               >
                 <FilterIcon className="h-5 w-5 text-slate-600 dark:text-slate-300" />
                 {activeFiltersCount > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center rounded-full bg-primary text-white text-[10px] border-2 border-background">
+                  <Badge className="bg-primary border-background absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 p-0 text-[10px] text-white">
                     {activeFiltersCount}
                   </Badge>
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[85vw] sm:w-[400px] p-0">
-              <SheetHeader className="p-6 border-b">
-                <SheetTitle className="text-xl font-black flex items-center gap-2">
-                  <FilterIcon className="h-5 w-5 text-primary" />
+            <SheetContent side="right" className="w-[85vw] p-0 sm:w-[400px]">
+              <SheetHeader className="border-b p-6">
+                <SheetTitle className="flex items-center gap-2 text-xl font-black">
+                  <FilterIcon className="text-primary h-5 w-5" />
                   Filter Requests
                 </SheetTitle>
               </SheetHeader>
@@ -103,7 +95,7 @@ export function RequestsExplorer() {
           </Sheet>
         </div>
         <Link href="/requests/new">
-          <Button className="gap-2 shadow-sm w-full sm:w-auto h-12 rounded-full px-6">
+          <Button className="h-12 w-full gap-2 rounded-full px-6 shadow-sm sm:w-auto">
             <Plus className="h-4 w-4" />
             Post a Request
           </Button>
@@ -111,10 +103,10 @@ export function RequestsExplorer() {
       </div>
 
       {/* Sidebar Filters */}
-      <aside className="hidden lg:block w-72 shrink-0 space-y-8">
-        <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-primary/10 shadow-sm sticky top-24">
-          <div className="flex items-center gap-2 mb-6">
-            <FilterIcon className="h-5 w-5 text-primary" />
+      <aside className="hidden w-72 shrink-0 space-y-8 lg:block">
+        <div className="border-primary/10 sticky top-24 rounded-[2rem] border bg-white p-8 shadow-sm dark:bg-slate-900">
+          <div className="mb-6 flex items-center gap-2">
+            <FilterIcon className="text-primary h-5 w-5" />
             <h2 className="text-xl font-black tracking-tight">Filters</h2>
           </div>
           <Filter />
@@ -128,29 +120,29 @@ export function RequestsExplorer() {
           {filterBloodType && filterBloodType !== "ALL" && (
             <Badge
               variant="secondary"
-              className="px-3 py-1.5 rounded-full bg-primary/10 text-primary border-primary/20 gap-2 font-bold text-xs"
+              className="bg-primary/10 text-primary border-primary/20 gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
             >
               {filterBloodType}
               <button onClick={() => setFilterBloodType(undefined)}>
-                <X className="h-3 w-3 hover:text-slate-900 transition-colors" />
+                <X className="h-3 w-3 transition-colors hover:text-slate-900" />
               </button>
             </Badge>
           )}
           {filterUrgency && filterUrgency !== "ALL" && (
             <Badge
               variant="secondary"
-              className="px-3 py-1.5 rounded-full bg-primary/10 text-primary border-primary/20 gap-2 font-bold text-xs"
+              className="bg-primary/10 text-primary border-primary/20 gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
             >
               {filterUrgency}
               <button onClick={() => setFilterUrgency(undefined)}>
-                <X className="h-3 w-3 hover:text-slate-900 transition-colors" />
+                <X className="h-3 w-3 transition-colors hover:text-slate-900" />
               </button>
             </Badge>
           )}
           {filterDivision && filterDivision !== "ALL" && (
             <Badge
               variant="secondary"
-              className="px-3 py-1.5 rounded-full bg-primary/10 text-primary border-primary/20 gap-2 font-bold text-xs"
+              className="bg-primary/10 text-primary border-primary/20 gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
             >
               {filterDivision}
               <button
@@ -160,38 +152,34 @@ export function RequestsExplorer() {
                   setFilterSubDistrict(undefined);
                 }}
               >
-                <X className="h-3 w-3 hover:text-slate-900 transition-colors" />
+                <X className="h-3 w-3 transition-colors hover:text-slate-900" />
               </button>
             </Badge>
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           {requests === undefined ? (
             Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="h-[320px] bg-white dark:bg-white/5 animate-pulse rounded-[2rem] border border-primary/5"
+                className="border-primary/5 h-[320px] animate-pulse rounded-[2rem] border bg-white dark:bg-white/5"
               />
             ))
           ) : filteredRequests && filteredRequests.length > 0 ? (
-            filteredRequests.map((request) => (
-              <RequestCard key={request._id} request={request} />
-            ))
+            filteredRequests.map(request => <RequestCard key={request._id} request={request} />)
           ) : (
-            <div className="col-span-full py-24 text-center bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-dashed border-primary/20">
-              <div className="bg-primary/10 h-20 w-20 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <Search className="h-10 w-10 text-primary" />
+            <div className="border-primary/20 col-span-full rounded-[3rem] border-2 border-dashed bg-white py-24 text-center dark:bg-slate-900">
+              <div className="bg-primary/10 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl">
+                <Search className="text-primary h-10 w-10" />
               </div>
-              <h3 className="text-2xl font-black tracking-tight mb-2">
-                No Requests Found
-              </h3>
-              <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xs mx-auto">
+              <h3 className="mb-2 text-2xl font-black tracking-tight">No Requests Found</h3>
+              <p className="mx-auto max-w-xs font-medium text-slate-500 dark:text-slate-400">
                 Try adjusting your filters or search query to find more results.
               </p>
               <Button
                 variant="outline"
-                className="mt-8 rounded-2xl font-bold border-primary/20"
+                className="border-primary/20 mt-8 rounded-2xl font-bold"
                 onClick={() => {
                   setFilterBloodType(undefined);
                   setFilterDivision(undefined);

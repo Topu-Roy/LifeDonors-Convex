@@ -1,32 +1,19 @@
 "use client";
 
-import { useAtom } from "jotai";
+import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { api } from "@/convex/_generated/api";
 import { currentStepAtom, setupFormAtom } from "@/state/setup/store";
+import { useMutation } from "convex/react";
+import { useAtom } from "jotai";
+import { ArrowLeft, Calendar as CalendarIcon, CheckCircle2, Heart, Loader2, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-  Field,
-  FieldLabel,
-  FieldGroup,
-  FieldError,
-  FieldDescription,
-} from "@/components/ui/field";
-import {
-  ArrowLeft,
-  CheckCircle2,
-  Heart,
-  Calendar as CalendarIcon,
-  Loader2,
-  Sparkles,
-} from "lucide-react";
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { useState } from "react";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { useForm } from "@tanstack/react-form";
-import * as z from "zod";
 
 const healthConditions = [
   "Heart Disease or history of heart attack",
@@ -69,27 +56,13 @@ export function EligibilityStep() {
         const heightInMeters = (finalData.height ?? 0) / 100;
         const bmi =
           heightInMeters > 0
-            ? parseFloat(
-                (
-                  (finalData.weight ?? 0) /
-                  (heightInMeters * heightInMeters)
-                ).toFixed(1),
-              )
+            ? parseFloat(((finalData.weight ?? 0) / (heightInMeters * heightInMeters)).toFixed(1))
             : 0;
 
         await updateProfile({
           age: finalData.age ?? 0,
           bmi: bmi,
-          bloodType:
-            (finalData.bloodType as
-              | "A+"
-              | "A-"
-              | "B+"
-              | "B-"
-              | "AB+"
-              | "AB-"
-              | "O+"
-              | "O-") || "A+",
+          bloodType: (finalData.bloodType as "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-") || "A+",
           hemoglobinLevel: finalData.hemoglobinLevel ?? 12.5,
           phoneNumber: finalData.phoneNumber ?? "",
           diseases: finalData.diseases ?? [],
@@ -102,9 +75,7 @@ export function EligibilityStep() {
         toast.success("Profile setup complete!");
         router.push("/profile");
       } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : "Failed to save profile",
-        );
+        toast.error(error instanceof Error ? error.message : "Failed to save profile");
       } finally {
         setIsSubmitting(false);
       }
@@ -113,71 +84,68 @@ export function EligibilityStep() {
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={e => {
         e.preventDefault();
         e.stopPropagation();
         void form.handleSubmit();
       }}
-      className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500"
+      className="animate-in fade-in slide-in-from-right-4 space-y-10 duration-500"
     >
       <FieldGroup>
         {/* Health Conditions */}
         <section className="space-y-6">
           <form.Field name="diseases">
-            {(field) => (
+            {field => (
               <Field>
                 <div>
-                  <FieldLabel className="text-xl font-black tracking-tight flex items-center gap-2">
-                    <Heart className="h-5 w-5 text-primary" />
+                  <FieldLabel className="flex items-center gap-2 text-xl font-black tracking-tight">
+                    <Heart className="text-primary h-5 w-5" />
                     Health Conditions
                   </FieldLabel>
-                  <FieldDescription className="text-sm text-muted-foreground font-medium mt-1">
+                  <FieldDescription className="text-muted-foreground mt-1 text-sm font-medium">
                     Please check any underlying health conditions you may have.
                   </FieldDescription>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
-                  {healthConditions.map((condition) => (
+                <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+                  {healthConditions.map(condition => (
                     <label
                       key={condition}
-                      className="flex items-start gap-3 p-4 md:p-5 rounded-3xl border-2 border-primary/5 hover:border-primary/20 hover:bg-primary/5 transition-all cursor-pointer group"
+                      className="border-primary/5 hover:border-primary/20 hover:bg-primary/5 group flex cursor-pointer items-start gap-3 rounded-3xl border-2 p-4 transition-all md:p-5"
                     >
                       <Checkbox
                         checked={field.state.value?.includes(condition)}
-                        onCheckedChange={(checked) => {
+                        onCheckedChange={checked => {
                           const current = field.state.value || [];
                           if (checked) {
                             field.handleChange([...current, condition]);
                           } else {
-                            field.handleChange(
-                              current.filter((c: string) => c !== condition),
-                            );
+                            field.handleChange(current.filter((c: string) => c !== condition));
                           }
                         }}
-                        className="mt-1 border-2 border-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                        className="border-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary mt-1 border-2"
                       />
-                      <span className="text-xs md:text-sm font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
+                      <span className="text-foreground group-hover:text-primary text-xs leading-tight font-bold transition-colors md:text-sm">
                         {condition}
                       </span>
                     </label>
                   ))}
-                  <label className="flex items-start gap-3 p-4 md:p-5 rounded-3xl border-2 border-primary/5 hover:border-primary/20 hover:bg-primary/5 transition-all cursor-pointer group">
+                  <label className="border-primary/5 hover:border-primary/20 hover:bg-primary/5 group flex cursor-pointer items-start gap-3 rounded-3xl border-2 p-4 transition-all md:p-5">
                     <Checkbox
                       checked={(field.state.value || []).length === 0}
-                      onCheckedChange={(checked) => {
+                      onCheckedChange={checked => {
                         if (checked) field.handleChange([]);
                       }}
-                      className="mt-1 border-2 border-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                      className="border-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary mt-1 border-2"
                     />
-                    <span className="text-xs md:text-sm font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
+                    <span className="text-foreground group-hover:text-primary text-xs leading-tight font-bold transition-colors md:text-sm">
                       None of the above
                     </span>
                   </label>
                 </div>
-                {field.state.meta.isTouched &&
-                  field.state.meta.errors.length > 0 && (
-                    <FieldError errors={field.state.meta.errors} />
-                  )}
+                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                  <FieldError errors={field.state.meta.errors} />
+                )}
               </Field>
             )}
           </form.Field>
@@ -186,83 +154,68 @@ export function EligibilityStep() {
         {/* Last Donation Date */}
         <section className="space-y-6 pt-4">
           <form.Field name="lastDonationDate">
-            {(field) => (
+            {field => (
               <Field>
                 <div>
-                  <FieldLabel className="text-xl font-black tracking-tight flex items-center gap-2">
-                    <CalendarIcon className="h-5 w-5 text-primary" />
+                  <FieldLabel className="flex items-center gap-2 text-xl font-black tracking-tight">
+                    <CalendarIcon className="text-primary h-5 w-5" />
                     Donation History
                   </FieldLabel>
-                  <FieldDescription className="text-sm text-muted-foreground font-medium mt-1">
+                  <FieldDescription className="text-muted-foreground mt-1 text-sm font-medium">
                     When was your last blood donation? (Leave blank if never)
                   </FieldDescription>
                 </div>
 
-                <div className="max-w-md mt-4">
+                <div className="mt-4 max-w-md">
                   <Input
                     type="date"
-                    value={
-                      field.state.value
-                        ? new Date(field.state.value)
-                            .toISOString()
-                            .split("T")[0]
-                        : ""
-                    }
-                    onChange={(e) =>
-                      field.handleChange(
-                        e.target.value ? new Date(e.target.value).getTime() : 0,
-                      )
-                    }
-                    className="h-12 md:h-14 rounded-3xl border-primary/10 bg-background shadow-sm focus-visible:ring-primary/20 focus-visible:border-primary transition-all text-base md:text-lg font-medium"
+                    value={field.state.value ? new Date(field.state.value).toISOString().split("T")[0] : ""}
+                    onChange={e => field.handleChange(e.target.value ? new Date(e.target.value).getTime() : 0)}
+                    className="border-primary/10 bg-background focus-visible:ring-primary/20 focus-visible:border-primary h-12 rounded-3xl text-base font-medium shadow-sm transition-all md:h-14 md:text-lg"
                   />
                 </div>
-                {field.state.meta.isTouched &&
-                  field.state.meta.errors.length > 0 && (
-                    <FieldError errors={field.state.meta.errors} />
-                  )}
+                {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                  <FieldError errors={field.state.meta.errors} />
+                )}
               </Field>
             )}
           </form.Field>
         </section>
 
         {/* Initial Eligibility Status Preview */}
-        <div className="bg-primary/5 border-2 border-primary/20 rounded-3xl p-6 md:p-8 flex items-start gap-4 md:gap-5 shadow-sm mt-8">
-          <div className="p-2 md:p-3 bg-primary/20 rounded-2xl text-primary shrink-0 shadow-lg shadow-primary/10">
+        <div className="bg-primary/5 border-primary/20 mt-8 flex items-start gap-4 rounded-3xl border-2 p-6 shadow-sm md:gap-5 md:p-8">
+          <div className="bg-primary/20 text-primary shadow-primary/10 shrink-0 rounded-2xl p-2 shadow-lg md:p-3">
             <CheckCircle2 className="h-6 w-6 md:h-8 md:w-8" />
           </div>
           <div>
-            <h3 className="text-lg md:text-xl font-black text-foreground mb-1 tracking-tight">
+            <h3 className="text-foreground mb-1 text-lg font-black tracking-tight md:text-xl">
               Initial Eligibility Review
             </h3>
-            <p className="text-muted-foreground font-medium text-sm md:text-base leading-relaxed">
-              Based on your responses,{" "}
-              <strong>you&apos;re on the right path!</strong> Final eligibility
-              will be confirmed during pre-donation health screening at the
-              center.
+            <p className="text-muted-foreground text-sm leading-relaxed font-medium md:text-base">
+              Based on your responses, <strong>you&apos;re on the right path!</strong> Final eligibility will be
+              confirmed during pre-donation health screening at the center.
             </p>
           </div>
         </div>
       </FieldGroup>
 
-      <div className="pt-8 border-t flex flex-col-reverse sm:flex-row justify-between gap-4">
+      <div className="flex flex-col-reverse justify-between gap-4 border-t pt-8 sm:flex-row">
         <Button
           type="button"
           variant="outline"
           onClick={() => setCurrentStep(2)}
           disabled={isSubmitting}
-          className="h-12 md:h-14 px-8 rounded-3xl font-bold border-primary/10 bg-background shadow-sm hover:bg-primary/5 transition-all gap-2 w-full sm:w-auto"
+          className="border-primary/10 bg-background hover:bg-primary/5 h-12 w-full gap-2 rounded-3xl px-8 font-bold shadow-sm transition-all sm:w-auto md:h-14"
         >
           <ArrowLeft className="h-5 w-5" />
           Back
         </Button>
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-        >
+        <form.Subscribe selector={state => [state.canSubmit, state.isSubmitting]}>
           {([canSubmit, isSubmitting]) => (
             <Button
               type="submit"
               disabled={!canSubmit || isSubmitting}
-              className="h-12 md:h-14 px-10 flex-1 rounded-3xl font-black shadow-xl shadow-primary/20 gap-3 transition-all hover:scale-[1.02] active:scale-95 bg-primary text-white w-full sm:w-auto"
+              className="shadow-primary/20 bg-primary h-12 w-full flex-1 gap-3 rounded-3xl px-10 font-black text-white shadow-xl transition-all hover:scale-[1.02] active:scale-95 sm:w-auto md:h-14"
             >
               {isSubmitting ? (
                 <Loader2 className="h-6 w-6 animate-spin" />

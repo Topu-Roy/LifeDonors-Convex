@@ -14,7 +14,7 @@ export const updateProfile = mutation({
       v.literal("AB+"),
       v.literal("AB-"),
       v.literal("O+"),
-      v.literal("O-"),
+      v.literal("O-")
     ),
     hemoglobinLevel: v.number(),
     diseases: v.array(v.string()),
@@ -31,7 +31,7 @@ export const updateProfile = mutation({
 
     const profile = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .withIndex("by_userId", q => q.eq("userId", identity.subject))
       .first();
 
     if (profile) {
@@ -49,7 +49,7 @@ export const updateProfile = mutation({
 
 export const getMyProfile = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
 
     const user = await auth.api.getSession({ headers });
@@ -58,7 +58,7 @@ export const getMyProfile = query({
 
     const profile = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", user.user.id))
+      .withIndex("by_userId", q => q.eq("userId", user.user.id))
       .first();
 
     return {
@@ -73,24 +73,20 @@ export const getMyProfile = query({
 
 export const checkEligibility = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return { eligible: false, reason: "Not logged in" };
 
     const userData = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .withIndex("by_userId", q => q.eq("userId", identity.subject))
       .first();
     if (!userData) return { eligible: false, reason: "User not found" };
 
     const { age, bmi, hemoglobinLevel, lastDonationDate, diseases } = userData;
 
     // Check if profile is complete
-    if (
-      age === undefined ||
-      bmi === undefined ||
-      hemoglobinLevel === undefined
-    ) {
+    if (age === undefined || bmi === undefined || hemoglobinLevel === undefined) {
       return {
         eligible: false,
         reason: "Profile incomplete. Please fill in your donor details.",
@@ -129,11 +125,8 @@ export const checkEligibility = query({
       const MS_PER_DAY = 1000 * 60 * 60 * 24;
       const DONATION_COOLDOWN_DAYS = 56;
 
-      const daysSinceLastDonation =
-        (Date.now() - lastDonationDate) / MS_PER_DAY;
-      const daysRemaining = Math.ceil(
-        DONATION_COOLDOWN_DAYS - daysSinceLastDonation,
-      );
+      const daysSinceLastDonation = (Date.now() - lastDonationDate) / MS_PER_DAY;
+      const daysRemaining = Math.ceil(DONATION_COOLDOWN_DAYS - daysSinceLastDonation);
 
       if (daysRemaining > 0) {
         return {

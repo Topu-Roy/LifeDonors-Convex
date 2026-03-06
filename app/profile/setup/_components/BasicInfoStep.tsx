@@ -1,27 +1,16 @@
 "use client";
 
-import { useAtom } from "jotai";
-import { currentStepAtom, setupFormAtom } from "@/state/setup/store";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Field,
-  FieldLabel,
-  FieldGroup,
-  FieldError,
-} from "@/components/ui/field";
-import { ArrowRight, User, Phone, MapPin } from "lucide-react";
-import { bangladeshAdministrativeData } from "@/constants/bangladeshAdministrativeAreas";
 import { useMemo } from "react";
 import { useForm } from "@tanstack/react-form";
+import { bangladeshAdministrativeData } from "@/constants/bangladeshAdministrativeAreas";
+import { currentStepAtom, setupFormAtom } from "@/state/setup/store";
+import { useAtom } from "jotai";
+import { ArrowRight, MapPin, Phone, User } from "lucide-react";
 import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const step1Schema = z.object({
   age: z.number().min(18, "Must be at least 18").max(65, "Must be under 65"),
@@ -47,38 +36,34 @@ export function BasicInfoStep() {
       onChange: step1Schema,
     },
     onSubmit: async ({ value }) => {
-      setFormData((prev) => ({ ...prev, ...value }));
+      setFormData(prev => ({ ...prev, ...value }));
       setCurrentStep(2);
     },
   });
 
   const divisions = useMemo(() => {
-    return bangladeshAdministrativeData.map((d) => d.division);
+    return bangladeshAdministrativeData.map(d => d.division);
   }, []);
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={e => {
         e.preventDefault();
         e.stopPropagation();
         void form.handleSubmit();
       }}
-      className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
+      className="animate-in fade-in slide-in-from-bottom-4 space-y-8 duration-500"
     >
       <FieldGroup>
         {/* Age and Phone */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <form.Field name="age">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !!field.state.meta.errors.length;
+            {field => {
+              const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel
-                    htmlFor={field.name}
-                    className="flex items-center gap-2"
-                  >
-                    <User className="h-4 w-4 text-primary" />
+                  <FieldLabel htmlFor={field.name} className="flex items-center gap-2">
+                    <User className="text-primary h-4 w-4" />
                     Your Age
                   </FieldLabel>
                   <Input
@@ -87,10 +72,8 @@ export function BasicInfoStep() {
                     placeholder="e.g. 25"
                     value={field.state.value || ""}
                     onBlur={field.handleBlur}
-                    onChange={(e) =>
-                      field.handleChange(parseInt(e.target.value) || 0)
-                    }
-                    className="h-12 md:h-14 rounded-3xl border-primary/10 bg-background shadow-sm focus-visible:ring-primary/20 focus-visible:border-primary transition-all text-base md:text-lg font-medium"
+                    onChange={e => field.handleChange(parseInt(e.target.value) || 0)}
+                    className="border-primary/10 bg-background focus-visible:ring-primary/20 focus-visible:border-primary h-12 rounded-3xl text-base font-medium shadow-sm transition-all md:h-14 md:text-lg"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -99,16 +82,12 @@ export function BasicInfoStep() {
           </form.Field>
 
           <form.Field name="phoneNumber">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !!field.state.meta.errors.length;
+            {field => {
+              const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel
-                    htmlFor={field.name}
-                    className="flex items-center gap-2"
-                  >
-                    <Phone className="h-4 w-4 text-primary" />
+                  <FieldLabel htmlFor={field.name} className="flex items-center gap-2">
+                    <Phone className="text-primary h-4 w-4" />
                     Phone Number
                   </FieldLabel>
                   <Input
@@ -117,8 +96,8 @@ export function BasicInfoStep() {
                     placeholder="e.g. 017XXXXXXXX"
                     value={field.state.value || ""}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    className="h-12 md:h-14 rounded-3xl border-primary/10 bg-background shadow-sm focus-visible:ring-primary/20 focus-visible:border-primary transition-all text-base md:text-lg font-medium"
+                    onChange={e => field.handleChange(e.target.value)}
+                    className="border-primary/10 bg-background focus-visible:ring-primary/20 focus-visible:border-primary h-12 rounded-3xl text-base font-medium shadow-sm transition-all md:h-14 md:text-lg"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -129,82 +108,80 @@ export function BasicInfoStep() {
 
         {/* Location Selectors */}
         <div className="space-y-6 pt-4">
-          <h3 className="text-base font-bold flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-primary" />
+          <h3 className="flex items-center gap-2 text-base font-bold">
+            <MapPin className="text-primary h-4 w-4" />
             Current Location
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <form.Field name="division">
-              {(field) => (
+              {field => (
                 <Field>
-                  <FieldLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                  <FieldLabel className="text-muted-foreground ml-1 text-xs font-bold tracking-wider uppercase">
                     Division
                   </FieldLabel>
                   <Select
                     value={field.state.value}
-                    onValueChange={(v) => {
+                    onValueChange={v => {
                       field.handleChange(v!);
                       form.setFieldValue("district", "");
                       form.setFieldValue("subDistrict", "");
                     }}
                   >
-                    <SelectTrigger className="h-11 md:h-12 rounded-2xl border-primary/10 bg-background shadow-sm focus:ring-primary/20 text-sm md:text-base">
+                    <SelectTrigger className="border-primary/10 bg-background focus:ring-primary/20 h-11 rounded-2xl text-sm shadow-sm md:h-12 md:text-base">
                       <SelectValue placeholder="Select Division" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-2xl border-primary/10">
-                      {divisions.map((d) => (
+                    <SelectContent className="border-primary/10 rounded-2xl">
+                      {divisions.map(d => (
                         <SelectItem key={d} value={d}>
                           {d}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {field.state.meta.isTouched &&
-                    field.state.meta.errors.length > 0 && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
+                  {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                    <FieldError errors={field.state.meta.errors} />
+                  )}
                 </Field>
               )}
             </form.Field>
 
-            <form.Subscribe selector={(state) => state.values.division}>
-              {(division) => (
+            <form.Subscribe selector={state => state.values.division}>
+              {division => (
                 <form.Field name="district">
-                  {(field) => {
+                  {field => {
                     const districts = division
                       ? (bangladeshAdministrativeData
-                          .find((d) => d.division === division)
-                          ?.districts.map((d) => d.district) ?? [])
+                          .find(d => d.division === division)
+                          ?.districts.map(d => d.district) ?? [])
                       : [];
                     return (
                       <Field>
-                        <FieldLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                        <FieldLabel className="text-muted-foreground ml-1 text-xs font-bold tracking-wider uppercase">
                           District
                         </FieldLabel>
                         <Select
                           value={field.state.value}
-                          onValueChange={(v) => {
+                          onValueChange={v => {
                             field.handleChange(v!);
                             form.setFieldValue("subDistrict", "");
                           }}
                           disabled={!division}
                         >
-                          <SelectTrigger className="h-11 md:h-12 rounded-2xl border-primary/10 bg-background shadow-sm focus:ring-primary/20 text-sm md:text-base">
+                          <SelectTrigger className="border-primary/10 bg-background focus:ring-primary/20 h-11 rounded-2xl text-sm shadow-sm md:h-12 md:text-base">
                             <SelectValue placeholder="Select District" />
                           </SelectTrigger>
-                          <SelectContent className="rounded-2xl border-primary/10">
-                            {districts.map((d) => (
+                          <SelectContent className="border-primary/10 rounded-2xl">
+                            {districts.map(d => (
                               <SelectItem key={d} value={d}>
                                 {d}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-                        {field.state.meta.isTouched &&
-                          field.state.meta.errors.length > 0 && (
-                            <FieldError errors={field.state.meta.errors} />
-                          )}
+                        {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
                       </Field>
                     );
                   }}
@@ -212,47 +189,40 @@ export function BasicInfoStep() {
               )}
             </form.Subscribe>
 
-            <form.Subscribe
-              selector={(state) => [
-                state.values.division,
-                state.values.district,
-              ]}
-            >
+            <form.Subscribe selector={state => [state.values.division, state.values.district]}>
               {([division, district]) => (
                 <form.Field name="subDistrict">
-                  {(field) => {
+                  {field => {
                     const subDistricts =
                       division && district
                         ? (bangladeshAdministrativeData
-                            .find((d) => d.division === division)
-                            ?.districts.find((d) => d.district === district)
-                            ?.subDistricts ?? [])
+                            .find(d => d.division === division)
+                            ?.districts.find(d => d.district === district)?.subDistricts ?? [])
                         : [];
                     return (
                       <Field>
-                        <FieldLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                        <FieldLabel className="text-muted-foreground ml-1 text-xs font-bold tracking-wider uppercase">
                           Sub District
                         </FieldLabel>
                         <Select
                           value={field.state.value}
-                          onValueChange={(v) => field.handleChange(v!)}
+                          onValueChange={v => field.handleChange(v!)}
                           disabled={!district}
                         >
-                          <SelectTrigger className="h-11 md:h-12 rounded-2xl border-primary/10 bg-background shadow-sm focus:ring-primary/20 text-sm md:text-base">
+                          <SelectTrigger className="border-primary/10 bg-background focus:ring-primary/20 h-11 rounded-2xl text-sm shadow-sm md:h-12 md:text-base">
                             <SelectValue placeholder="Select Sub District" />
                           </SelectTrigger>
-                          <SelectContent className="rounded-2xl border-primary/10">
-                            {subDistricts.map((s) => (
+                          <SelectContent className="border-primary/10 rounded-2xl">
+                            {subDistricts.map(s => (
                               <SelectItem key={s} value={s}>
                                 {s}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-                        {field.state.meta.isTouched &&
-                          field.state.meta.errors.length > 0 && (
-                            <FieldError errors={field.state.meta.errors} />
-                          )}
+                        {field.state.meta.isTouched && field.state.meta.errors.length > 0 && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
                       </Field>
                     );
                   }}
@@ -263,15 +233,13 @@ export function BasicInfoStep() {
         </div>
       </FieldGroup>
 
-      <div className="pt-8 border-t flex justify-end">
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-        >
+      <div className="flex justify-end border-t pt-8">
+        <form.Subscribe selector={state => [state.canSubmit, state.isSubmitting]}>
           {([canSubmit, isSubmitting]) => (
             <Button
               type="submit"
               disabled={!canSubmit || isSubmitting}
-              className="h-12 md:h-14 px-10 rounded-3xl font-black shadow-xl shadow-primary/20 gap-2 transition-all hover:scale-105 active:scale-95 w-full md:w-auto"
+              className="shadow-primary/20 h-12 w-full gap-2 rounded-3xl px-10 font-black shadow-xl transition-all hover:scale-105 active:scale-95 md:h-14 md:w-auto"
             >
               Continue
               <ArrowRight className="h-5 w-5" />

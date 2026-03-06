@@ -12,14 +12,7 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
     districts: [
       {
         district: "Barguna",
-        subDistricts: [
-          "Amtali",
-          "Bamna",
-          "Barguna Sadar",
-          "Betagi",
-          "Patharghata",
-          "Taltali",
-        ],
+        subDistricts: ["Amtali", "Bamna", "Barguna Sadar", "Betagi", "Patharghata", "Taltali"],
       },
       {
         district: "Barisal",
@@ -84,15 +77,7 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
     districts: [
       {
         district: "Bandarban",
-        subDistricts: [
-          "Alikadam",
-          "Bandarban Sadar",
-          "Lama",
-          "Naikhongchhari",
-          "Rowangchhari",
-          "Ruma",
-          "Thanchi",
-        ],
+        subDistricts: ["Alikadam", "Bandarban Sadar", "Lama", "Naikhongchhari", "Rowangchhari", "Ruma", "Thanchi"],
       },
       {
         district: "Brahmanbaria",
@@ -179,14 +164,7 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Feni",
-        subDistricts: [
-          "Chhagalnaiya",
-          "Daganbhuiyan",
-          "Feni Sadar",
-          "Fulgazi",
-          "Parshuram",
-          "Sonagazi",
-        ],
+        subDistricts: ["Chhagalnaiya", "Daganbhuiyan", "Feni Sadar", "Fulgazi", "Parshuram", "Sonagazi"],
       },
       {
         district: "Khagrachhari",
@@ -204,13 +182,7 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Lakshmipur",
-        subDistricts: [
-          "Kamalnagar",
-          "Lakshmipur Sadar",
-          "Raipur",
-          "Ramganj",
-          "Ramgati",
-        ],
+        subDistricts: ["Kamalnagar", "Lakshmipur Sadar", "Raipur", "Ramganj", "Ramgati"],
       },
       {
         district: "Noakhali",
@@ -266,23 +238,11 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Gazipur",
-        subDistricts: [
-          "Gazipur Sadar",
-          "Kaliakair",
-          "Kaliganj",
-          "Kapasia",
-          "Sreepur",
-        ],
+        subDistricts: ["Gazipur Sadar", "Kaliakair", "Kaliganj", "Kapasia", "Sreepur"],
       },
       {
         district: "Gopalganj",
-        subDistricts: [
-          "Gopalganj Sadar",
-          "Kashiani",
-          "Kotalipara",
-          "Muksudpur",
-          "Tungipara",
-        ],
+        subDistricts: ["Gopalganj Sadar", "Kashiani", "Kotalipara", "Muksudpur", "Tungipara"],
       },
       {
         district: "Kishoreganj",
@@ -308,69 +268,27 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Manikganj",
-        subDistricts: [
-          "Daulatpur",
-          "Ghior",
-          "Harirampur",
-          "Manikganj Sadar",
-          "Saturia",
-          "Shivalaya",
-          "Singair",
-        ],
+        subDistricts: ["Daulatpur", "Ghior", "Harirampur", "Manikganj Sadar", "Saturia", "Shivalaya", "Singair"],
       },
       {
         district: "Munshiganj",
-        subDistricts: [
-          "Gazaria",
-          "Lohajang",
-          "Munshiganj Sadar",
-          "Sirajdikhan",
-          "Sreenagar",
-          "Tongibari",
-        ],
+        subDistricts: ["Gazaria", "Lohajang", "Munshiganj Sadar", "Sirajdikhan", "Sreenagar", "Tongibari"],
       },
       {
         district: "Narayanganj",
-        subDistricts: [
-          "Araihazar",
-          "Bandar",
-          "Narayanganj Sadar",
-          "Rupganj",
-          "Sonargaon",
-        ],
+        subDistricts: ["Araihazar", "Bandar", "Narayanganj Sadar", "Rupganj", "Sonargaon"],
       },
       {
         district: "Narsingdi",
-        subDistricts: [
-          "Belabo",
-          "Manohardi",
-          "Narsingdi Sadar",
-          "Palash",
-          "Raipura",
-          "Shibpur",
-        ],
+        subDistricts: ["Belabo", "Manohardi", "Narsingdi Sadar", "Palash", "Raipura", "Shibpur"],
       },
       {
         district: "Rajbari",
-        subDistricts: [
-          "Baliakandi",
-          "Goalandaghat",
-          "Kalukhali",
-          "Pangsha",
-          "Rajbari Sadar",
-        ],
+        subDistricts: ["Baliakandi", "Goalandaghat", "Kalukhali", "Pangsha", "Rajbari Sadar"],
       },
       {
         district: "Shariatpur",
-        subDistricts: [
-          "Bhedarganj",
-          "Damudya",
-          "Gosairhat",
-          "Jajira",
-          "Naria",
-          "Shariatpur Sadar",
-          "Zanjira",
-        ],
+        subDistricts: ["Bhedarganj", "Damudya", "Gosairhat", "Jajira", "Naria", "Shariatpur Sadar", "Zanjira"],
       },
       {
         district: "Tangail",
@@ -410,12 +328,7 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Chuadanga",
-        subDistricts: [
-          "Alamdanga",
-          "Chuadanga Sadar",
-          "Damurhuda",
-          "Jibannagar",
-        ],
+        subDistricts: ["Alamdanga", "Chuadanga Sadar", "Damurhuda", "Jibannagar"],
       },
       {
         district: "Jessore",
@@ -432,14 +345,7 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Jhenaidah",
-        subDistricts: [
-          "Harinakunda",
-          "Jhenaidah Sadar",
-          "Kaliganj",
-          "Kotchandpur",
-          "Maheshpur",
-          "Shailkupa",
-        ],
+        subDistricts: ["Harinakunda", "Jhenaidah Sadar", "Kaliganj", "Kotchandpur", "Maheshpur", "Shailkupa"],
       },
       {
         district: "Khulna",
@@ -457,14 +363,7 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Kushtia",
-        subDistricts: [
-          "Bheramara",
-          "Daulatpur",
-          "Khoksa",
-          "Kumarkhali",
-          "Kushtia Sadar",
-          "Mirpur",
-        ],
+        subDistricts: ["Bheramara", "Daulatpur", "Khoksa", "Kumarkhali", "Kushtia Sadar", "Mirpur"],
       },
       {
         district: "Magura",
@@ -480,15 +379,7 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Satkhira",
-        subDistricts: [
-          "Assasuni",
-          "Debhata",
-          "Kalaroa",
-          "Kaliganj",
-          "Satkhira Sadar",
-          "Shyamnagar",
-          "Tala",
-        ],
+        subDistricts: ["Assasuni", "Debhata", "Kalaroa", "Kaliganj", "Satkhira Sadar", "Shyamnagar", "Tala"],
       },
     ],
   },
@@ -542,13 +433,7 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Sherpur",
-        subDistricts: [
-          "Jhenaigati",
-          "Nakla",
-          "Nalitabari",
-          "Sherpur Sadar",
-          "Sreebardi",
-        ],
+        subDistricts: ["Jhenaigati", "Nakla", "Nalitabari", "Sherpur Sadar", "Sreebardi"],
       },
     ],
   },
@@ -574,24 +459,11 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Chapainawabganj",
-        subDistricts: [
-          "Bholahat",
-          "Chapainawabganj Sadar",
-          "Gomastapur",
-          "Nachole",
-          "Shibganj",
-        ],
+        subDistricts: ["Bholahat", "Chapainawabganj Sadar", "Gomastapur", "Nachole", "Shibganj"],
       },
       {
         district: "Joypurhat",
-        subDistricts: [
-          "Akkelpur",
-          "Bambal",
-          "Joypurhat Sadar",
-          "Kalai",
-          "Khetlal",
-          "Panchbibi",
-        ],
+        subDistricts: ["Akkelpur", "Bambal", "Joypurhat Sadar", "Kalai", "Khetlal", "Panchbibi"],
       },
       {
         district: "Naogaon",
@@ -611,15 +483,7 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Natore",
-        subDistricts: [
-          "Bagatipara",
-          "Baraigram",
-          "Gurudaspur",
-          "Lalpur",
-          "Natore Sadar",
-          "Naldanga",
-          "Singra",
-        ],
+        subDistricts: ["Bagatipara", "Baraigram", "Gurudaspur", "Lalpur", "Natore Sadar", "Naldanga", "Singra"],
       },
       {
         district: "Pabna",
@@ -713,34 +577,15 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Lalmonirhat",
-        subDistricts: [
-          "Aditmari",
-          "Hatibandha",
-          "Kaliganj",
-          "Lalmonirhat Sadar",
-          "Patgram",
-        ],
+        subDistricts: ["Aditmari", "Hatibandha", "Kaliganj", "Lalmonirhat Sadar", "Patgram"],
       },
       {
         district: "Nilphamari",
-        subDistricts: [
-          "Dimla",
-          "Domar",
-          "Jaldhaka",
-          "Kishoreganj",
-          "Nilphamari Sadar",
-          "Saidpur",
-        ],
+        subDistricts: ["Dimla", "Domar", "Jaldhaka", "Kishoreganj", "Nilphamari Sadar", "Saidpur"],
       },
       {
         district: "Panchagarh",
-        subDistricts: [
-          "Atwari",
-          "Boda",
-          "Debiganj",
-          "Panchagarh Sadar",
-          "Tetulia",
-        ],
+        subDistricts: ["Atwari", "Boda", "Debiganj", "Panchagarh Sadar", "Tetulia"],
       },
       {
         district: "Rangpur",
@@ -757,13 +602,7 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Thakurgaon",
-        subDistricts: [
-          "Baliadangi",
-          "Haripur",
-          "Pirganj",
-          "Ranisankail",
-          "Thakurgaon Sadar",
-        ],
+        subDistricts: ["Baliadangi", "Haripur", "Pirganj", "Ranisankail", "Thakurgaon Sadar"],
       },
     ],
   },
@@ -786,15 +625,7 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
       },
       {
         district: "Moulvibazar",
-        subDistricts: [
-          "Barlekha",
-          "Juri",
-          "Kamalganj",
-          "Kulaura",
-          "Moulvibazar Sadar",
-          "Rajnagar",
-          "Sreemangal",
-        ],
+        subDistricts: ["Barlekha", "Juri", "Kamalganj", "Kulaura", "Moulvibazar Sadar", "Rajnagar", "Sreemangal"],
       },
       {
         district: "Sunamganj",
@@ -841,7 +672,7 @@ export const bangladeshAdministrativeData: DistrictsAndSubDistrictsType = [
  * @returns string[]
  */
 export function getAllDivisions(): string[] {
-  return bangladeshAdministrativeData.map((d) => d.division);
+  return bangladeshAdministrativeData.map(d => d.division);
 }
 
 /**
@@ -849,13 +680,9 @@ export function getAllDivisions(): string[] {
  * @param division string
  * @returns string[]
  */
-export function getDistrictsByDivision({
-  division,
-}: {
-  division: string;
-}): string[] {
-  const div = bangladeshAdministrativeData.find((d) => d.division === division);
-  return div ? div.districts.map((d) => d.district) : [];
+export function getDistrictsByDivision({ division }: { division: string }): string[] {
+  const div = bangladeshAdministrativeData.find(d => d.division === division);
+  return div ? div.districts.map(d => d.district) : [];
 }
 
 /**
@@ -871,7 +698,7 @@ export function getSubDistrictsByDistrict({
   division: string;
   district: string;
 }): string[] {
-  const div = bangladeshAdministrativeData.find((d) => d.division === division);
-  const dist = div?.districts.find((d) => d.district === district);
+  const div = bangladeshAdministrativeData.find(d => d.division === division);
+  const dist = div?.districts.find(d => d.district === district);
   return dist ? dist.subDistricts : [];
 }

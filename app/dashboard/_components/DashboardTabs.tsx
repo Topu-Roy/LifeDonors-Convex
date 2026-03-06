@@ -1,34 +1,29 @@
 "use client";
 
-import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { RequestCard } from "@/components/RequestCard";
+import { type Id } from "@/convex/_generated/dataModel";
+import { useMutation, useQuery } from "convex/react";
 import {
-  Card,
-  CardContent,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { useSearchParams } from "next/navigation";
-import { cn } from "@/lib/utils";
-import {
-  Plus,
-  History,
-  MessageSquare,
-  Droplet,
   Calendar,
   CheckCircle2,
-  XCircle,
   Clock,
+  Droplet,
   ExternalLink,
   Heart,
+  History,
+  MessageSquare,
+  Plus,
+  XCircle,
 } from "lucide-react";
-import { toast } from "sonner";
-import { type Id } from "@/convex/_generated/dataModel";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { RequestCard } from "@/components/RequestCard";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function DashboardTabs() {
   const searchParams = useSearchParams();
@@ -39,10 +34,7 @@ export function DashboardTabs() {
   const updateDonationStatus = useMutation(api.donations.updateDonationStatus);
   const withdrawDonation = useMutation(api.donations.withdrawDonation);
 
-  const handleUpdateStatus = async (
-    donationId: Id<"donations">,
-    status: "Donated" | "No Show",
-  ) => {
+  const handleUpdateStatus = async (donationId: Id<"donations">, status: "Donated" | "No Show") => {
     try {
       await updateDonationStatus({ donationId, status });
       toast.success(`Donation marked as ${status}`);
@@ -58,43 +50,35 @@ export function DashboardTabs() {
         toast.success("Commitment withdrawn");
       }
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to withdraw",
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to withdraw");
     }
   };
 
   return (
     <Tabs defaultValue={defaultTab} className="w-full space-y-8">
-      <TabsList className="bg-background border p-1 h-12 md:h-14 rounded-full w-full max-w-md shadow-sm">
+      <TabsList className="bg-background h-12 w-full max-w-md rounded-full border p-1 shadow-sm md:h-14">
         <TabsTrigger
           value="requests"
-          className="rounded-full px-4 md:px-8 h-full font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all gap-2 text-xs md:text-sm"
+          className="data-[state=active]:bg-primary h-full gap-2 rounded-full px-4 text-xs font-bold transition-all data-[state=active]:text-white md:px-8 md:text-sm"
         >
           <MessageSquare className="h-4 w-4" />
           My Requests
         </TabsTrigger>
         <TabsTrigger
           value="donations"
-          className="rounded-full px-4 md:px-8 h-full font-bold data-[state=active]:bg-primary data-[state=active]:text-white transition-all gap-2 text-xs md:text-sm"
+          className="data-[state=active]:bg-primary h-full gap-2 rounded-full px-4 text-xs font-bold transition-all data-[state=active]:text-white md:px-8 md:text-sm"
         >
           <History className="h-4 w-4" />
           My Donations
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent
-        value="requests"
-        className="space-y-6 focus-visible:outline-none"
-      >
+      <TabsContent value="requests" className="space-y-6 focus-visible:outline-none">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2">
+          <h2 className="flex items-center gap-2 text-xl font-black tracking-tight md:text-2xl">
             Active Requests
             {myRequests && (
-              <Badge
-                variant="secondary"
-                className="rounded-full px-2 py-0 text-[10px]"
-              >
+              <Badge variant="secondary" className="rounded-full px-2 py-0 text-[10px]">
                 {myRequests.length}
               </Badge>
             )}
@@ -103,7 +87,7 @@ export function DashboardTabs() {
             href="/requests"
             className={cn(
               buttonVariants({ size: "sm" }),
-              "font-bold rounded-xl shadow-lg shadow-primary/20 gap-2 shrink-0 h-10 px-4",
+              "shadow-primary/20 h-10 shrink-0 gap-2 rounded-xl px-4 font-bold shadow-lg"
             )}
           >
             <Plus className="h-4 w-4" />
@@ -112,30 +96,27 @@ export function DashboardTabs() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {myRequests === undefined ? (
             Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-64 bg-muted animate-pulse rounded-3xl border"
-              />
+              <div key={i} className="bg-muted h-64 animate-pulse rounded-3xl border" />
             ))
           ) : (
             <>
-              {myRequests.map((request) => (
+              {myRequests.map(request => (
                 <RequestCard key={request._id} request={request} isOwner />
               ))}
               {/* Create New Placeholder Card */}
               <Link
                 href="/requests"
-                className="group flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed border-border bg-transparent p-6 hover:border-primary hover:bg-primary/5 transition-all text-center min-h-[250px]"
+                className="group border-border hover:border-primary hover:bg-primary/5 flex min-h-[250px] flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed bg-transparent p-6 text-center transition-all"
               >
-                <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                <div className="bg-primary/10 text-primary flex h-14 w-14 items-center justify-center rounded-2xl transition-transform group-hover:scale-110">
                   <Plus className="h-8 w-8" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg">Create New Request</h3>
-                  <p className="text-sm text-muted-foreground mt-1 px-4">
+                  <h3 className="text-lg font-bold">Create New Request</h3>
+                  <p className="text-muted-foreground mt-1 px-4 text-sm">
                     Need blood for a patient? Post a new request here.
                   </p>
                 </div>
@@ -145,12 +126,9 @@ export function DashboardTabs() {
         </div>
       </TabsContent>
 
-      <TabsContent
-        value="donations"
-        className="space-y-6 focus-visible:outline-none"
-      >
+      <TabsContent value="donations" className="space-y-6 focus-visible:outline-none">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-black tracking-tight flex items-center gap-2">
+          <h2 className="flex items-center gap-2 text-2xl font-black tracking-tight">
             My Commitments
             {myDonations && (
               <Badge variant="secondary" className="rounded-full px-2 py-0">
@@ -160,41 +138,32 @@ export function DashboardTabs() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {myDonations === undefined ? (
             Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-32 bg-muted animate-pulse rounded-3xl border"
-              />
+              <div key={i} className="bg-muted h-32 animate-pulse rounded-3xl border" />
             ))
           ) : myDonations.length > 0 ? (
-            myDonations.map((donation) => (
+            myDonations.map(donation => (
               <DonationTrackingCard
                 key={donation._id}
                 donation={donation}
-                onMarkDonated={(id) => handleUpdateStatus(id, "Donated")}
+                onMarkDonated={id => handleUpdateStatus(id, "Donated")}
                 onWithdraw={handleWithdraw}
               />
             ))
           ) : (
-            <Card className="col-span-full border-dashed p-12 text-center rounded-3xl">
-              <div className="h-16 w-16 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Droplet className="h-8 w-8 text-muted-foreground" />
+            <Card className="col-span-full rounded-3xl border-dashed p-12 text-center">
+              <div className="bg-muted mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl">
+                <Droplet className="text-muted-foreground h-8 w-8" />
               </div>
-              <CardTitle className="text-xl font-bold">
-                No donations yet
-              </CardTitle>
-              <CardDescription className="max-w-xs mx-auto mt-2 text-base">
-                When you volunteer for a blood request, it will appear here for
-                you to track.
+              <CardTitle className="text-xl font-bold">No donations yet</CardTitle>
+              <CardDescription className="mx-auto mt-2 max-w-xs text-base">
+                When you volunteer for a blood request, it will appear here for you to track.
               </CardDescription>
               <Link
                 href="/requests"
-                className={cn(
-                  buttonVariants({ variant: "outline" }),
-                  "mt-6 font-bold rounded-xl",
-                )}
+                className={cn(buttonVariants({ variant: "outline" }), "mt-6 rounded-xl font-bold")}
               >
                 Find Requests
               </Link>
@@ -233,14 +202,7 @@ function DonationTrackingCard({
     _id: Id<"donations">;
     _creationTime: number;
     acceptedAt?: number | undefined;
-    status:
-      | "Accepted"
-      | "Rejected"
-      | "Offered"
-      | "Donated"
-      | "No Show"
-      | "Withdrawn"
-      | "Cancelled";
+    status: "Accepted" | "Rejected" | "Offered" | "Donated" | "No Show" | "Withdrawn" | "Cancelled";
     donorId: string;
     requestId: Id<"requests">;
   };
@@ -256,52 +218,40 @@ function DonationTrackingCard({
     "No Show": { color: "bg-destructive/10 text-destructive", icon: XCircle },
   };
 
-  const config =
-    statusConfig[donation.status as keyof typeof statusConfig] ||
-    statusConfig.Offered;
+  const config = statusConfig[donation.status as keyof typeof statusConfig] || statusConfig.Offered;
   const StatusIcon = config.icon;
 
   return (
-    <Card className="overflow-hidden border group hover:shadow-md transition-all rounded-3xl">
+    <Card className="group overflow-hidden rounded-3xl border transition-all hover:shadow-md">
       <CardContent className="p-0">
-        <div className="flex items-center p-5 gap-4">
-          <div
-            className={cn(
-              "size-14 rounded-2xl flex items-center justify-center shrink-0",
-              config.color,
-            )}
-          >
+        <div className="flex items-center gap-4 p-5">
+          <div className={cn("flex size-14 shrink-0 items-center justify-center rounded-2xl", config.color)}>
             <StatusIcon className="h-7 w-7" />
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-2 overflow-hidden">
-              <h4 className="font-black truncate text-lg">
-                {donation.request?.bloodTypeNeeded} for{" "}
-                {donation.request?.patientName}
+              <h4 className="truncate text-lg font-black">
+                {donation.request?.bloodTypeNeeded} for {donation.request?.patientName}
               </h4>
               <Badge
                 variant="secondary"
                 className={cn(
-                  "rounded-full font-bold text-[10px] uppercase tracking-wider shrink-0 px-2 py-0",
-                  config.color,
+                  "shrink-0 rounded-full px-2 py-0 text-[10px] font-bold tracking-wider uppercase",
+                  config.color
                 )}
               >
                 {donation.status}
               </Badge>
             </div>
-            <p className="text-sm text-muted-foreground font-medium truncate">
-              {donation.request?.hospitalName}
-            </p>
-            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+            <p className="text-muted-foreground truncate text-sm font-medium">{donation.request?.hospitalName}</p>
+            <div className="text-muted-foreground mt-2 flex items-center gap-4 text-xs">
               <span className="flex items-center gap-1 font-medium">
                 <Calendar className="h-3 w-3" />
-                {donation.acceptedAt
-                  ? new Date(donation.acceptedAt).toLocaleDateString()
-                  : "Pending"}
+                {donation.acceptedAt ? new Date(donation.acceptedAt).toLocaleDateString() : "Pending"}
               </span>
               <Link
                 href={`/requests/${donation.requestId}`}
-                className="flex items-center gap-1 text-primary hover:underline font-bold"
+                className="text-primary flex items-center gap-1 font-bold hover:underline"
               >
                 <ExternalLink className="h-3 w-3" />
                 View Request
@@ -310,18 +260,18 @@ function DonationTrackingCard({
           </div>
         </div>
         {(donation.status === "Offered" || donation.status === "Accepted") && (
-          <div className="flex items-center gap-2 p-3 bg-muted/50 border-t">
+          <div className="bg-muted/50 flex items-center gap-2 border-t p-3">
             {donation.status === "Accepted" && (
               <Button
                 size="sm"
                 onClick={() => onMarkDonated(donation._id)}
-                className="flex-1 font-bold rounded-xl shadow-lg shadow-primary/20"
+                className="shadow-primary/20 flex-1 rounded-xl font-bold shadow-lg"
               >
                 I Have Donated
               </Button>
             )}
             {donation.status === "Offered" && (
-              <div className="flex-1 text-xs text-muted-foreground font-medium italic bg-background p-2 rounded-xl border border-dashed flex items-center justify-center gap-2">
+              <div className="text-muted-foreground bg-background flex flex-1 items-center justify-center gap-2 rounded-xl border border-dashed p-2 text-xs font-medium italic">
                 <Clock className="h-3 w-3 animate-spin duration-3000" />
                 Waiting for requester to select you...
               </div>
@@ -330,7 +280,7 @@ function DonationTrackingCard({
               size="sm"
               variant="outline"
               onClick={() => onWithdraw(donation._id)}
-              className="px-4 font-bold border-destructive/20 text-destructive hover:bg-destructive/5 rounded-xl transition-colors"
+              className="border-destructive/20 text-destructive hover:bg-destructive/5 rounded-xl px-4 font-bold transition-colors"
             >
               Withdraw
             </Button>

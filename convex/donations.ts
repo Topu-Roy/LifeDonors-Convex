@@ -26,23 +26,23 @@ export const offerDonation = mutation({
 
 export const getMyDonations = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
 
     const donations = await ctx.db
       .query("donations")
-      .withIndex("by_donorId", (q) => q.eq("donorId", identity.subject))
+      .withIndex("by_donorId", q => q.eq("donorId", identity.subject))
       .collect();
 
     const enrichedDonations = await Promise.all(
-      donations.map(async (donation) => {
+      donations.map(async donation => {
         const request = await ctx.db.get("requests", donation.requestId);
         return {
           ...donation,
           request,
         };
-      }),
+      })
     );
 
     return enrichedDonations;
@@ -66,7 +66,7 @@ export const updateDonationStatus = mutation({
 
     const profile = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .withIndex("by_userId", q => q.eq("userId", identity.subject))
       .first();
 
     const isDonor = donation.donorId === identity.subject;
@@ -81,22 +81,15 @@ export const updateDonationStatus = mutation({
     // Recalculate request status
     const allAcceptedDonations = await ctx.db
       .query("donations")
-      .withIndex("by_requestId", (q) => q.eq("requestId", donation.requestId))
-      .filter((q) =>
-        q.or(
-          q.eq(q.field("status"), "Accepted"),
-          q.eq(q.field("status"), "Donated"),
-        ),
-      )
+      .withIndex("by_requestId", q => q.eq("requestId", donation.requestId))
+      .filter(q => q.or(q.eq(q.field("status"), "Accepted"), q.eq(q.field("status"), "Donated")))
       .collect();
 
     const filledBags = allAcceptedDonations.length;
 
     if (args.status === "Donated") {
       // If this was the last bag needed, mark request as Completed or keep as Accepted
-      const allDonated = allAcceptedDonations.every(
-        (d) => d.status === "Donated",
-      );
+      const allDonated = allAcceptedDonations.every(d => d.status === "Donated");
       if (filledBags >= request.numberOfBags && allDonated) {
         await ctx.db.patch("requests", donation.requestId, {
           status: "Completed",
@@ -123,7 +116,7 @@ export const selectDonor = mutation({
     const request = await ctx.db.get("requests", donation.requestId);
     const profile = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .withIndex("by_userId", q => q.eq("userId", identity.subject))
       .first();
 
     if (!request || request.requesterId !== profile?._id) {
@@ -139,13 +132,8 @@ export const selectDonor = mutation({
     // Check if we reached capacity
     const allAcceptedDonations = await ctx.db
       .query("donations")
-      .withIndex("by_requestId", (q) => q.eq("requestId", donation.requestId))
-      .filter((q) =>
-        q.or(
-          q.eq(q.field("status"), "Accepted"),
-          q.eq(q.field("status"), "Donated"),
-        ),
-      )
+      .withIndex("by_requestId", q => q.eq("requestId", donation.requestId))
+      .filter(q => q.or(q.eq(q.field("status"), "Accepted"), q.eq(q.field("status"), "Donated")))
       .collect();
 
     if (allAcceptedDonations.length >= request.numberOfBags) {
@@ -168,7 +156,7 @@ export const rejectDonor = mutation({
     const request = await ctx.db.get("requests", args.requestId);
     const profile = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .withIndex("by_userId", q => q.eq("userId", identity.subject))
       .first();
 
     if (!request || request.requesterId !== profile?._id) {
@@ -182,13 +170,8 @@ export const rejectDonor = mutation({
       // Re-open request if we drop below capacity
       const allAcceptedDonations = await ctx.db
         .query("donations")
-        .withIndex("by_requestId", (q) => q.eq("requestId", donation.requestId))
-        .filter((q) =>
-          q.or(
-            q.eq(q.field("status"), "Accepted"),
-            q.eq(q.field("status"), "Donated"),
-          ),
-        )
+        .withIndex("by_requestId", q => q.eq("requestId", donation.requestId))
+        .filter(q => q.or(q.eq(q.field("status"), "Accepted"), q.eq(q.field("status"), "Donated")))
         .collect();
 
       if (allAcceptedDonations.length < request.numberOfBags) {
@@ -221,15 +204,8 @@ export const withdrawDonation = mutation({
       if (request) {
         const allAcceptedDonations = await ctx.db
           .query("donations")
-          .withIndex("by_requestId", (q) =>
-            q.eq("requestId", donation.requestId),
-          )
-          .filter((q) =>
-            q.or(
-              q.eq(q.field("status"), "Accepted"),
-              q.eq(q.field("status"), "Donated"),
-            ),
-          )
+          .withIndex("by_requestId", q => q.eq("requestId", donation.requestId))
+          .filter(q => q.or(q.eq(q.field("status"), "Accepted"), q.eq(q.field("status"), "Donated")))
           .collect();
 
         if (allAcceptedDonations.length < request.numberOfBags) {

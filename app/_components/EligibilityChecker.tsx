@@ -2,44 +2,28 @@
 
 import { Activity, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function EligibilityChecker() {
   return (
-    <Card className="shadow-lg border-border relative overflow-hidden group">
-      <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-        <Sparkles className="h-24 w-24 text-primary" />
+    <Card className="border-border group relative overflow-hidden shadow-lg">
+      <div className="absolute top-0 right-0 p-4 opacity-5 transition-opacity group-hover:opacity-10">
+        <Sparkles className="text-primary h-24 w-24" />
       </div>
       <CardHeader>
-        <CardTitle className="text-xl font-bold flex items-center gap-2">
-          <Activity className="h-5 w-5 text-primary" />
+        <CardTitle className="flex items-center gap-2 text-xl font-bold">
+          <Activity className="text-primary h-5 w-5" />
           Can I Donate?
         </CardTitle>
-        <CardDescription>
-          Take a quick check to see if you are eligible to donate blood today.
-        </CardDescription>
+        <CardDescription>Take a quick check to see if you are eligible to donate blood today.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Age
-            </Label>
+            <Label className="text-muted-foreground text-xs font-bold tracking-wider uppercase">Age</Label>
             <Select>
               <SelectTrigger className="bg-muted/50 border-border">
                 <SelectValue placeholder="Select age range" />
@@ -53,9 +37,7 @@ export function EligibilityChecker() {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Weight
-            </Label>
+            <Label className="text-muted-foreground text-xs font-bold tracking-wider uppercase">Weight</Label>
             <Select>
               <SelectTrigger className="bg-muted/50 border-border">
                 <SelectValue placeholder="Select weight" />
@@ -68,7 +50,7 @@ export function EligibilityChecker() {
           </div>
 
           <div className="space-y-3">
-            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <Label className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
               Felt well today?
             </Label>
             <RadioGroup defaultValue="yes" className="flex gap-4">
@@ -87,9 +69,7 @@ export function EligibilityChecker() {
             </RadioGroup>
           </div>
         </div>
-        <Button className="w-full font-bold shadow-lg shadow-primary/20">
-          Check Eligibility
-        </Button>
+        <Button className="shadow-primary/20 w-full font-bold shadow-lg">Check Eligibility</Button>
       </CardContent>
     </Card>
   );

@@ -1,53 +1,29 @@
 "use client";
 
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-  FieldDescription,
-  FieldError,
-} from "@/components/ui/field";
 import { useForm } from "@tanstack/react-form";
-import * as z from "zod";
-import { toast } from "sonner";
-import { ShieldCheck } from "lucide-react";
 import {
   getAllDivisions,
   getDistrictsByDivision,
   getSubDistrictsByDistrict,
 } from "@/constants/bangladeshAdministrativeAreas";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
+import { ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { type ProfileType } from "./ProfileView";
 
-export const bloodTypes = [
-  "A+",
-  "A-",
-  "B+",
-  "B-",
-  "AB+",
-  "AB-",
-  "O+",
-  "O-",
-] as const;
+export const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] as const;
 
 const formSchema = z.object({
   age: z.number().min(18, "Must be at least 18").max(65, "Must be under 65"),
   bmi: z.number().min(18.5, "BMI too low").max(30, "BMI too high"),
   bloodType: z.enum(bloodTypes),
-  hemoglobinLevel: z
-    .number()
-    .min(12.5, "Hemoglobin too low")
-    .max(18, "Hemoglobin too high"),
+  hemoglobinLevel: z.number().min(12.5, "Hemoglobin too low").max(18, "Hemoglobin too high"),
   phoneNumber: z.string().min(10, "Valid phone number required"),
   diseases: z.string(),
   lastDonationDate: z.string(),
@@ -56,13 +32,7 @@ const formSchema = z.object({
   subDistrict: z.string().min(1, "Sub-district is required"),
 });
 
-export function ProfileForm({
-  profile,
-  onSuccess,
-}: {
-  profile?: ProfileType;
-  onSuccess: () => void;
-}) {
+export function ProfileForm({ profile, onSuccess }: { profile?: ProfileType; onSuccess: () => void }) {
   const updateProfile = useMutation(api.users.updateProfile);
 
   const form = useForm({
@@ -90,12 +60,10 @@ export function ProfileForm({
           diseases: value.diseases
             ? value.diseases
                 .split(",")
-                .map((d) => d.trim())
+                .map(d => d.trim())
                 .filter(Boolean)
             : [],
-          lastDonationDate: value.lastDonationDate
-            ? new Date(value.lastDonationDate).getTime()
-            : 0,
+          lastDonationDate: value.lastDonationDate ? new Date(value.lastDonationDate).getTime() : 0,
         });
         toast.success("Profile updated successfully!");
         onSuccess();
@@ -111,7 +79,7 @@ export function ProfileForm({
 
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={e => {
         e.preventDefault();
         e.stopPropagation();
         void form.handleSubmit();
@@ -121,9 +89,8 @@ export function ProfileForm({
       <FieldGroup>
         <div className="grid grid-cols-2 gap-4">
           <form.Field name="age">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !!field.state.meta.errors.length;
+            {field => {
+              const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>Age</FieldLabel>
@@ -142,14 +109,13 @@ export function ProfileForm({
             }}
           </form.Field>
           <form.Field name="bloodType">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !!field.state.meta.errors.length;
+            {field => {
+              const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>Blood Type</FieldLabel>
                   <Select
-                    onValueChange={(val) => {
+                    onValueChange={val => {
                       if (val) field.handleChange(val);
                     }}
                     value={field.state.value}
@@ -158,7 +124,7 @@ export function ProfileForm({
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {bloodTypes.map((type) => (
+                      {bloodTypes.map(type => (
                         <SelectItem key={type} value={type}>
                           {type}
                         </SelectItem>
@@ -174,9 +140,8 @@ export function ProfileForm({
 
         <div className="grid grid-cols-2 gap-4">
           <form.Field name="bmi">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !!field.state.meta.errors.length;
+            {field => {
+              const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>BMI</FieldLabel>
@@ -190,23 +155,18 @@ export function ProfileForm({
                       field.handleChange(Number(e.target.value))
                     }
                   />
-                  <FieldDescription className="text-[10px]">
-                    Weight(kg) / Height(m)²
-                  </FieldDescription>
+                  <FieldDescription className="text-[10px]">Weight(kg) / Height(m)²</FieldDescription>
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
             }}
           </form.Field>
           <form.Field name="hemoglobinLevel">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !!field.state.meta.errors.length;
+            {field => {
+              const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Hemoglobin (g/dL)
-                  </FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Hemoglobin (g/dL)</FieldLabel>
                   <Input
                     id={field.name}
                     type="number"
@@ -225,9 +185,8 @@ export function ProfileForm({
         </div>
 
         <form.Field name="phoneNumber">
-          {(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !!field.state.meta.errors.length;
+          {field => {
+            const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Phone Number</FieldLabel>
@@ -236,9 +195,7 @@ export function ProfileForm({
                   placeholder="Your primary phone number"
                   value={field.state.value}
                   onBlur={field.handleBlur}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    field.handleChange(e.target.value)
-                  }
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.handleChange(e.target.value)}
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
@@ -247,9 +204,8 @@ export function ProfileForm({
         </form.Field>
 
         <form.Field name="lastDonationDate">
-          {(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !!field.state.meta.errors.length;
+          {field => {
+            const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Last Donation Date</FieldLabel>
@@ -258,9 +214,7 @@ export function ProfileForm({
                   type="date"
                   value={field.state.value}
                   onBlur={field.handleBlur}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    field.handleChange(e.target.value)
-                  }
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.handleChange(e.target.value)}
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
@@ -268,21 +222,17 @@ export function ProfileForm({
           }}
         </form.Field>
 
-        <div className="space-y-4 border-y py-4 my-2">
-          <h4 className="text-sm font-semibold text-foreground">
-            Preferred Donation Location
-          </h4>
+        <div className="my-2 space-y-4 border-y py-4">
+          <h4 className="text-foreground text-sm font-semibold">Preferred Donation Location</h4>
           <div className="grid grid-cols-1 gap-4">
             <form.Field name="division">
-              {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched &&
-                  !!field.state.meta.errors.length;
+              {field => {
+                const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor={field.name}>Division</FieldLabel>
                     <Select
-                      onValueChange={(val) => {
+                      onValueChange={val => {
                         field.handleChange(val ?? "");
                         form.setFieldValue("district", "");
                         form.setFieldValue("subDistrict", "");
@@ -293,38 +243,32 @@ export function ProfileForm({
                         <SelectValue placeholder="Select division" />
                       </SelectTrigger>
                       <SelectContent>
-                        {getAllDivisions().map((div) => (
+                        {getAllDivisions().map(div => (
                           <SelectItem key={div} value={div}>
                             {div}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
                   </Field>
                 );
               }}
             </form.Field>
 
             <div className="grid grid-cols-2 gap-4">
-              <form.Subscribe selector={(state) => state.values.division}>
-                {(division) => (
+              <form.Subscribe selector={state => state.values.division}>
+                {division => (
                   <form.Field name="district">
-                    {(field) => {
-                      const isInvalid =
-                        field.state.meta.isTouched &&
-                        !!field.state.meta.errors.length;
-                      const districts = division
-                        ? getDistrictsByDivision({ division })
-                        : [];
+                    {field => {
+                      const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
+                      const districts = division ? getDistrictsByDivision({ division }) : [];
                       return (
                         <Field data-invalid={isInvalid}>
                           <FieldLabel htmlFor={field.name}>District</FieldLabel>
                           <Select
                             disabled={!division}
-                            onValueChange={(val) => {
+                            onValueChange={val => {
                               field.handleChange(val ?? "");
                               form.setFieldValue("subDistrict", "");
                             }}
@@ -334,16 +278,14 @@ export function ProfileForm({
                               <SelectValue placeholder="District" />
                             </SelectTrigger>
                             <SelectContent>
-                              {districts.map((dist) => (
+                              {districts.map(dist => (
                                 <SelectItem key={dist} value={dist}>
                                   {dist}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
-                          {isInvalid && (
-                            <FieldError errors={field.state.meta.errors} />
-                          )}
+                          {isInvalid && <FieldError errors={field.state.meta.errors} />}
                         </Field>
                       );
                     }}
@@ -351,18 +293,11 @@ export function ProfileForm({
                 )}
               </form.Subscribe>
 
-              <form.Subscribe
-                selector={(state) => [
-                  state.values.division,
-                  state.values.district,
-                ]}
-              >
+              <form.Subscribe selector={state => [state.values.division, state.values.district]}>
                 {([division, district]) => (
                   <form.Field name="subDistrict">
-                    {(field) => {
-                      const isInvalid =
-                        field.state.meta.isTouched &&
-                        !!field.state.meta.errors.length;
+                    {field => {
+                      const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
                       const subDistricts =
                         division && district
                           ? getSubDistrictsByDistrict({
@@ -372,30 +307,24 @@ export function ProfileForm({
                           : [];
                       return (
                         <Field data-invalid={isInvalid}>
-                          <FieldLabel htmlFor={field.name}>
-                            Sub-District
-                          </FieldLabel>
+                          <FieldLabel htmlFor={field.name}>Sub-District</FieldLabel>
                           <Select
                             disabled={!district}
-                            onValueChange={(val) =>
-                              field.handleChange(val ?? "")
-                            }
+                            onValueChange={val => field.handleChange(val ?? "")}
                             value={field.state.value}
                           >
                             <SelectTrigger id={field.name}>
                               <SelectValue placeholder="Town/Area" />
                             </SelectTrigger>
                             <SelectContent>
-                              {subDistricts.map((sub) => (
+                              {subDistricts.map(sub => (
                                 <SelectItem key={sub} value={sub}>
                                   {sub}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
-                          {isInvalid && (
-                            <FieldError errors={field.state.meta.errors} />
-                          )}
+                          {isInvalid && <FieldError errors={field.state.meta.errors} />}
                         </Field>
                       );
                     }}
@@ -407,26 +336,19 @@ export function ProfileForm({
         </div>
 
         <form.Field name="diseases">
-          {(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !!field.state.meta.errors.length;
+          {field => {
+            const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>
-                  Pre-existing Conditions
-                </FieldLabel>
+                <FieldLabel htmlFor={field.name}>Pre-existing Conditions</FieldLabel>
                 <Input
                   id={field.name}
                   placeholder="e.g., Diabetes, Hypertension (comma separated)"
                   value={field.state.value}
                   onBlur={field.handleBlur}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    field.handleChange(e.target.value)
-                  }
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.handleChange(e.target.value)}
                 />
-                <FieldDescription>
-                  Leave empty if none. Use commas to separate multiple.
-                </FieldDescription>
+                <FieldDescription>Leave empty if none. Use commas to separate multiple.</FieldDescription>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
@@ -434,24 +356,18 @@ export function ProfileForm({
         </form.Field>
       </FieldGroup>
 
-      <div className="bg-muted/50 p-4 rounded-lg flex items-start gap-3 border border-border">
-        <ShieldCheck className="h-5 w-5 text-primary mt-0.5" />
-        <p className="text-xs text-muted-foreground leading-relaxed">
+      <div className="bg-muted/50 border-border flex items-start gap-3 rounded-lg border p-4">
+        <ShieldCheck className="text-primary mt-0.5 h-5 w-5" />
+        <p className="text-muted-foreground text-xs leading-relaxed">
           Your data is private and only used to ensure safe donation practices.
         </p>
       </div>
 
-      <form.Subscribe
-        selector={(state) => [state.canSubmit, state.isSubmitting]}
-      >
-        {(state) => {
+      <form.Subscribe selector={state => [state.canSubmit, state.isSubmitting]}>
+        {state => {
           const [canSubmit, isSubmitting] = state;
           return (
-            <Button
-              type="submit"
-              disabled={!canSubmit}
-              className="w-full font-bold"
-            >
+            <Button type="submit" disabled={!canSubmit} className="w-full font-bold">
               {isSubmitting ? "Saving..." : "Save Profile Updates"}
             </Button>
           );

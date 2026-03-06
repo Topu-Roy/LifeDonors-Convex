@@ -1,6 +1,6 @@
-import { bangladeshAdministrativeData } from "../constants/bangladeshAdministrativeAreas";
 import * as fs from "fs";
 import * as path from "path";
+import { bangladeshAdministrativeData } from "../constants/bangladeshAdministrativeAreas";
 
 const names = [
   "Anisur Rahman",
@@ -93,8 +93,7 @@ const hospitals = [
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const urgencies = ["Low", "Medium", "High", "Critical"];
 
-const getRandom = (arr: string[]) =>
-  arr[Math.floor(Math.random() * arr.length)];
+const getRandom = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
 
 for (const div of bangladeshAdministrativeData) {
   const divisionDir = path.join("assets", div.division);
@@ -103,10 +102,7 @@ for (const div of bangladeshAdministrativeData) {
   }
 
   for (const dist of div.districts) {
-    const districtFile = path.join(
-      divisionDir,
-      `${dist.district.replace(/ /g, "_")}.ts`,
-    );
+    const districtFile = path.join(divisionDir, `${dist.district.replace(/ /g, "_")}.ts`);
     let content = `export const seedData = [\n`;
 
     for (const sub of dist.subDistricts) {

@@ -1,37 +1,21 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useForm } from "@tanstack/react-form";
 import {
   getAllDivisions,
   getDistrictsByDivision,
   getSubDistrictsByDistrict,
 } from "@/constants/bangladeshAdministrativeAreas";
 import { api } from "@/convex/_generated/api";
-import { useForm } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
 import { HelpCircle } from "lucide-react";
 import { toast } from "sonner";
 import z from "zod";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] as const;
 const urgencies = ["Low", "Medium", "High", "Critical"] as const;
@@ -55,10 +39,7 @@ interface BloodRequestFormProps {
   className?: string;
 }
 
-export function BloodRequestForm({
-  onSuccess,
-  className,
-}: BloodRequestFormProps) {
+export function BloodRequestForm({ onSuccess, className }: BloodRequestFormProps) {
   const createRequest = useMutation(api.requests.createBloodRequest);
 
   const form = useForm({
@@ -97,7 +78,7 @@ export function BloodRequestForm({
   return (
     <TooltipProvider delay={200}>
       <form
-        onSubmit={(e) => {
+        onSubmit={e => {
           e.preventDefault();
           e.stopPropagation();
           void form.handleSubmit();
@@ -106,20 +87,17 @@ export function BloodRequestForm({
       >
         <FieldGroup>
           <form.Field name="patientName">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !!field.state.meta.errors.length;
+            {field => {
+              const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
               return (
                 <Field data-invalid={isInvalid}>
                   <div className="flex items-center gap-1.5">
                     <FieldLabel htmlFor={field.name}>Patient Name</FieldLabel>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/50 hover:text-primary transition-colors cursor-help" />
+                        <HelpCircle className="text-muted-foreground/50 hover:text-primary h-3.5 w-3.5 cursor-help transition-colors" />
                       </TooltipTrigger>
-                      <TooltipContent>
-                        The full name of the person who needs blood.
-                      </TooltipContent>
+                      <TooltipContent>The full name of the person who needs blood.</TooltipContent>
                     </Tooltip>
                   </div>
                   <Input
@@ -127,7 +105,7 @@ export function BloodRequestForm({
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={e => field.handleChange(e.target.value)}
                     aria-invalid={isInvalid}
                     placeholder="Enter patient's name"
                   />
@@ -138,17 +116,13 @@ export function BloodRequestForm({
           </form.Field>
           <div className="grid grid-cols-2 gap-4">
             <form.Field name="bloodTypeNeeded">
-              {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched &&
-                  !!field.state.meta.errors.length;
+              {field => {
+                const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Blood Type Needed
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Blood Type Needed</FieldLabel>
                     <Select
-                      onValueChange={(val) => field.handleChange(val!)}
+                      onValueChange={val => field.handleChange(val!)}
                       defaultValue={field.state.value}
                       value={field.state.value}
                     >
@@ -156,41 +130,36 @@ export function BloodRequestForm({
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {bloodTypes.map((type) => (
+                        {bloodTypes.map(type => (
                           <SelectItem key={type} value={type}>
                             {type}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
                   </Field>
                 );
               }}
             </form.Field>
             <form.Field name="urgency">
-              {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched &&
-                  !!field.state.meta.errors.length;
+              {field => {
+                const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
                 return (
                   <Field data-invalid={isInvalid}>
                     <div className="flex items-center gap-1.5">
                       <FieldLabel htmlFor={field.name}>Urgency</FieldLabel>
                       <Tooltip>
                         <TooltipTrigger>
-                          <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/50 hover:text-primary transition-colors cursor-help" />
+                          <HelpCircle className="text-muted-foreground/50 hover:text-primary h-3.5 w-3.5 cursor-help transition-colors" />
                         </TooltipTrigger>
                         <TooltipContent>
-                          How urgently is the blood needed? &quot;Critical&quot;
-                          usually means within a few hours.
+                          How urgently is the blood needed? &quot;Critical&quot; usually means within a few hours.
                         </TooltipContent>
                       </Tooltip>
                     </div>
                     <Select
-                      onValueChange={(val) => field.handleChange(val!)}
+                      onValueChange={val => field.handleChange(val!)}
                       defaultValue={field.state.value}
                       value={field.state.value}
                     >
@@ -198,34 +167,30 @@ export function BloodRequestForm({
                         <SelectValue placeholder="Select urgency" />
                       </SelectTrigger>
                       <SelectContent>
-                        {urgencies.map((u) => (
+                        {urgencies.map(u => (
                           <SelectItem key={u} value={u}>
                             {u}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
                   </Field>
                 );
               }}
             </form.Field>
           </div>
 
-          <div className="space-y-4 border rounded-lg p-4 bg-muted/30">
+          <div className="bg-muted/30 space-y-4 rounded-lg border p-4">
             <h4 className="text-sm font-semibold">Location Details</h4>
             <form.Field name="division">
-              {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched &&
-                  !!field.state.meta.errors.length;
+              {field => {
+                const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor={field.name}>Division</FieldLabel>
                     <Select
-                      onValueChange={(val) => {
+                      onValueChange={val => {
                         field.handleChange(val ?? "");
                         form.setFieldValue("district", "");
                         form.setFieldValue("subDistrict", "");
@@ -236,38 +201,32 @@ export function BloodRequestForm({
                         <SelectValue placeholder="Select division" />
                       </SelectTrigger>
                       <SelectContent>
-                        {getAllDivisions().map((div) => (
+                        {getAllDivisions().map(div => (
                           <SelectItem key={div} value={div}>
                             {div}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
                   </Field>
                 );
               }}
             </form.Field>
 
             <div className="grid grid-cols-2 gap-4">
-              <form.Subscribe selector={(state) => state.values.division}>
-                {(division) => (
+              <form.Subscribe selector={state => state.values.division}>
+                {division => (
                   <form.Field name="district">
-                    {(field) => {
-                      const isInvalid =
-                        field.state.meta.isTouched &&
-                        !!field.state.meta.errors.length;
-                      const districts = division
-                        ? getDistrictsByDivision({ division })
-                        : [];
+                    {field => {
+                      const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
+                      const districts = division ? getDistrictsByDivision({ division }) : [];
                       return (
                         <Field data-invalid={isInvalid}>
                           <FieldLabel htmlFor={field.name}>District</FieldLabel>
                           <Select
                             disabled={!division}
-                            onValueChange={(val) => {
+                            onValueChange={val => {
                               field.handleChange(val ?? "");
                               form.setFieldValue("subDistrict", "");
                             }}
@@ -277,16 +236,14 @@ export function BloodRequestForm({
                               <SelectValue placeholder="District" />
                             </SelectTrigger>
                             <SelectContent>
-                              {districts.map((dist) => (
+                              {districts.map(dist => (
                                 <SelectItem key={dist} value={dist}>
                                   {dist}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
-                          {isInvalid && (
-                            <FieldError errors={field.state.meta.errors} />
-                          )}
+                          {isInvalid && <FieldError errors={field.state.meta.errors} />}
                         </Field>
                       );
                     }}
@@ -294,18 +251,11 @@ export function BloodRequestForm({
                 )}
               </form.Subscribe>
 
-              <form.Subscribe
-                selector={(state) => [
-                  state.values.division,
-                  state.values.district,
-                ]}
-              >
+              <form.Subscribe selector={state => [state.values.division, state.values.district]}>
                 {([division, district]) => (
                   <form.Field name="subDistrict">
-                    {(field) => {
-                      const isInvalid =
-                        field.state.meta.isTouched &&
-                        !!field.state.meta.errors.length;
+                    {field => {
+                      const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
                       const subDistricts =
                         division && district
                           ? getSubDistrictsByDistrict({
@@ -315,30 +265,24 @@ export function BloodRequestForm({
                           : [];
                       return (
                         <Field data-invalid={isInvalid}>
-                          <FieldLabel htmlFor={field.name}>
-                            Sub-District
-                          </FieldLabel>
+                          <FieldLabel htmlFor={field.name}>Sub-District</FieldLabel>
                           <Select
                             disabled={!district}
-                            onValueChange={(val) =>
-                              field.handleChange(val ?? "")
-                            }
+                            onValueChange={val => field.handleChange(val ?? "")}
                             value={field.state.value}
                           >
                             <SelectTrigger id={field.name}>
                               <SelectValue placeholder="Town/Area" />
                             </SelectTrigger>
                             <SelectContent>
-                              {subDistricts.map((sub) => (
+                              {subDistricts.map(sub => (
                                 <SelectItem key={sub} value={sub}>
                                   {sub}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
-                          {isInvalid && (
-                            <FieldError errors={field.state.meta.errors} />
-                          )}
+                          {isInvalid && <FieldError errors={field.state.meta.errors} />}
                         </Field>
                       );
                     }}
@@ -349,9 +293,8 @@ export function BloodRequestForm({
           </div>
 
           <form.Field name="hospitalName">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !!field.state.meta.errors.length;
+            {field => {
+              const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>Hospital Name</FieldLabel>
@@ -360,7 +303,7 @@ export function BloodRequestForm({
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={e => field.handleChange(e.target.value)}
                     aria-invalid={isInvalid}
                     placeholder="e.g., Central Hospital"
                   />
@@ -370,22 +313,18 @@ export function BloodRequestForm({
             }}
           </form.Field>
           <form.Field name="hospitalLocation">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !!field.state.meta.errors.length;
+            {field => {
+              const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
               return (
                 <Field data-invalid={isInvalid}>
                   <div className="flex items-center gap-1.5">
-                    <FieldLabel htmlFor={field.name}>
-                      Hospital Location Details
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Hospital Location Details</FieldLabel>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/50 hover:text-primary transition-colors cursor-help" />
+                        <HelpCircle className="text-muted-foreground/50 hover:text-primary h-3.5 w-3.5 cursor-help transition-colors" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        Room number, floor, or specific ward to help donors find
-                        the patient.
+                        Room number, floor, or specific ward to help donors find the patient.
                       </TooltipContent>
                     </Tooltip>
                   </div>
@@ -394,7 +333,7 @@ export function BloodRequestForm({
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={e => field.handleChange(e.target.value)}
                     aria-invalid={isInvalid}
                     placeholder="e.g., Floor 3, Room 302"
                   />
@@ -405,23 +344,18 @@ export function BloodRequestForm({
           </form.Field>
           <div className="grid grid-cols-2 gap-4">
             <form.Field name="phoneNumber">
-              {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched &&
-                  !!field.state.meta.errors.length;
+              {field => {
+                const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
                 return (
                   <Field data-invalid={isInvalid}>
                     <div className="flex items-center gap-1.5">
-                      <FieldLabel htmlFor={field.name}>
-                        Your Phone Number
-                      </FieldLabel>
+                      <FieldLabel htmlFor={field.name}>Your Phone Number</FieldLabel>
                       <Tooltip>
                         <TooltipTrigger>
-                          <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/50 hover:text-primary transition-colors cursor-help" />
+                          <HelpCircle className="text-muted-foreground/50 hover:text-primary h-3.5 w-3.5 cursor-help transition-colors" />
                         </TooltipTrigger>
                         <TooltipContent>
-                          The primary number donors will call to coordinate with
-                          you.
+                          The primary number donors will call to coordinate with you.
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -430,35 +364,28 @@ export function BloodRequestForm({
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={e => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
                       placeholder="Your number"
                     />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
                   </Field>
                 );
               }}
             </form.Field>
             <form.Field name="contactNumber">
-              {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched &&
-                  !!field.state.meta.errors.length;
+              {field => {
+                const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
                 return (
                   <Field data-invalid={isInvalid}>
                     <div className="flex items-center gap-1.5">
-                      <FieldLabel htmlFor={field.name}>
-                        Backup Contact
-                      </FieldLabel>
+                      <FieldLabel htmlFor={field.name}>Backup Contact</FieldLabel>
                       <Tooltip>
                         <TooltipTrigger>
-                          <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/50 hover:text-primary transition-colors cursor-help" />
+                          <HelpCircle className="text-muted-foreground/50 hover:text-primary h-3.5 w-3.5 cursor-help transition-colors" />
                         </TooltipTrigger>
                         <TooltipContent>
-                          An alternative number in case your primary phone is
-                          unreachable.
+                          An alternative number in case your primary phone is unreachable.
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -467,35 +394,29 @@ export function BloodRequestForm({
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={e => field.handleChange(e.target.value)}
                       aria-invalid={isInvalid}
                       placeholder="Backup number"
                     />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
                   </Field>
                 );
               }}
             </form.Field>
           </div>
           <form.Field name="numberOfBags">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !!field.state.meta.errors.length;
+            {field => {
+              const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
               return (
                 <Field data-invalid={isInvalid}>
                   <div className="flex items-center gap-1.5">
-                    <FieldLabel htmlFor={field.name}>
-                      Number of Bags Needed
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Number of Bags Needed</FieldLabel>
                     <Tooltip>
                       <TooltipTrigger>
-                        <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/50 hover:text-primary transition-colors cursor-help" />
+                        <HelpCircle className="text-muted-foreground/50 hover:text-primary h-3.5 w-3.5 cursor-help transition-colors" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        Total units of blood required for the patient&apos;s
-                        treatment.
+                        Total units of blood required for the patient&apos;s treatment.
                       </TooltipContent>
                     </Tooltip>
                   </div>
@@ -506,7 +427,7 @@ export function BloodRequestForm({
                     min={1}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    onChange={e => field.handleChange(Number(e.target.value))}
                     aria-invalid={isInvalid}
                     placeholder="How many bags?"
                   />
@@ -517,17 +438,11 @@ export function BloodRequestForm({
           </form.Field>
         </FieldGroup>
 
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-        >
-          {(state) => {
+        <form.Subscribe selector={state => [state.canSubmit, state.isSubmitting]}>
+          {state => {
             const [canSubmit, isSubmitting] = state;
             return (
-              <Button
-                type="submit"
-                disabled={!canSubmit}
-                className="w-full font-bold"
-              >
+              <Button type="submit" disabled={!canSubmit} className="w-full font-bold">
                 {isSubmitting ? "Posting..." : "Post Request"}
               </Button>
             );

@@ -14,7 +14,7 @@ export default defineSchema({
       v.literal("AB+"),
       v.literal("AB-"),
       v.literal("O+"),
-      v.literal("O-"),
+      v.literal("O-")
     ),
     hemoglobinLevel: v.number(),
     diseases: v.array(v.string()),
@@ -44,20 +44,10 @@ export default defineSchema({
       v.literal("AB+"),
       v.literal("AB-"),
       v.literal("O+"),
-      v.literal("O-"),
+      v.literal("O-")
     ),
-    urgency: v.union(
-      v.literal("Low"),
-      v.literal("Medium"),
-      v.literal("High"),
-      v.literal("Critical"),
-    ),
-    status: v.union(
-      v.literal("Open"),
-      v.literal("Accepted"),
-      v.literal("Completed"),
-      v.literal("Cancelled"),
-    ),
+    urgency: v.union(v.literal("Low"), v.literal("Medium"), v.literal("High"), v.literal("Critical")),
+    status: v.union(v.literal("Open"), v.literal("Accepted"), v.literal("Completed"), v.literal("Cancelled")),
     contactNumber: v.string(),
     numberOfBags: v.number(),
     createdAt: v.number(),
@@ -79,7 +69,7 @@ export default defineSchema({
       v.literal("No Show"),
       v.literal("Withdrawn"),
       v.literal("Rejected"),
-      v.literal("Cancelled"),
+      v.literal("Cancelled")
     ),
     acceptedAt: v.optional(v.number()),
   })

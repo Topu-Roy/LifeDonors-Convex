@@ -1,22 +1,14 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  MapPin,
-  User,
-  Clock,
-  Hospital,
-  ChevronRight,
-  TrendingUp,
-} from "lucide-react";
+import { api } from "@/convex/_generated/api";
 import { type Doc } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
+import { ChevronRight, Clock, Hospital, MapPin, TrendingUp, User } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 type RequestCardProps = {
   request: Doc<"requests"> & {
@@ -37,10 +29,7 @@ function timeAgo(date: number) {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
-export function RequestCard({
-  request,
-  isOwner: isOwnerProp,
-}: RequestCardProps) {
+export function RequestCard({ request, isOwner: isOwnerProp }: RequestCardProps) {
   const user = useQuery(api.users.getMyProfile);
   const acceptRequest = useMutation(api.donations.offerDonation);
 
@@ -59,17 +48,14 @@ export function RequestCard({
 
   const urgencyStyles = {
     Low: "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900",
-    Medium:
-      "border-orange-200 dark:border-orange-900/50 bg-white dark:bg-slate-900",
+    Medium: "border-orange-200 dark:border-orange-900/50 bg-white dark:bg-slate-900",
     High: "border-red-200 dark:border-red-900/50 bg-white dark:bg-slate-900",
-    Critical:
-      "border-red-400 dark:border-red-800 bg-red-50/30 dark:bg-red-950/20",
+    Critical: "border-red-400 dark:border-red-800 bg-red-50/30 dark:bg-red-950/20",
   };
 
   const urgencyBadgeStyles = {
     Low: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
-    Medium:
-      "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300",
+    Medium: "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300",
     High: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300",
     Critical: "bg-red-600 text-white animate-pulse",
   };
@@ -77,20 +63,20 @@ export function RequestCard({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-3xl border-2 p-1 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden group",
-        urgencyStyles[request.urgency],
+        "group flex flex-col overflow-hidden rounded-3xl border-2 p-1 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl",
+        urgencyStyles[request.urgency]
       )}
     >
-      <div className="p-6 flex flex-col h-full gap-6">
+      <div className="flex h-full flex-col gap-6 p-6">
         {/* Card Top: Blood Type & Urgency */}
-        <div className="flex justify-between items-start">
+        <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
             <div
               className={cn(
-                "flex h-16 w-16 items-center justify-center rounded-3xl font-black text-2xl shadow-inner",
+                "flex h-16 w-16 items-center justify-center rounded-3xl text-2xl font-black shadow-inner",
                 request.urgency === "Critical" || request.urgency === "High"
                   ? "bg-red-600 text-white shadow-red-900/20"
-                  : "bg-primary text-slate-900 shadow-primary-900/10",
+                  : "bg-primary shadow-primary-900/10 text-slate-900"
               )}
             >
               {request.bloodTypeNeeded}
@@ -98,20 +84,19 @@ export function RequestCard({
             <div>
               <Badge
                 className={cn(
-                  "rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border-none mb-1.5",
-                  urgencyBadgeStyles[request.urgency],
+                  "mb-1.5 rounded-full border-none px-3 py-1 text-[10px] font-black tracking-widest uppercase",
+                  urgencyBadgeStyles[request.urgency]
                 )}
               >
                 {request.urgency}
               </Badge>
-              <p className="font-bold text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                <TrendingUp className="h-3 w-3 text-primary" />
-                {request.numberOfBags}{" "}
-                {request.numberOfBags > 1 ? "Bags" : "Bag"} Needed
+              <p className="flex items-center gap-1 text-sm font-bold text-slate-500 dark:text-slate-400">
+                <TrendingUp className="text-primary h-3 w-3" />
+                {request.numberOfBags} {request.numberOfBags > 1 ? "Bags" : "Bag"} Needed
               </p>
             </div>
           </div>
-          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800/50 px-3 py-1 rounded-full uppercase tracking-tighter">
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold tracking-tighter text-slate-400 uppercase dark:bg-slate-800/50 dark:text-slate-500">
             {timeAgo(request.createdAt)}
           </span>
         </div>
@@ -119,14 +104,14 @@ export function RequestCard({
         {/* Card Body: Details */}
         <div className="flex-1 space-y-4">
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-400 shrink-0">
+            <div className="shrink-0 rounded-xl bg-slate-100 p-2 text-slate-400 dark:bg-slate-800">
               <Hospital className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="font-black text-slate-900 dark:text-slate-100 truncate text-lg tracking-tight">
+              <p className="truncate text-lg font-black tracking-tight text-slate-900 dark:text-slate-100">
                 {request.hospitalName}
               </p>
-              <p className="text-slate-500 dark:text-slate-400 text-xs font-medium truncate flex items-center gap-1">
+              <p className="flex items-center gap-1 truncate text-xs font-medium text-slate-500 dark:text-slate-400">
                 <MapPin className="h-3 w-3 shrink-0" />
                 {request.hospitalLocation}, {request.district}
               </p>
@@ -134,15 +119,15 @@ export function RequestCard({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-              <User className="h-4 w-4 text-primary shrink-0" />
-              <p className="text-[11px] font-bold text-slate-600 dark:text-slate-400 truncate">
+            <div className="flex items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
+              <User className="text-primary h-4 w-4 shrink-0" />
+              <p className="truncate text-[11px] font-bold text-slate-600 dark:text-slate-400">
                 {request.patientName}
               </p>
             </div>
-            <div className="flex items-center gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-              <Clock className="h-4 w-4 text-primary shrink-0" />
-              <p className="text-[11px] font-bold text-slate-600 dark:text-slate-400 truncate">
+            <div className="flex items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
+              <Clock className="text-primary h-4 w-4 shrink-0" />
+              <p className="truncate text-[11px] font-bold text-slate-600 dark:text-slate-400">
                 By{" "}
                 {new Date(request.createdAt + 86400000).toLocaleDateString([], {
                   month: "short",
@@ -160,11 +145,11 @@ export function RequestCard({
               href={`/requests/${request._id}`}
               className={cn(
                 buttonVariants({ variant: "default" }),
-                "w-full h-14 rounded-2xl font-black text-base shadow-lg shadow-primary/20 gap-2 transition-all hover:scale-[1.02] active:scale-95 bg-primary text-slate-900 group",
+                "shadow-primary/20 bg-primary group h-14 w-full gap-2 rounded-2xl text-base font-black text-slate-900 shadow-lg transition-all hover:scale-[1.02] active:scale-95"
               )}
             >
               Review Request
-              <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
           ) : (
             <div className="flex gap-2">
@@ -172,7 +157,7 @@ export function RequestCard({
                 href={`/requests/${request._id}`}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "flex-1 h-14 rounded-2xl font-bold border-primary/20 hover:bg-primary/5 text-slate-600 dark:text-slate-300",
+                  "border-primary/20 hover:bg-primary/5 h-14 flex-1 rounded-2xl font-bold text-slate-600 dark:text-slate-300"
                 )}
               >
                 Details
@@ -180,7 +165,7 @@ export function RequestCard({
               <Button
                 onClick={handleAccept}
                 className={cn(
-                  "flex-2 h-14 rounded-2xl font-black text-base shadow-lg shadow-primary/20 gap-2 transition-all hover:scale-[1.02] active:scale-95 bg-primary text-slate-900",
+                  "shadow-primary/20 bg-primary h-14 flex-2 gap-2 rounded-2xl text-base font-black text-slate-900 shadow-lg transition-all hover:scale-[1.02] active:scale-95"
                 )}
               >
                 Volunteer Now

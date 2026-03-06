@@ -1,20 +1,18 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
 
 const Page = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-muted/30">
-      <div className="max-w-md w-full px-6 py-12 text-center space-y-8 bg-white dark:bg-slate-900 rounded-3xl border shadow-xl shadow-primary/5">
+    <div className="bg-muted/30 flex min-h-screen flex-col items-center justify-center">
+      <div className="shadow-primary/5 w-full max-w-md space-y-8 rounded-3xl border bg-white px-6 py-12 text-center shadow-xl dark:bg-slate-900">
         <div className="space-y-2">
           <h1 className="text-3xl font-black tracking-tight">Welcome Back</h1>
-          <p className="text-muted-foreground font-medium">
-            Sign in to manage your donations and requests.
-          </p>
+          <p className="text-muted-foreground font-medium">Sign in to manage your donations and requests.</p>
         </div>
         <Button
-          className="w-full h-14 rounded-2xl font-black text-lg gap-2"
+          className="h-14 w-full gap-2 rounded-2xl text-lg font-black"
           onClick={async () => {
             await authClient.signIn.social({
               provider: "github",

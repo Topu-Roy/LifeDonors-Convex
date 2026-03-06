@@ -2,18 +2,7 @@ import { cn } from "@/lib/utils";
 
 interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   as?: React.ElementType;
-  maxWidth?:
-    | "sm"
-    | "md"
-    | "lg"
-    | "xl"
-    | "2xl"
-    | "3xl"
-    | "4xl"
-    | "5xl"
-    | "6xl"
-    | "7xl"
-    | "full";
+  maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl" | "full";
 }
 
 const maxWidthMap = {
@@ -38,14 +27,7 @@ export function Container({
   ...props
 }: ContainerProps) {
   return (
-    <Component
-      className={cn(
-        "mx-auto w-full px-4 sm:px-6 lg:px-8",
-        maxWidthMap[maxWidth],
-        className,
-      )}
-      {...props}
-    >
+    <Component className={cn("mx-auto w-full px-4 sm:px-6 lg:px-8", maxWidthMap[maxWidth], className)} {...props}>
       {children}
     </Component>
   );
