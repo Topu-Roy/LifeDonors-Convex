@@ -27,7 +27,7 @@ import {
   getDistrictsByDivision,
   getSubDistrictsByDistrict,
 } from "@/constants/bangladeshAdministrativeAreas";
-import { ProfileType } from "../page";
+import { type ProfileType } from "../page";
 
 export const bloodTypes = [
   "A+",
@@ -69,7 +69,7 @@ export function ProfileForm({
     defaultValues: {
       age: profile?.age ?? 0,
       bmi: profile?.bmi ?? 0,
-      bloodType: (profile?.bloodType ?? "A+") as (typeof bloodTypes)[number],
+      bloodType: profile?.bloodType ?? "A+",
       hemoglobinLevel: profile?.hemoglobinLevel ?? 0,
       phoneNumber: profile?.phoneNumber ?? "",
       diseases: profile?.diseases?.join(", ") ?? "",
@@ -114,7 +114,7 @@ export function ProfileForm({
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        form.handleSubmit();
+        void form.handleSubmit();
       }}
       className="space-y-6 pt-4"
     >
@@ -150,8 +150,7 @@ export function ProfileForm({
                   <FieldLabel htmlFor={field.name}>Blood Type</FieldLabel>
                   <Select
                     onValueChange={(val) => {
-                      if (val)
-                        field.handleChange(val as (typeof bloodTypes)[number]);
+                      if (val) field.handleChange(val);
                     }}
                     value={field.state.value}
                   >

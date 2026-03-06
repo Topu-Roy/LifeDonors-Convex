@@ -37,11 +37,11 @@ export function BasicInfoStep() {
 
   const form = useForm({
     defaultValues: {
-      age: formData.age || 0,
-      phoneNumber: formData.phoneNumber || "",
-      division: formData.division || "",
-      district: formData.district || "",
-      subDistrict: formData.subDistrict || "",
+      age: formData.age ?? 0,
+      phoneNumber: formData.phoneNumber ?? "",
+      division: formData.division ?? "",
+      district: formData.district ?? "",
+      subDistrict: formData.subDistrict ?? "",
     },
     validators: {
       onChange: step1Schema,
@@ -61,7 +61,7 @@ export function BasicInfoStep() {
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        form.handleSubmit();
+        void form.handleSubmit();
       }}
       className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
     >
@@ -144,7 +144,7 @@ export function BasicInfoStep() {
                   <Select
                     value={field.state.value}
                     onValueChange={(v) => {
-                      field.handleChange(v as string);
+                      field.handleChange(v!);
                       form.setFieldValue("district", "");
                       form.setFieldValue("subDistrict", "");
                     }}
@@ -173,9 +173,9 @@ export function BasicInfoStep() {
                 <form.Field name="district">
                   {(field) => {
                     const districts = division
-                      ? bangladeshAdministrativeData
+                      ? (bangladeshAdministrativeData
                           .find((d) => d.division === division)
-                          ?.districts.map((d) => d.district) || []
+                          ?.districts.map((d) => d.district) ?? [])
                       : [];
                     return (
                       <Field>
@@ -185,7 +185,7 @@ export function BasicInfoStep() {
                         <Select
                           value={field.state.value}
                           onValueChange={(v) => {
-                            field.handleChange(v as string);
+                            field.handleChange(v!);
                             form.setFieldValue("subDistrict", "");
                           }}
                           disabled={!division}
@@ -223,10 +223,10 @@ export function BasicInfoStep() {
                   {(field) => {
                     const subDistricts =
                       division && district
-                        ? bangladeshAdministrativeData
+                        ? (bangladeshAdministrativeData
                             .find((d) => d.division === division)
                             ?.districts.find((d) => d.district === district)
-                            ?.subDistricts || []
+                            ?.subDistricts ?? [])
                         : [];
                     return (
                       <Field>
@@ -235,7 +235,7 @@ export function BasicInfoStep() {
                         </FieldLabel>
                         <Select
                           value={field.state.value}
-                          onValueChange={(v) => field.handleChange(v as string)}
+                          onValueChange={(v) => field.handleChange(v!)}
                           disabled={!district}
                         >
                           <SelectTrigger className="h-11 md:h-12 rounded-2xl border-primary/10 bg-background shadow-sm focus:ring-primary/20 text-sm md:text-base">

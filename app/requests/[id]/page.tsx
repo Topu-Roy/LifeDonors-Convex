@@ -1,4 +1,4 @@
-import { Id } from "@/convex/_generated/dataModel";
+import { type Id } from "@/convex/_generated/dataModel";
 import { RequestDetails } from "./_components/requestDetails";
 
 export default async function RequestReviewPage({

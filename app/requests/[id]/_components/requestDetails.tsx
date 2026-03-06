@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
+import { type Id } from "@/convex/_generated/dataModel";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -278,7 +278,7 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
                             <div className="space-y-1">
                               <div className="flex items-center gap-3">
                                 <span className="font-black text-lg sm:text-xl tracking-tight">
-                                  {v.donor?.phoneNumber || "Private Donor"}
+                                  {v.donor?.phoneNumber ?? "Private Donor"}
                                 </span>
                                 <Badge
                                   className={cn(

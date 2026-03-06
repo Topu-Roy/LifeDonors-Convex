@@ -111,7 +111,7 @@ export default function Home() {
             <ImpactCard
               icon={<Activity className="h-6 w-6" />}
               label="Urgent Requests"
-              value={requests?.length.toString() || "34"}
+              value={requests?.length.toString() ?? "34"}
               color="text-orange-500"
               bgColor="bg-orange-500/5"
               borderColor="border-orange-100"

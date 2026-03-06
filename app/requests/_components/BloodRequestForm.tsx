@@ -100,7 +100,7 @@ export function BloodRequestForm({
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          form.handleSubmit();
+          void form.handleSubmit();
         }}
         className={className ?? "space-y-6"}
       >
@@ -148,9 +148,7 @@ export function BloodRequestForm({
                       Blood Type Needed
                     </FieldLabel>
                     <Select
-                      onValueChange={(val) =>
-                        field.handleChange(val as (typeof bloodTypes)[number])
-                      }
+                      onValueChange={(val) => field.handleChange(val!)}
                       defaultValue={field.state.value}
                       value={field.state.value}
                     >
@@ -192,9 +190,7 @@ export function BloodRequestForm({
                       </Tooltip>
                     </div>
                     <Select
-                      onValueChange={(val) =>
-                        field.handleChange(val as (typeof urgencies)[number])
-                      }
+                      onValueChange={(val) => field.handleChange(val!)}
                       defaultValue={field.state.value}
                       value={field.state.value}
                     >

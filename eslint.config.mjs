@@ -16,6 +16,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "convex/_generated/**",
+    "convex/betterAuth/_generated/**",
   ]),
 
   // TypeScript-specific configuration

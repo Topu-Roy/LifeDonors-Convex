@@ -28,13 +28,13 @@ import {
   Heart,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Id } from "@/convex/_generated/dataModel";
+import { type Id } from "@/convex/_generated/dataModel";
 import Link from "next/link";
 import { Container } from "@/components/Container";
 
 export default function DashboardPage() {
   const searchParams = useSearchParams();
-  const defaultTab = searchParams.get("tab") || "requests";
+  const defaultTab = searchParams.get("tab") ?? "requests";
 
   const myRequests = useQuery(api.users.getMyRequests);
   const myDonations = useQuery(api.users.getMyDonations);

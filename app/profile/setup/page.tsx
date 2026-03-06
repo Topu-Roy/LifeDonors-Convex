@@ -11,7 +11,7 @@ import { BasicInfoStep } from "./_components/BasicInfoStep";
 import { HealthDetailsStep } from "./_components/HealthDetailsStep";
 import { EligibilityStep } from "./_components/EligibilityStep";
 import { cn } from "@/lib/utils";
-import { ProfileType } from "../page";
+import { type ProfileType } from "../page";
 import { Container } from "@/components/Container";
 
 export const bloodTypes = [

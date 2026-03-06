@@ -10,7 +10,7 @@ import {
   ChevronRight,
   TrendingUp,
 } from "lucide-react";
-import { Doc } from "@/convex/_generated/dataModel";
+import { type Doc } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";

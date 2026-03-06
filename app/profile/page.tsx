@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ProfileForm } from "./_components/profileForm";
-import { Id } from "@/convex/_generated/dataModel";
+import { type Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/Container";

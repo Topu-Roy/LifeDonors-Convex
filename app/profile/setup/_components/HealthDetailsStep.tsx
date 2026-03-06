@@ -34,10 +34,10 @@ export function HealthDetailsStep() {
 
   const form = useForm({
     defaultValues: {
-      bloodType: formData.bloodType || "A+",
-      weight: formData.weight || 0,
-      height: formData.height || 0,
-      hemoglobinLevel: formData.hemoglobinLevel || 12.5,
+      bloodType: formData.bloodType ?? "A+",
+      weight: formData.weight ?? 0,
+      height: formData.height ?? 0,
+      hemoglobinLevel: formData.hemoglobinLevel ?? 12.5,
     },
     validators: {
       onChange: step2Schema,
@@ -53,7 +53,7 @@ export function HealthDetailsStep() {
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        form.handleSubmit();
+        void form.handleSubmit();
       }}
       className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
     >
@@ -176,7 +176,9 @@ export function HealthDetailsStep() {
                 <Slider
                   value={[field.state.value]}
                   onValueChange={(v) => {
-                    const val = Array.isArray(v) ? v[0] : v;
+                    const val: number = Array.isArray(v)
+                      ? (v[0] as number)
+                      : (v as number);
                     field.handleChange(Math.round(val * 10) / 10);
                   }}
                   min={10}

@@ -50,8 +50,8 @@ export function EligibilityStep() {
 
   const form = useForm({
     defaultValues: {
-      diseases: formData.diseases || [],
-      lastDonationDate: formData.lastDonationDate || 0,
+      diseases: formData.diseases ?? [],
+      lastDonationDate: formData.lastDonationDate ?? 0,
     },
     validators: {
       onChange: step3Schema,
@@ -66,19 +66,19 @@ export function EligibilityStep() {
         };
 
         // BMI calculation: weight / (height/100)^2
-        const heightInMeters = (finalData.height || 0) / 100;
+        const heightInMeters = (finalData.height ?? 0) / 100;
         const bmi =
           heightInMeters > 0
             ? parseFloat(
                 (
-                  (finalData.weight || 0) /
+                  (finalData.weight ?? 0) /
                   (heightInMeters * heightInMeters)
                 ).toFixed(1),
               )
             : 0;
 
         await updateProfile({
-          age: finalData.age || 0,
+          age: finalData.age ?? 0,
           bmi: bmi,
           bloodType:
             (finalData.bloodType as
@@ -90,13 +90,13 @@ export function EligibilityStep() {
               | "AB-"
               | "O+"
               | "O-") || "A+",
-          hemoglobinLevel: finalData.hemoglobinLevel || 12.5,
-          phoneNumber: finalData.phoneNumber || "",
-          diseases: finalData.diseases || [],
-          lastDonationDate: finalData.lastDonationDate || 0,
-          division: finalData.division || "",
-          district: finalData.district || "",
-          subDistrict: finalData.subDistrict || "",
+          hemoglobinLevel: finalData.hemoglobinLevel ?? 12.5,
+          phoneNumber: finalData.phoneNumber ?? "",
+          diseases: finalData.diseases ?? [],
+          lastDonationDate: finalData.lastDonationDate ?? 0,
+          division: finalData.division ?? "",
+          district: finalData.district ?? "",
+          subDistrict: finalData.subDistrict ?? "",
         });
 
         toast.success("Profile setup complete!");
@@ -116,7 +116,7 @@ export function EligibilityStep() {
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        form.handleSubmit();
+        void form.handleSubmit();
       }}
       className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500"
     >

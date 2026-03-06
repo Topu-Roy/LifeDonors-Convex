@@ -67,10 +67,10 @@ export function Filter() {
   };
 
   const hasActiveFilters =
-    (filterBloodType && filterBloodType !== "ALL") ||
-    (filterDivision && filterDivision !== "ALL") ||
-    (filterDistrict && filterDistrict !== "ALL") ||
-    (filterSubDistrict && filterSubDistrict !== "ALL") ||
+    (filterBloodType && filterBloodType !== "ALL") ??
+    (filterDivision && filterDivision !== "ALL") ??
+    (filterDistrict && filterDistrict !== "ALL") ??
+    (filterSubDistrict && filterSubDistrict !== "ALL") ??
     (filterUrgency && filterUrgency !== "ALL");
 
   return (
@@ -84,7 +84,7 @@ export function Filter() {
           <Select
             value={filterBloodType ?? "ALL"}
             onValueChange={(val) =>
-              setFilterBloodType(val === "ALL" ? undefined : (val as string))
+              setFilterBloodType(val === "ALL" ? undefined : val!)
             }
           >
             <SelectTrigger className="w-full h-10 md:h-12 rounded-xl bg-slate-50 dark:bg-slate-800 border-primary/10 transition-all focus:ring-primary/20 text-sm md:text-base">
@@ -109,7 +109,7 @@ export function Filter() {
           <Select
             value={filterUrgency ?? "ALL"}
             onValueChange={(val) =>
-              setFilterUrgency(val === "ALL" ? undefined : (val as string))
+              setFilterUrgency(val === "ALL" ? undefined : val!)
             }
           >
             <SelectTrigger className="w-full h-10 md:h-12 rounded-xl bg-slate-50 dark:bg-slate-800 border-primary/10 transition-all focus:ring-primary/20 text-sm md:text-base">
@@ -137,7 +137,7 @@ export function Filter() {
             <Select
               value={filterDivision ?? "ALL"}
               onValueChange={(val) => {
-                setFilterDivision(val === "ALL" ? undefined : (val as string));
+                setFilterDivision(val === "ALL" ? undefined : val!);
                 setFilterDistrict(undefined);
                 setFilterSubDistrict(undefined);
               }}
@@ -159,7 +159,7 @@ export function Filter() {
             <Select
               value={filterDistrict ?? "ALL"}
               onValueChange={(val) => {
-                setFilterDistrict(val === "ALL" ? undefined : (val as string));
+                setFilterDistrict(val === "ALL" ? undefined : val!);
                 setFilterSubDistrict(undefined);
               }}
               disabled={!filterDivision || filterDivision === "ALL"}
@@ -185,9 +185,7 @@ export function Filter() {
             <Select
               value={filterSubDistrict ?? "ALL"}
               onValueChange={(val) =>
-                setFilterSubDistrict(
-                  val === "ALL" ? undefined : (val as string),
-                )
+                setFilterSubDistrict(val === "ALL" ? undefined : val!)
               }
               disabled={!filterDistrict || filterDistrict === "ALL"}
             >
