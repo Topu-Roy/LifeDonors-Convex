@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { authComponent, createAuth } from "./betterAuth/auth";
 
 export const updateProfile = mutation({
   args: {
@@ -49,19 +50,23 @@ export const updateProfile = mutation({
 export const getMyProfile = query({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
+    const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
+
+    const user = await auth.api.getSession({ headers });
+
+    if (!user) return null;
 
     const profile = await ctx.db
       .query("profiles")
-      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .withIndex("by_userId", (q) => q.eq("userId", user.user.id))
       .first();
 
     return {
       ...profile,
-      name: identity.name,
-      imageUrl: identity.pictureUrl,
-      email: identity.email,
+      name: user.user.name,
+      imageUrl: user.user.image,
+      email: user.user.email,
+      role: user.user.role,
     };
   },
 });
