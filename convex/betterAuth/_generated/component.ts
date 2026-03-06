@@ -31,11 +31,15 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           input:
             | {
                 data: {
+                  banExpires?: null | number;
+                  banReason?: null | string;
+                  banned?: null | boolean;
                   createdAt: number;
                   email: string;
                   emailVerified: boolean;
                   image?: null | string;
                   name: string;
+                  role?: null | string;
                   updatedAt: number;
                   userId?: null | string;
                 };
@@ -45,6 +49,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 data: {
                   createdAt: number;
                   expiresAt: number;
+                  impersonatedBy?: null | string;
                   ipAddress?: null | string;
                   token: string;
                   updatedAt: number;
@@ -88,6 +93,21 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   publicKey: string;
                 };
                 model: "jwks";
+              }
+            | {
+                data: {
+                  aaguid?: null | string;
+                  backedUp: boolean;
+                  counter: number;
+                  createdAt?: null | number;
+                  credentialID: string;
+                  deviceType: string;
+                  name?: null | string;
+                  publicKey: string;
+                  transports?: null | string;
+                  userId: string;
+                };
+                model: "passkey";
               };
           onCreateHandle?: string;
           select?: Array<string>;
@@ -112,6 +132,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
+                    | "banned"
+                    | "banReason"
+                    | "banExpires"
                     | "_id";
                   operator?:
                     | "lt"
@@ -146,6 +170,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "ipAddress"
                     | "userAgent"
                     | "userId"
+                    | "impersonatedBy"
                     | "_id";
                   operator?:
                     | "lt"
@@ -248,6 +273,43 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "privateKey"
                     | "createdAt"
                     | "expiresAt"
+                    | "_id";
+                  operator?:
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "not_in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
+                  value:
+                    | string
+                    | number
+                    | boolean
+                    | Array<string>
+                    | Array<number>
+                    | null;
+                }>;
+              }
+            | {
+                model: "passkey";
+                where?: Array<{
+                  connector?: "AND" | "OR";
+                  field:
+                    | "name"
+                    | "publicKey"
+                    | "userId"
+                    | "credentialID"
+                    | "counter"
+                    | "deviceType"
+                    | "backedUp"
+                    | "transports"
+                    | "createdAt"
+                    | "aaguid"
                     | "_id";
                   operator?:
                     | "lt"
@@ -300,6 +362,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
+                    | "banned"
+                    | "banReason"
+                    | "banExpires"
                     | "_id";
                   operator?:
                     | "lt"
@@ -334,6 +400,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "ipAddress"
                     | "userAgent"
                     | "userId"
+                    | "impersonatedBy"
                     | "_id";
                   operator?:
                     | "lt"
@@ -457,6 +524,43 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | Array<number>
                     | null;
                 }>;
+              }
+            | {
+                model: "passkey";
+                where?: Array<{
+                  connector?: "AND" | "OR";
+                  field:
+                    | "name"
+                    | "publicKey"
+                    | "userId"
+                    | "credentialID"
+                    | "counter"
+                    | "deviceType"
+                    | "backedUp"
+                    | "transports"
+                    | "createdAt"
+                    | "aaguid"
+                    | "_id";
+                  operator?:
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "not_in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
+                  value:
+                    | string
+                    | number
+                    | boolean
+                    | Array<string>
+                    | Array<number>
+                    | null;
+                }>;
               };
           onDeleteHandle?: string;
         },
@@ -469,7 +573,13 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         {
           join?: any;
           limit?: number;
-          model: "user" | "session" | "account" | "verification" | "jwks";
+          model:
+            | "user"
+            | "session"
+            | "account"
+            | "verification"
+            | "jwks"
+            | "passkey";
           offset?: number;
           paginationOpts: {
             cursor: string | null;
@@ -512,7 +622,13 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         "internal",
         {
           join?: any;
-          model: "user" | "session" | "account" | "verification" | "jwks";
+          model:
+            | "user"
+            | "session"
+            | "account"
+            | "verification"
+            | "jwks"
+            | "passkey";
           select?: Array<string>;
           where?: Array<{
             connector?: "AND" | "OR";
@@ -549,11 +665,15 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             | {
                 model: "user";
                 update: {
+                  banExpires?: null | number;
+                  banReason?: null | string;
+                  banned?: null | boolean;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
                   image?: null | string;
                   name?: string;
+                  role?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -567,6 +687,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
+                    | "banned"
+                    | "banReason"
+                    | "banExpires"
                     | "_id";
                   operator?:
                     | "lt"
@@ -594,6 +718,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 update: {
                   createdAt?: number;
                   expiresAt?: number;
+                  impersonatedBy?: null | string;
                   ipAddress?: null | string;
                   token?: string;
                   updatedAt?: number;
@@ -610,6 +735,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "ipAddress"
                     | "userAgent"
                     | "userId"
+                    | "impersonatedBy"
                     | "_id";
                   operator?:
                     | "lt"
@@ -739,6 +865,55 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "privateKey"
                     | "createdAt"
                     | "expiresAt"
+                    | "_id";
+                  operator?:
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "not_in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
+                  value:
+                    | string
+                    | number
+                    | boolean
+                    | Array<string>
+                    | Array<number>
+                    | null;
+                }>;
+              }
+            | {
+                model: "passkey";
+                update: {
+                  aaguid?: null | string;
+                  backedUp?: boolean;
+                  counter?: number;
+                  createdAt?: null | number;
+                  credentialID?: string;
+                  deviceType?: string;
+                  name?: null | string;
+                  publicKey?: string;
+                  transports?: null | string;
+                  userId?: string;
+                };
+                where?: Array<{
+                  connector?: "AND" | "OR";
+                  field:
+                    | "name"
+                    | "publicKey"
+                    | "userId"
+                    | "credentialID"
+                    | "counter"
+                    | "deviceType"
+                    | "backedUp"
+                    | "transports"
+                    | "createdAt"
+                    | "aaguid"
                     | "_id";
                   operator?:
                     | "lt"
@@ -782,11 +957,15 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
             | {
                 model: "user";
                 update: {
+                  banExpires?: null | number;
+                  banReason?: null | string;
+                  banned?: null | boolean;
                   createdAt?: number;
                   email?: string;
                   emailVerified?: boolean;
                   image?: null | string;
                   name?: string;
+                  role?: null | string;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -800,6 +979,10 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
+                    | "banned"
+                    | "banReason"
+                    | "banExpires"
                     | "_id";
                   operator?:
                     | "lt"
@@ -827,6 +1010,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 update: {
                   createdAt?: number;
                   expiresAt?: number;
+                  impersonatedBy?: null | string;
                   ipAddress?: null | string;
                   token?: string;
                   updatedAt?: number;
@@ -843,6 +1027,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "ipAddress"
                     | "userAgent"
                     | "userId"
+                    | "impersonatedBy"
                     | "_id";
                   operator?:
                     | "lt"
@@ -972,6 +1157,55 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "privateKey"
                     | "createdAt"
                     | "expiresAt"
+                    | "_id";
+                  operator?:
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "not_in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
+                  value:
+                    | string
+                    | number
+                    | boolean
+                    | Array<string>
+                    | Array<number>
+                    | null;
+                }>;
+              }
+            | {
+                model: "passkey";
+                update: {
+                  aaguid?: null | string;
+                  backedUp?: boolean;
+                  counter?: number;
+                  createdAt?: null | number;
+                  credentialID?: string;
+                  deviceType?: string;
+                  name?: null | string;
+                  publicKey?: string;
+                  transports?: null | string;
+                  userId?: string;
+                };
+                where?: Array<{
+                  connector?: "AND" | "OR";
+                  field:
+                    | "name"
+                    | "publicKey"
+                    | "userId"
+                    | "credentialID"
+                    | "counter"
+                    | "deviceType"
+                    | "backedUp"
+                    | "transports"
+                    | "createdAt"
+                    | "aaguid"
                     | "_id";
                   operator?:
                     | "lt"

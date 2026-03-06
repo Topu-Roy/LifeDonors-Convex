@@ -7,6 +7,9 @@ import { components } from "../_generated/api";
 import type { DataModel } from "../_generated/dataModel";
 import authConfig from "../auth.config";
 import schema from "./schema";
+import { admin } from "better-auth/plugins";
+import { passkey } from "@better-auth/passkey";
+import { nextCookies } from "better-auth/next-js";
 
 // Better Auth Component
 export const authComponent = createClient<DataModel, typeof schema>(
@@ -20,7 +23,7 @@ export const authComponent = createClient<DataModel, typeof schema>(
 // Better Auth Options
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   return {
-    appName: "My App",
+    appName: "LifeDonors",
     baseURL: process.env.SITE_URL,
     secret: process.env.BETTER_AUTH_SECRET,
     database: authComponent.adapter(ctx),
@@ -30,7 +33,14 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         clientSecret: process.env.GITHUB_CLIENT_SECRET!,
       },
     },
-    plugins: [convex({ authConfig })],
+    // Session cookie for client-side caching
+    session: {
+      cookieCache: {
+        enabled: true,
+        maxAge: 60, // 1 minute
+      },
+    },
+    plugins: [convex({ authConfig }), admin(), passkey(), nextCookies()], // make sure nextCookies is the last plugin in the array
   } satisfies BetterAuthOptions;
 };
 
