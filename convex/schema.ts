@@ -61,11 +61,13 @@ export default defineSchema({
     contactNumber: v.string(),
     numberOfBags: v.number(),
     createdAt: v.number(),
+    isSeed: v.optional(v.boolean()),
   })
     .index("by_status", ["status"])
     .index("by_bloodTypeNeeded", ["bloodTypeNeeded"])
     .index("by_requesterId", ["requesterId"])
-    .index("by_urgency", ["urgency"]),
+    .index("by_urgency", ["urgency"])
+    .index("by_isSeed", ["isSeed"]),
 
   donations: defineTable({
     donorId: v.string(), // Better Auth userId
