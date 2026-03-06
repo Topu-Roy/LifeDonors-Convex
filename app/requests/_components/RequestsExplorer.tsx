@@ -36,7 +36,7 @@ export function RequestsExplorer() {
   const [filterUrgency, setFilterUrgency] = useAtom(filterUrgencyAtom);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const requests = useQuery(api.users.getAllRequests, {
+  const requests = useQuery(api.requests.getAllRequests, {
     bloodType: filterBloodType === "ALL" ? undefined : filterBloodType,
     division: filterDivision === "ALL" ? undefined : filterDivision,
     district: filterDistrict === "ALL" ? undefined : filterDistrict,

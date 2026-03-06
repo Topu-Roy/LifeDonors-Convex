@@ -42,7 +42,7 @@ export function RequestCard({
   isOwner: isOwnerProp,
 }: RequestCardProps) {
   const user = useQuery(api.users.getMyProfile);
-  const acceptRequest = useMutation(api.users.acceptRequest);
+  const acceptRequest = useMutation(api.donations.offerDonation);
 
   const isOwner = isOwnerProp ?? user?._id === request.requesterId;
 

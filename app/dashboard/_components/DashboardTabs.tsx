@@ -34,10 +34,10 @@ export function DashboardTabs() {
   const searchParams = useSearchParams();
   const defaultTab = searchParams.get("tab") ?? "requests";
 
-  const myRequests = useQuery(api.users.getMyRequests);
-  const myDonations = useQuery(api.users.getMyDonations);
-  const updateDonationStatus = useMutation(api.users.updateDonationStatus);
-  const withdrawDonation = useMutation(api.users.withdrawDonation);
+  const myRequests = useQuery(api.requests.getMyRequests);
+  const myDonations = useQuery(api.donations.getMyDonations);
+  const updateDonationStatus = useMutation(api.donations.updateDonationStatus);
+  const withdrawDonation = useMutation(api.donations.withdrawDonation);
 
   const handleUpdateStatus = async (
     donationId: Id<"donations">,

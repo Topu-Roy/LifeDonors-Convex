@@ -29,11 +29,11 @@ import { Container } from "@/components/Container";
 export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
   const router = useRouter();
 
-  const request = useQuery(api.users.getRequestById, { requestId });
-  const selectDonor = useMutation(api.users.selectDonor);
-  const rejectDonor = useMutation(api.users.rejectDonor);
-  const updateDonationStatus = useMutation(api.users.updateDonationStatus);
-  const cancelRequest = useMutation(api.users.cancelRequest);
+  const request = useQuery(api.requests.getRequestById, { requestId });
+  const selectDonor = useMutation(api.donations.selectDonor);
+  const rejectDonor = useMutation(api.donations.rejectDonor);
+  const updateDonationStatus = useMutation(api.donations.updateDonationStatus);
+  const cancelRequest = useMutation(api.requests.cancelRequest);
 
   if (request === undefined) {
     return (

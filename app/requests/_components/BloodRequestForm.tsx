@@ -59,7 +59,7 @@ export function BloodRequestForm({
   onSuccess,
   className,
 }: BloodRequestFormProps) {
-  const createRequest = useMutation(api.users.createBloodRequest);
+  const createRequest = useMutation(api.requests.createBloodRequest);
 
   const form = useForm({
     defaultValues: {

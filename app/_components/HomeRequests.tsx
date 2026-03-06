@@ -15,7 +15,7 @@ import Link from "next/link";
 import { ImpactCard } from "./HomeImpactCard";
 
 export function HomeRequests() {
-  const requests = useQuery(api.users.getAllRequests, {});
+  const requests = useQuery(api.requests.getAllRequests, {});
 
   return (
     <>
