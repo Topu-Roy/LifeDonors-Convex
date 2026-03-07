@@ -57,7 +57,7 @@ export const seedDatabase = mutation({
         bloodType: "O+" as BloodType, // Cast to union type
         hemoglobinLevel: 14, // Placeholder
         diseases: [],
-        phoneNumber: session.user.email || "01700000000",
+        phoneNumber: session.user.email ?? "01700000000",
         lastDonationDate: 0,
         division: "Dhaka",
         district: "Dhaka",
