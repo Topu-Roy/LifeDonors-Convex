@@ -160,6 +160,11 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
             >
               {request.status}
             </Badge>
+            {request.isSeed && (
+              <Badge className="rounded-full border-none bg-blue-100 px-3 py-1.5 text-[9px] font-black tracking-widest text-blue-600 uppercase sm:px-4 sm:text-[10px] dark:bg-blue-900/40 dark:text-blue-300">
+                Demo Data
+              </Badge>
+            )}
           </div>
         </div>
 

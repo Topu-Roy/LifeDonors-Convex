@@ -96,9 +96,16 @@ export function RequestCard({ request, isOwner: isOwnerProp }: RequestCardProps)
               </p>
             </div>
           </div>
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold tracking-tighter text-slate-400 uppercase dark:bg-slate-800/50 dark:text-slate-500">
-            {timeAgo(request.createdAt)}
-          </span>
+          <div className="flex flex-col items-end gap-2">
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold tracking-tighter text-slate-400 uppercase dark:bg-slate-800/50 dark:text-slate-500">
+              {timeAgo(request.createdAt)}
+            </span>
+            {request.isSeed && (
+              <Badge className="rounded-full border-none bg-blue-100 px-2 py-0.5 text-[8px] font-black tracking-widest text-blue-600 uppercase dark:bg-blue-900/40 dark:text-blue-300">
+                Demo
+              </Badge>
+            )}
+          </div>
         </div>
 
         {/* Card Body: Details */}

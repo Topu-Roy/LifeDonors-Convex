@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { type Id } from "@/convex/_generated/dataModel";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import {
   Activity,
   AlertCircle,
   Calendar,
   CheckCircle2,
+  Database,
   Droplet,
   Edit2,
   History,
@@ -16,11 +17,13 @@ import {
   Loader2,
   MapPin,
   Scale,
+  Settings,
   Verified,
   Waves,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/Container";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -71,7 +74,9 @@ const isProfileComplete = (p: ProfileType) => {
 export function ProfileView() {
   const profile = useQuery(api.users.getMyProfile);
   const eligibility = useQuery(api.users.checkEligibility);
+  const seedDatabase = useMutation(api.seed.seedDatabase);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -89,6 +94,24 @@ export function ProfileView() {
   }
 
   if (!profile) return null;
+
+  const handleSeed = async () => {
+    if (!confirm("Are you sure you want to seed the database? This can only be done when the database is empty."))
+      return;
+    setIsSeeding(true);
+    try {
+      const result = await seedDatabase();
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to seed database");
+    } finally {
+      setIsSeeding(false);
+    }
+  };
 
   const initials = profile.name
     ? profile.name
@@ -282,6 +305,33 @@ export function ProfileView() {
           </div>
         </div>
       </section>
+
+      {/* Admin Actions */}
+      {profile.role === "admin" && (
+        <section className="bg-primary/5 border-primary/20 mt-8 space-y-6 rounded-3xl border border-dashed p-8 shadow-inner">
+          <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+            <div className="space-y-2">
+              <h3 className="flex items-center gap-2 text-xl font-black tracking-tight">
+                <Settings className="text-primary h-5 w-5" />
+                Admin Controls
+              </h3>
+              <p className="text-muted-foreground text-sm font-medium">
+                Manage system data and administrative tasks. Use with caution.
+              </p>
+            </div>
+
+            <Button
+              variant="default"
+              onClick={handleSeed}
+              disabled={isSeeding}
+              className="shadow-primary/20 h-12 gap-2 rounded-2xl px-8 font-bold shadow-lg"
+            >
+              {isSeeding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Database className="h-4 w-4" />}
+              Seed Database from Assets
+            </Button>
+          </div>
+        </section>
+      )}
 
       {/* Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
