@@ -8,7 +8,6 @@ import { convex } from "@convex-dev/better-auth/plugins";
 import type { GenericCtx } from "@convex-dev/better-auth/utils";
 import type { BetterAuthOptions } from "better-auth";
 import { betterAuth } from "better-auth";
-import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins";
 
 // Better Auth Component
@@ -37,7 +36,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         maxAge: 60, // 1 minute
       },
     },
-    plugins: [convex({ authConfig }), admin(), passkey(), nextCookies()], // make sure nextCookies is the last plugin in the array
+    plugins: [convex({ authConfig }), admin(), passkey()],
   } satisfies BetterAuthOptions;
 };
 

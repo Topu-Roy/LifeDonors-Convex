@@ -3,9 +3,8 @@ import { FeatureItem } from "@/app/_components/HomeFeatureItem";
 import { HomeRequests } from "@/app/_components/HomeRequests";
 import { Activity, Droplet, HandHeart, Search, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { Container } from "@/components/Container";
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
@@ -33,26 +32,26 @@ export default function Home() {
               </p>
             </div>
             <div className="relative z-10 mt-4 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
-              <Link
-                href="/requests"
-                className={cn(
-                  buttonVariants({ size: "lg" }),
+              <Button
+                className={
                   "h-14 w-full gap-2 px-8 text-lg font-bold shadow-xl transition-all hover:scale-105 sm:w-auto"
-                )}
+                }
               >
-                <Search className="h-5 w-5" />
-                Find Requests
-              </Link>
-              <Link
-                href="/profile"
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "lg" }),
+                <Link href="/requests">
+                  <Search className="h-5 w-5" />
+                  Find Requests
+                </Link>
+              </Button>
+              <Button
+                className={
                   "h-14 w-full gap-2 bg-white px-8 text-lg font-bold text-slate-900 shadow-xl transition-all hover:scale-105 hover:bg-slate-100 sm:w-auto"
-                )}
+                }
               >
-                <HandHeart className="h-5 w-5" />
-                Become a Donor
-              </Link>
+                <Link href="/profile">
+                  <HandHeart className="h-5 w-5" />
+                  Become a Donor
+                </Link>
+              </Button>
             </div>
           </div>
         </Container>
