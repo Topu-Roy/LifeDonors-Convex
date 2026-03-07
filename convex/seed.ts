@@ -1,6 +1,6 @@
-import { allSeedData } from "../assets/seedData";
-import { mutation } from "./_generated/server";
-import { authComponent, createAuth } from "./betterAuth/auth";
+import { allSeedData } from "@/assets/seedData";
+import { mutation } from "@/convex/_generated/server";
+import { authComponent, createAuth } from "@/convex/betterAuth/auth";
 
 type BloodType = "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 type Urgency = "Low" | "Medium" | "High" | "Critical";

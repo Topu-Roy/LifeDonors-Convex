@@ -1,5 +1,5 @@
+import { RequestDetails } from "@/app/requests/[id]/_components/requestDetails";
 import { type Id } from "@/convex/_generated/dataModel";
-import { RequestDetails } from "./_components/requestDetails";
 
 export default async function RequestReviewPage({ params }: PageProps<"/requests/[id]">) {
   const { id } = await params;

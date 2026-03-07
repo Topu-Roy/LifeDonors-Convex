@@ -1,11 +1,11 @@
 "use client";
 
+import { ImpactCard } from "@/app/_components/HomeImpactCard";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { Activity, AlertCircle, ArrowRight, Droplet, Heart, Users } from "lucide-react";
 import Link from "next/link";
 import { RequestCard } from "@/components/RequestCard";
-import { ImpactCard } from "./HomeImpactCard";
 
 export function HomeRequests() {
   const requests = useQuery(api.requests.getAllRequests, {});

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
+import { SetupWizard } from "@/app/profile/setup/_components/SetupWizard";
 import { Droplet } from "lucide-react";
 import { Container } from "@/components/Container";
-import { SetupWizard } from "./_components/SetupWizard";
 
 export default function ProfileSetupPage() {
   return (

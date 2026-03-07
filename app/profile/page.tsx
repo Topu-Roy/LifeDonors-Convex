@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { ProfileView } from "./_components/ProfileView";
+import { ProfileView } from "@/app/profile/_components/ProfileView";
 
 export default function ProfilePage() {
   return (

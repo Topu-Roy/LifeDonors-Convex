@@ -1,7 +1,7 @@
 import { Suspense } from "react";
+import { DashboardTabs } from "@/app/dashboard/_components/DashboardTabs";
 import { LayoutDashboard } from "lucide-react";
 import { Container } from "@/components/Container";
-import { DashboardTabs } from "./_components/DashboardTabs";
 
 export default function DashboardPage() {
   return (

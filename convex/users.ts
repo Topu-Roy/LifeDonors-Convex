@@ -1,6 +1,6 @@
+import { mutation, query } from "@/convex/_generated/server";
+import { authComponent, createAuth } from "@/convex/betterAuth/auth";
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
-import { authComponent, createAuth } from "./betterAuth/auth";
 
 export const updateProfile = mutation({
   args: {

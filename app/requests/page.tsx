@@ -1,6 +1,6 @@
 import { Suspense } from "react";
+import { RequestsExplorer } from "@/app/requests/_components/RequestsExplorer";
 import { Container } from "@/components/Container";
-import { RequestsExplorer } from "./_components/RequestsExplorer";
 
 export default function RequestsPage() {
   return (

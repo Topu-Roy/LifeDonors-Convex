@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Filter } from "@/app/requests/_components/filters";
 import { api } from "@/convex/_generated/api";
 import {
   filterBloodTypeAtom,
@@ -18,7 +19,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Filter } from "./filters";
 
 export function RequestsExplorer() {
   const [filterBloodType, setFilterBloodType] = useAtom(filterBloodTypeAtom);

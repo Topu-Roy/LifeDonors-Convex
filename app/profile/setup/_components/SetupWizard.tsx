@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
+import { type ProfileType } from "@/app/profile/_components/ProfileView";
+import { BasicInfoStep } from "@/app/profile/setup/_components/BasicInfoStep";
+import { EligibilityStep } from "@/app/profile/setup/_components/EligibilityStep";
+import { HealthDetailsStep } from "@/app/profile/setup/_components/HealthDetailsStep";
 import { api } from "@/convex/_generated/api";
 import { currentStepAtom } from "@/state/setup/store";
 import { useQuery } from "convex/react";
@@ -8,10 +12,6 @@ import { useAtom } from "jotai";
 import { Check, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { type ProfileType } from "../../_components/ProfileView";
-import { BasicInfoStep } from "./BasicInfoStep";
-import { EligibilityStep } from "./EligibilityStep";
-import { HealthDetailsStep } from "./HealthDetailsStep";
 
 const steps = [
   { id: 1, title: "Basic Information", description: "Age, Phone & Location" },

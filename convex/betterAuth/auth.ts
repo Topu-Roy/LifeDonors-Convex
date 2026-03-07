@@ -1,3 +1,7 @@
+import { components } from "@/convex/_generated/api";
+import type { DataModel } from "@/convex/_generated/dataModel";
+import authConfig from "@/convex/auth.config";
+import schema from "@/convex/betterAuth/schema";
 import { passkey } from "@better-auth/passkey";
 import { createClient } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
@@ -6,10 +10,6 @@ import type { BetterAuthOptions } from "better-auth";
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins";
-import { components } from "../_generated/api";
-import type { DataModel } from "../_generated/dataModel";
-import authConfig from "../auth.config";
-import schema from "./schema";
 
 // Better Auth Component
 export const authComponent = createClient<DataModel, typeof schema>(components.betterAuth, {

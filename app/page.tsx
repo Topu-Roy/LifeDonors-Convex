@@ -1,11 +1,11 @@
+import { EligibilityChecker } from "@/app/_components/EligibilityChecker";
+import { FeatureItem } from "@/app/_components/HomeFeatureItem";
+import { HomeRequests } from "@/app/_components/HomeRequests";
 import { Activity, Droplet, HandHeart, Search, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/Container";
 import { buttonVariants } from "@/components/ui/button";
-import { EligibilityChecker } from "./_components/EligibilityChecker";
-import { FeatureItem } from "./_components/HomeFeatureItem";
-import { HomeRequests } from "./_components/HomeRequests";
 
 export default function Home() {
   return (
