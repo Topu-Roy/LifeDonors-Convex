@@ -13,6 +13,7 @@ import {
   Menu,
   MessageSquarePlus,
   PlusCircle,
+  ShieldCheck,
   User,
   UserCircle,
 } from "lucide-react";
@@ -227,6 +228,14 @@ function UserMenu() {
               <span>My Profile</span>
             </Link>
           </DropdownMenuItem>
+          {user.role === "admin" && (
+            <DropdownMenuItem className="rounded-md">
+              <Link href="/admin" className="flex w-full cursor-pointer items-center py-1">
+                <ShieldCheck className="text-primary mr-2 h-4 w-4" />
+                <span className="font-bold">Admin Panel</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem className="rounded-md">
             <Link href="/profile" className="flex w-full cursor-pointer items-center py-1">
               <Droplet className="text-primary mr-2 h-4 w-4" />
