@@ -1,5 +1,5 @@
+import { allSeedData } from "../assets/seedData";
 import { mutation } from "./_generated/server";
-import { allSeedData } from "./assets/seedData";
 import { authComponent, createAuth } from "./betterAuth/auth";
 
 type BloodType = "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
