@@ -6,9 +6,10 @@ import { useQuery } from "convex/react";
 import { Activity, AlertCircle, ArrowRight, Droplet, Heart, Users } from "lucide-react";
 import Link from "next/link";
 import { RequestCard } from "@/components/RequestCard";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function HomeRequests() {
-  const requests = useQuery(api.requests.getAllRequests, {});
+  const requests = useQuery(api.requests.getAllRequests, { take: 4 });
 
   return (
     <>
@@ -41,7 +42,7 @@ export function HomeRequests() {
       </div>
 
       {/* Urgent Needs Section Content */}
-      <div className="mt-12 flex w-full flex-col gap-6 lg:w-2/3">
+      <div className="mt-12 flex w-full flex-col gap-6">
         <div className="border-border flex flex-col justify-between gap-4 border-b pb-2 sm:flex-row sm:items-center">
           <h2 className="flex items-center gap-2 text-xl font-black tracking-tight md:text-2xl">
             <AlertCircle className="text-primary h-6 w-6" />
@@ -56,13 +57,11 @@ export function HomeRequests() {
           </Link>
         </div>
 
-        <div className="space-y-4">
+        <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
           {requests === undefined ? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="bg-muted/50 h-40 animate-pulse rounded-2xl border" />
-            ))
+            Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-40 rounded-2xl" />)
           ) : requests.length > 0 ? (
-            requests.slice(0, 3).map(request => <RequestCard key={request._id} request={request} />)
+            requests.map(request => <RequestCard key={request._id} request={request} />)
           ) : (
             <div className="bg-muted/20 border-border rounded-2xl border border-dashed py-20 text-center opacity-60">
               <Droplet className="text-muted-foreground mx-auto mb-4 h-12 w-12" />

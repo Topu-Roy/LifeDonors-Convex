@@ -63,7 +63,7 @@ export function RequestCard({ request, isOwner: isOwnerProp }: RequestCardProps)
   return (
     <div
       className={cn(
-        "group flex flex-col overflow-hidden rounded-3xl border-2 p-1 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl",
+        "group flex flex-col overflow-hidden rounded-3xl border-2 p-1 shadow-sm hover:shadow-xl",
         urgencyStyles[request.urgency]
       )}
     >
@@ -76,7 +76,7 @@ export function RequestCard({ request, isOwner: isOwnerProp }: RequestCardProps)
                 "flex h-16 w-16 items-center justify-center rounded-3xl text-2xl font-black shadow-inner",
                 request.urgency === "Critical" || request.urgency === "High"
                   ? "bg-red-600 text-white shadow-red-900/20"
-                  : "bg-primary shadow-primary-900/10 text-slate-900"
+                  : "bg-primary shadow-primary-900/10 text-white"
               )}
             >
               {request.bloodTypeNeeded}
@@ -97,11 +97,11 @@ export function RequestCard({ request, isOwner: isOwnerProp }: RequestCardProps)
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold tracking-tighter text-slate-400 uppercase dark:bg-slate-800/50 dark:text-slate-500">
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold tracking-tighter text-slate-400 dark:bg-slate-800/50 dark:text-slate-500">
               {timeAgo(request.createdAt)}
             </span>
             {request.isSeed && (
-              <Badge className="rounded-full border-none bg-blue-100 px-2 py-0.5 text-[8px] font-black tracking-widest text-blue-600 uppercase dark:bg-blue-900/40 dark:text-blue-300">
+              <Badge className="rounded-full border-none bg-blue-100 px-2 py-0.5 text-[8px] font-black tracking-widest text-blue-600 dark:bg-blue-900/40 dark:text-blue-300">
                 Demo
               </Badge>
             )}
@@ -128,13 +128,13 @@ export function RequestCard({ request, isOwner: isOwnerProp }: RequestCardProps)
           <div className="grid grid-cols-2 gap-3">
             <div className="flex items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
               <User className="text-primary h-4 w-4 shrink-0" />
-              <p className="truncate text-[11px] font-bold text-slate-600 dark:text-slate-400">
+              <p className="truncate text-sm font-bold text-slate-600 dark:text-slate-400">
                 {request.patientName}
               </p>
             </div>
             <div className="flex items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
               <Clock className="text-primary h-4 w-4 shrink-0" />
-              <p className="truncate text-[11px] font-bold text-slate-600 dark:text-slate-400">
+              <p className="truncate text-sm font-bold text-slate-600 dark:text-slate-400">
                 By{" "}
                 {new Date(request.createdAt + 86400000).toLocaleDateString([], {
                   month: "short",
@@ -152,7 +152,7 @@ export function RequestCard({ request, isOwner: isOwnerProp }: RequestCardProps)
               href={`/requests/${request._id}`}
               className={cn(
                 buttonVariants({ variant: "default" }),
-                "shadow-primary/20 bg-primary group h-14 w-full gap-2 rounded-2xl text-base font-black text-slate-900 shadow-lg transition-all hover:scale-[1.02] active:scale-95"
+                "shadow-primary/20 bg-primary group h-14 w-full gap-2 rounded-2xl text-base font-black shadow-lg transition-all hover:scale-[1.02] active:scale-95"
               )}
             >
               Review Request
@@ -164,7 +164,7 @@ export function RequestCard({ request, isOwner: isOwnerProp }: RequestCardProps)
                 href={`/requests/${request._id}`}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "border-primary/20 hover:bg-primary/5 h-14 flex-1 rounded-2xl font-bold text-slate-600 dark:text-slate-300"
+                  "border-primary/20 hover:bg-primary/5 h-14 flex-1 rounded-2xl font-bold"
                 )}
               >
                 Details
@@ -172,7 +172,7 @@ export function RequestCard({ request, isOwner: isOwnerProp }: RequestCardProps)
               <Button
                 onClick={handleAccept}
                 className={cn(
-                  "shadow-primary/20 bg-primary h-14 flex-2 gap-2 rounded-2xl text-base font-black text-slate-900 shadow-lg transition-all hover:scale-[1.02] active:scale-95"
+                  "shadow-primary/20 bg-primary h-14 flex-2 gap-2 rounded-2xl text-base font-black shadow-lg transition-all hover:scale-[1.02] active:scale-95"
                 )}
               >
                 Volunteer Now

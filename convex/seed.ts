@@ -1,4 +1,4 @@
-import { allSeedData } from "@/assets/seedData";
+import { allSeedData } from "@/assets/seed/seedData";
 import { mutation } from "@/convex/_generated/server";
 import { authComponent, createAuth } from "@/convex/betterAuth/auth";
 

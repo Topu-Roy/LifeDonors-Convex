@@ -1,7 +1,9 @@
 import { EligibilityChecker } from "@/app/_components/EligibilityChecker";
 import { FeatureItem } from "@/app/_components/HomeFeatureItem";
 import { HomeRequests } from "@/app/_components/HomeRequests";
+import BloodDonationImage from "@/assets/images/blood-donation.jpg";
 import { Activity, Droplet, HandHeart, Search, ShieldCheck, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/Container";
 import { Button } from "@/components/ui/button";
@@ -11,44 +13,39 @@ export default function Home() {
     <div className="flex min-h-screen flex-col">
       <main className="flex w-full flex-1 flex-col items-center pb-12">
         {/* Hero Section */}
-        <Container as="section" className="py-8">
-          <div
-            className="relative flex min-h-[500px] flex-col items-center justify-center gap-8 overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900 p-8 shadow-2xl"
-            style={{
-              backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.8)), url("https://images.unsplash.com/photo-1542884748-2b87b36c6b90?auto=format&fit=crop&q=80")`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          >
-            <div className="relative z-10 flex max-w-3xl flex-col gap-4 text-center">
+        <Container as="section" className="relative overflow-hidden py-8">
+          <div className="relative z-10 flex min-h-[500px] flex-col items-center justify-center gap-8 overflow-hidden rounded-4xl border border-white/10 p-8 shadow-2xl">
+            <Image
+              src={BloodDonationImage}
+              alt="Blood Donation"
+              className="absolute inset-0 object-cover brightness-50"
+            />
+            <div className="relative z-20 flex max-w-3xl flex-col gap-4 text-center">
               <h1 className="animate-in fade-in slide-in-from-top-4 text-4xl leading-[1.1] font-black tracking-tighter text-white duration-1000 sm:text-5xl md:text-7xl">
                 Give Blood.
                 <br />
                 <span className="text-primary italic">Save a Life.</span>
               </h1>
-              <p className="mx-auto max-w-2xl text-lg leading-relaxed font-medium text-slate-200 opacity-90 md:text-xl">
-                Join our community of lifesavers. Find urgent local blood requests, track your donations, and make
-                a real difference in your community.
+              <p className="mx-auto max-w-2xl text-lg leading-relaxed font-medium text-balance text-white opacity-90 text-shadow-md md:text-xl">
+                Find nearby blood requests, donate safely, and help save lives in your community.
               </p>
             </div>
-            <div className="relative z-10 mt-4 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
+            <div className="relative z-20 mt-4 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
               <Button
-                className={
-                  "h-14 w-full gap-2 px-8 text-lg font-bold shadow-xl transition-all hover:scale-105 sm:w-auto"
-                }
+                className={"h-14 w-full px-6 text-lg font-bold shadow-xl transition-all hover:scale-105 sm:w-auto"}
               >
-                <Link href="/requests">
-                  <Search className="h-5 w-5" />
+                <Link href="/requests" className="flex items-center justify-center gap-4">
+                  <Search strokeWidth={3} size={20} className="size-4.5" />
                   Find Requests
                 </Link>
               </Button>
               <Button
                 className={
-                  "h-14 w-full gap-2 bg-white px-8 text-lg font-bold text-slate-900 shadow-xl transition-all hover:scale-105 hover:bg-slate-100 sm:w-auto"
+                  "h-14 w-full bg-white px-6 text-lg font-bold text-slate-900 shadow-xl transition-all hover:scale-105 hover:bg-slate-100 sm:w-auto"
                 }
               >
-                <Link href="/profile">
-                  <HandHeart className="h-5 w-5" />
+                <Link href="/profile" className="flex items-center justify-center gap-4">
+                  <HandHeart strokeWidth={2.5} size={20} className="size-4.5" />
                   Become a Donor
                 </Link>
               </Button>
@@ -64,8 +61,10 @@ export default function Home() {
         {/* Main Content Area */}
         <Container className="flex flex-col gap-12 py-12 lg:flex-row">
           {/* Right Column: Features & Eligibility */}
-          <div className="ml-auto flex w-full flex-col gap-8 lg:w-1/3">
-            <EligibilityChecker />
+          <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2">
+            <div className="">
+              <EligibilityChecker />
+            </div>
 
             {/* Platform Features */}
             <div className="space-y-4">
