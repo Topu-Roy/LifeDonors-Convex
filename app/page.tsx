@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
-      <main className="flex w-full flex-1 flex-col items-center pb-12">
+      <main className="flex w-full flex-1 flex-col items-center">
         {/* Hero Section */}
         <Container as="section" className="relative overflow-hidden py-8">
           <div className="relative z-10 flex min-h-[500px] flex-col items-center justify-center gap-8 overflow-hidden rounded-4xl border border-white/10 p-8 shadow-2xl">
@@ -59,9 +59,9 @@ export default function Home() {
         </Container>
 
         {/* Main Content Area */}
-        <Container className="flex flex-col gap-12 py-12 lg:flex-row">
+        <Container className="flex flex-col gap-12 py-20 lg:flex-row">
           {/* Right Column: Features & Eligibility */}
-          <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2">
+          <div className="grid w-full grid-cols-1 gap-20">
             <div className="">
               <EligibilityChecker />
             </div>

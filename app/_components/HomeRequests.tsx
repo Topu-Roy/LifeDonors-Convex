@@ -42,7 +42,7 @@ export function HomeRequests() {
       </div>
 
       {/* Urgent Needs Section Content */}
-      <div className="mt-12 flex w-full flex-col gap-6">
+      <div className="flex w-full flex-col gap-6 pt-20">
         <div className="border-border flex flex-col justify-between gap-4 border-b pb-2 sm:flex-row sm:items-center">
           <h2 className="flex items-center gap-2 text-xl font-black tracking-tight md:text-2xl">
             <AlertCircle className="text-primary h-6 w-6" />
