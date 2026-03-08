@@ -52,12 +52,17 @@ export default defineSchema({
     numberOfBags: v.number(),
     createdAt: v.number(),
     isSeed: v.optional(v.boolean()),
+    searchableText: v.optional(v.string()), // Combined text for searching
   })
     .index("by_status", ["status"])
     .index("by_bloodTypeNeeded", ["bloodTypeNeeded"])
     .index("by_requesterId", ["requesterId"])
     .index("by_urgency", ["urgency"])
-    .index("by_isSeed", ["isSeed"]),
+    .index("by_isSeed", ["isSeed"])
+    .searchIndex("search_text", {
+      searchField: "searchableText",
+      filterFields: ["status", "bloodTypeNeeded", "urgency", "division", "district", "subDistrict"],
+    }),
 
   donations: defineTable({
     donorId: v.string(), // Better Auth userId

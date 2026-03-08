@@ -1,4 +1,5 @@
-import { mutation, query } from "@/convex/_generated/server";
+import { internalMutation, mutation, query } from "@/convex/_generated/server";
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 
 export const createBloodRequest = mutation({
@@ -35,11 +36,14 @@ export const createBloodRequest = mutation({
 
     if (!profile) throw new Error("Profile not found");
 
+    const searchableText = `${args.patientName} ${args.hospitalName} ${args.bloodTypeNeeded}`.toLowerCase();
+
     return await ctx.db.insert("requests", {
       ...args,
       requesterId: profile._id,
       status: "Open",
       createdAt: Date.now(),
+      searchableText,
     });
   },
 });
@@ -81,6 +85,70 @@ export const getAllRequests = query({
     }
 
     return await requests.order("desc").collect();
+  },
+});
+
+export const getPaginatedRequests = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+    bloodType: v.optional(v.string()),
+    division: v.optional(v.string()),
+    district: v.optional(v.string()),
+    subDistrict: v.optional(v.string()),
+    urgency: v.optional(v.string()),
+    searchQuery: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { bloodType, division, district, subDistrict, urgency, searchQuery } = args;
+
+    if (searchQuery) {
+      return await ctx.db
+        .query("requests")
+        .withSearchIndex("search_text", q => {
+          let search = q.search("searchableText", searchQuery);
+          if (bloodType) search = search.eq("bloodTypeNeeded", bloodType as "A+");
+          if (urgency) search = search.eq("urgency", urgency as "Low");
+          if (division) search = search.eq("division", division);
+          if (district) search = search.eq("district", district);
+          if (subDistrict) search = search.eq("subDistrict", subDistrict);
+          return search.eq("status", "Open");
+        })
+        .paginate(args.paginationOpts);
+    }
+
+    let requests = ctx.db.query("requests").withIndex("by_status", q => q.eq("status", "Open"));
+
+    if (bloodType) {
+      requests = requests.filter(q => q.eq(q.field("bloodTypeNeeded"), bloodType));
+    }
+    if (urgency) {
+      requests = requests.filter(q => q.eq(q.field("urgency"), urgency));
+    }
+    if (division) {
+      requests = requests.filter(q => q.eq(q.field("division"), division));
+    }
+    if (district) {
+      requests = requests.filter(q => q.eq(q.field("district"), district));
+    }
+    if (subDistrict) {
+      requests = requests.filter(q => q.eq(q.field("subDistrict"), subDistrict));
+    }
+
+    return await requests.order("desc").paginate(args.paginationOpts);
+  },
+});
+
+export const backfillSearchableText = internalMutation({
+  args: {},
+  handler: async ctx => {
+    const requests = await ctx.db.query("requests").collect();
+    for (const request of requests) {
+      if (!request.searchableText) {
+        const searchableText =
+          `${request.patientName} ${request.hospitalName} ${request.bloodTypeNeeded}`.toLowerCase();
+        await ctx.db.patch("requests", request._id, { searchableText });
+      }
+    }
   },
 });
 

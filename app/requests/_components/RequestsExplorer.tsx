@@ -10,7 +10,7 @@ import {
   filterSubDistrictAtom,
   filterUrgencyAtom,
 } from "@/state/requests/store";
-import { useQuery } from "convex/react";
+import { usePaginatedQuery } from "convex/react";
 import { useAtom } from "jotai";
 import { Filter as FilterIcon, Plus, Search, X } from "lucide-react";
 import Link from "next/link";
@@ -28,20 +28,24 @@ export function RequestsExplorer() {
   const [filterUrgency, setFilterUrgency] = useAtom(filterUrgencyAtom);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const requests = useQuery(api.requests.getAllRequests, {
-    bloodType: filterBloodType === "ALL" ? undefined : filterBloodType,
-    division: filterDivision === "ALL" ? undefined : filterDivision,
-    district: filterDistrict === "ALL" ? undefined : filterDistrict,
-    subDistrict: filterSubDistrict === "ALL" ? undefined : filterSubDistrict,
-    urgency: filterUrgency === "ALL" ? undefined : filterUrgency,
-  });
-
-  const filteredRequests = requests?.filter(
-    r =>
-      r.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.hospitalName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.bloodTypeNeeded.toLowerCase().includes(searchQuery.toLowerCase())
+  const {
+    results: requests,
+    status,
+    loadMore,
+  } = usePaginatedQuery(
+    api.requests.getPaginatedRequests,
+    {
+      bloodType: filterBloodType === "ALL" ? undefined : filterBloodType,
+      division: filterDivision === "ALL" ? undefined : filterDivision,
+      district: filterDistrict === "ALL" ? undefined : filterDistrict,
+      subDistrict: filterSubDistrict === "ALL" ? undefined : filterSubDistrict,
+      urgency: filterUrgency === "ALL" ? undefined : filterUrgency,
+      searchQuery: searchQuery || undefined,
+    },
+    { initialNumItems: 12 }
   );
+
+  const filteredRequests = requests; // Search is now handled on the backend
 
   const activeFiltersCount = [
     filterBloodType,
@@ -67,20 +71,24 @@ export function RequestsExplorer() {
           </div>
 
           <Sheet>
-            <SheetTrigger>
-              <Button
-                variant="outline"
-                size="icon"
-                className="border-primary/10 relative h-12 w-12 shrink-0 rounded-full bg-white/50 lg:hidden dark:bg-white/5"
-              >
-                <FilterIcon className="h-5 w-5 text-slate-600 dark:text-slate-300" />
-                {activeFiltersCount > 0 && (
-                  <Badge className="bg-primary border-background absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 p-0 text-[10px] text-white">
-                    {activeFiltersCount}
-                  </Badge>
-                )}
-              </Button>
-            </SheetTrigger>
+            <SheetTrigger
+              render={props => (
+                <Button
+                  {...props}
+                  variant="outline"
+                  size="icon"
+                  className="border-primary/10 relative h-12 w-12 shrink-0 rounded-full bg-white/50 lg:hidden dark:bg-white/5"
+                >
+                  <FilterIcon className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+                  {activeFiltersCount > 0 && (
+                    <Badge className="bg-primary border-background absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 p-0 text-[10px] text-white">
+                      {activeFiltersCount}
+                    </Badge>
+                  )}
+                </Button>
+              )}
+            />
+
             <SheetContent side="right" className="w-[85vw] p-0 sm:w-[400px]">
               <SheetHeader className="border-b p-6">
                 <SheetTitle className="flex items-center gap-2 text-xl font-black">
@@ -104,7 +112,7 @@ export function RequestsExplorer() {
 
       {/* Sidebar Filters */}
       <aside className="hidden w-72 shrink-0 space-y-8 lg:block">
-        <div className="border-primary/10 sticky top-24 rounded-[2rem] border bg-white p-8 shadow-sm dark:bg-slate-900">
+        <div className="border-primary/10 sticky top-24 rounded-4xl border bg-white p-8 shadow-sm dark:bg-slate-900">
           <div className="mb-6 flex items-center gap-2">
             <FilterIcon className="text-primary h-5 w-5" />
             <h2 className="text-xl font-black tracking-tight">Filters</h2>
@@ -159,15 +167,26 @@ export function RequestsExplorer() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {requests === undefined ? (
+          {status === "LoadingFirstPage" ? (
             Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="border-primary/5 h-[320px] animate-pulse rounded-[2rem] border bg-white dark:bg-white/5"
+                className="border-primary/5 h-[320px] animate-pulse rounded-4xl border bg-white dark:bg-white/5"
               />
             ))
           ) : filteredRequests && filteredRequests.length > 0 ? (
-            filteredRequests.map(request => <RequestCard key={request._id} request={request} />)
+            <>
+              {filteredRequests.map(request => (
+                <RequestCard key={request._id} request={request} />
+              ))}
+              {status === "LoadingMore" &&
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div
+                    key={`loading-more-${i}`}
+                    className="border-primary/5 h-[320px] animate-pulse rounded-4xl border bg-white dark:bg-white/5"
+                  />
+                ))}
+            </>
           ) : (
             <div className="border-primary/20 col-span-full rounded-[3rem] border-2 border-dashed bg-white py-24 text-center dark:bg-slate-900">
               <div className="bg-primary/10 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl">
@@ -192,6 +211,18 @@ export function RequestsExplorer() {
             </div>
           )}
         </div>
+
+        {status === "CanLoadMore" && (
+          <div className="mt-12 flex justify-center">
+            <Button
+              onClick={() => loadMore(12)}
+              variant="outline"
+              className="border-primary/20 hover:bg-primary/5 h-12 rounded-full px-10 font-bold transition-all"
+            >
+              Load More Requests
+            </Button>
+          </div>
+        )}
       </main>
     </div>
   );

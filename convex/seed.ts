@@ -76,11 +76,14 @@ export const seedDatabase = mutation({
     const typedSeedData = allSeedData as unknown as SeedRequest[];
 
     for (const request of typedSeedData) {
+      const searchableText =
+        `${request.patientName} ${request.hospitalName} ${request.bloodTypeNeeded}`.toLowerCase();
       await ctx.db.insert("requests", {
         ...request,
         requesterId: adminProfile._id,
         createdAt: Date.now() - Math.floor(Math.random() * 1000 * 60 * 60 * 24 * 30),
         isSeed: true,
+        searchableText,
       });
       count++;
     }
