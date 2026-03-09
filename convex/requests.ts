@@ -107,14 +107,13 @@ export const updateBloodRequest = mutation({
   },
 });
 
-export const getAllRequests = query({
+export const getRequestsForHome = query({
   args: {
     bloodType: v.optional(v.string()),
     division: v.optional(v.string()),
     district: v.optional(v.string()),
     subDistrict: v.optional(v.string()),
     urgency: v.optional(v.string()),
-    take: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     let requests = ctx.db.query("requests").withIndex("by_status", q => q.eq("status", "Open"));
@@ -139,11 +138,7 @@ export const getAllRequests = query({
       requests = requests.filter(q => q.eq(q.field("subDistrict"), args.subDistrict));
     }
 
-    if (args.take) {
-      return await requests.order("desc").take(args.take);
-    }
-
-    return await requests.order("desc").collect();
+    return await requests.order("desc").take(4);
   },
 });
 

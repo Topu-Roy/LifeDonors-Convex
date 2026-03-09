@@ -9,7 +9,7 @@ import { RequestCard } from "@/components/RequestCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function HomeRequests() {
-  const requests = useQuery(api.requests.getAllRequests, { take: 4 });
+  const requests = useQuery(api.requests.getRequestsForHome, {});
 
   return (
     <>

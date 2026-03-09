@@ -2,21 +2,16 @@
 
 import { cn } from "@/lib/utils";
 
-export function ImpactCard({
-  icon,
-  label,
-  value,
-  color,
-  bgColor,
-  borderColor,
-}: {
+type Props = {
   icon: React.ReactNode;
   label: string;
   value: string;
   color: string;
   bgColor: string;
   borderColor: string;
-}) {
+};
+
+export function ImpactCard({ icon, label, value, color, bgColor, borderColor }: Props) {
   return (
     <div
       className={cn(
