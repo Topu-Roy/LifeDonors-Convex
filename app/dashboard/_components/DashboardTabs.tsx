@@ -2,7 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { type Id } from "@/convex/_generated/dataModel";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, usePaginatedQuery } from "convex/react";
 import {
   Calendar,
   CheckCircle2,
@@ -29,8 +29,17 @@ export function DashboardTabs() {
   const searchParams = useSearchParams();
   const defaultTab = searchParams.get("tab") ?? "requests";
 
-  const myRequests = useQuery(api.requests.getMyRequests);
-  const myDonations = useQuery(api.donations.getMyDonations);
+  const {
+    results: myRequests,
+    status: myRequestsStatus,
+    loadMore: loadMoreRequests,
+  } = usePaginatedQuery(api.requests.getPaginatedMyRequests, {}, { initialNumItems: 6 });
+
+  const {
+    results: myDonations,
+    status: myDonationsStatus,
+    loadMore: loadMoreDonations,
+  } = usePaginatedQuery(api.donations.getPaginatedMyDonations, {}, { initialNumItems: 6 });
   const updateDonationStatus = useMutation(api.donations.updateDonationStatus);
   const withdrawDonation = useMutation(api.donations.withdrawDonation);
 
@@ -97,7 +106,7 @@ export function DashboardTabs() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {myRequests === undefined ? (
+          {myRequestsStatus === "LoadingFirstPage" ? (
             Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="bg-muted h-64 animate-pulse rounded-3xl border" />
             ))
@@ -124,6 +133,18 @@ export function DashboardTabs() {
             </>
           )}
         </div>
+
+        {myRequestsStatus === "CanLoadMore" && (
+          <div className="mt-8 flex justify-center">
+            <Button
+              onClick={() => loadMoreRequests(6)}
+              variant="outline"
+              className="border-primary/20 hover:bg-primary/5 h-12 rounded-full px-10 font-bold transition-all"
+            >
+              Load More Requests
+            </Button>
+          </div>
+        )}
       </TabsContent>
 
       <TabsContent value="donations" className="space-y-6 focus-visible:outline-none">
@@ -139,11 +160,11 @@ export function DashboardTabs() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {myDonations === undefined ? (
+          {myDonationsStatus === "LoadingFirstPage" ? (
             Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="bg-muted h-32 animate-pulse rounded-3xl border" />
             ))
-          ) : myDonations.length > 0 ? (
+          ) : myDonations && myDonations.length > 0 ? (
             myDonations.map(donation => (
               <DonationTrackingCard
                 key={donation._id}
@@ -170,6 +191,18 @@ export function DashboardTabs() {
             </Card>
           )}
         </div>
+
+        {myDonationsStatus === "CanLoadMore" && (
+          <div className="mt-8 flex justify-center">
+            <Button
+              onClick={() => loadMoreDonations(6)}
+              variant="outline"
+              className="border-primary/20 hover:bg-primary/5 h-12 rounded-full px-10 font-bold transition-all"
+            >
+              Load More Commitments
+            </Button>
+          </div>
+        )}
       </TabsContent>
     </Tabs>
   );

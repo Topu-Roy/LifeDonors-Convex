@@ -118,9 +118,11 @@ export function RequestCard({ request, isOwner: isOwnerProp }: RequestCardProps)
               <p className="truncate text-lg font-black tracking-tight text-slate-900 dark:text-slate-100">
                 {request.hospitalName}
               </p>
-              <p className="flex items-center gap-1 truncate text-xs font-medium text-slate-500 dark:text-slate-400">
+              <p className="text-muted-foreground flex items-center gap-1 text-xs font-medium">
                 <MapPin className="h-3 w-3 shrink-0" />
-                {request.hospitalLocation}, {request.district}
+                <span className="truncate">
+                  {request.hospitalLocation}, {request.district}
+                </span>
               </p>
             </div>
           </div>

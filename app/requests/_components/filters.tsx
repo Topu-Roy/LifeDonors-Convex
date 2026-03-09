@@ -73,7 +73,7 @@ export function Filter() {
             <SelectTrigger className="border-primary/10 focus:ring-primary/20 h-10 w-full rounded-xl bg-slate-50 text-sm transition-all md:h-12 md:text-base dark:bg-slate-800">
               <SelectValue placeholder="All Blood Types" />
             </SelectTrigger>
-            <SelectContent className="border-primary/10 rounded-xl">
+            <SelectContent className="border-primary/10 p-2">
               <SelectItem value="ALL">All Blood Types</SelectItem>
               {bloodTypes.map(type => (
                 <SelectItem key={type} value={type}>
@@ -93,10 +93,10 @@ export function Filter() {
             value={filterUrgency ?? "ALL"}
             onValueChange={val => setFilterUrgency(val === "ALL" ? undefined : val!)}
           >
-            <SelectTrigger className="border-primary/10 focus:ring-primary/20 h-10 w-full rounded-xl bg-slate-50 text-sm transition-all md:h-12 md:text-base dark:bg-slate-800">
+            <SelectTrigger className="border-primary/10 focus:ring-primary/20 h-10 w-full bg-slate-50 text-sm transition-all md:h-12 md:text-base dark:bg-slate-800">
               <SelectValue placeholder="All Levels" />
             </SelectTrigger>
-            <SelectContent className="border-primary/10 rounded-xl">
+            <SelectContent className="border-primary/10 p-2">
               <SelectItem value="ALL">All Levels</SelectItem>
               {urgencyLevels.map(level => (
                 <SelectItem key={level} value={level}>
@@ -123,10 +123,10 @@ export function Filter() {
                 setFilterSubDistrict(undefined);
               }}
             >
-              <SelectTrigger className="border-primary/10 focus:ring-primary/20 h-10 w-full rounded-xl bg-slate-50 text-xs transition-all md:h-11 md:text-sm dark:bg-slate-800">
+              <SelectTrigger className="border-primary/10 focus:ring-primary/20 h-10 w-full bg-slate-50 text-xs transition-all md:h-11 md:text-sm dark:bg-slate-800">
                 <SelectValue placeholder="All Divisions" />
               </SelectTrigger>
-              <SelectContent className="border-primary/10 rounded-xl">
+              <SelectContent className="border-primary/10 p-2">
                 <SelectItem value="ALL">All Divisions</SelectItem>
                 {getAllDivisions().map(div => (
                   <SelectItem key={div} value={div}>
@@ -145,10 +145,10 @@ export function Filter() {
               }}
               disabled={!filterDivision || filterDivision === "ALL"}
             >
-              <SelectTrigger className="border-primary/10 focus:ring-primary/20 h-10 w-full rounded-xl bg-slate-50 text-xs transition-all disabled:opacity-50 md:h-11 md:text-sm dark:bg-slate-800">
+              <SelectTrigger className="border-primary/10 focus:ring-primary/20 h-10 w-full bg-slate-50 text-xs transition-all disabled:opacity-50 md:h-11 md:text-sm dark:bg-slate-800">
                 <SelectValue placeholder="All Districts" />
               </SelectTrigger>
-              <SelectContent className="border-primary/10 rounded-xl">
+              <SelectContent className="border-primary/10 p-2">
                 <SelectItem value="ALL">All Districts</SelectItem>
                 {filterDivision &&
                   filterDivision !== "ALL" &&
@@ -166,10 +166,10 @@ export function Filter() {
               onValueChange={val => setFilterSubDistrict(val === "ALL" ? undefined : val!)}
               disabled={!filterDistrict || filterDistrict === "ALL"}
             >
-              <SelectTrigger className="border-primary/10 focus:ring-primary/20 h-10 w-full rounded-xl bg-slate-50 text-xs transition-all disabled:opacity-50 md:h-11 md:text-sm dark:bg-slate-800">
+              <SelectTrigger className="border-primary/10 focus:ring-primary/20 h-10 w-full bg-slate-50 text-xs transition-all disabled:opacity-50 md:h-11 md:text-sm dark:bg-slate-800">
                 <SelectValue placeholder="All Sub-Districts" />
               </SelectTrigger>
-              <SelectContent className="border-primary/10 rounded-xl">
+              <SelectContent className="border-primary/10 p-2">
                 <SelectItem value="ALL">All Sub-Districts</SelectItem>
                 {filterDistrict &&
                   filterDistrict !== "ALL" &&

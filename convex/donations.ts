@@ -1,4 +1,5 @@
 import { mutation, query } from "@/convex/_generated/server";
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 
 export const offerDonation = mutation({
@@ -46,6 +47,35 @@ export const getMyDonations = query({
     );
 
     return enrichedDonations;
+  },
+});
+
+export const getPaginatedMyDonations = query({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const paginatedDonations = await ctx.db
+      .query("donations")
+      .withIndex("by_donorId", q => q.eq("donorId", identity.subject))
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    const enrichedPage = await Promise.all(
+      paginatedDonations.page.map(async donation => {
+        const request = await ctx.db.get("requests", donation.requestId);
+        return {
+          ...donation,
+          request,
+        };
+      })
+    );
+
+    return {
+      ...paginatedDonations,
+      page: enrichedPage,
+    };
   },
 });
 

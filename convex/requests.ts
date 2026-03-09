@@ -200,6 +200,59 @@ export const getMyRequests = query({
   },
 });
 
+export const getPaginatedMyRequests = query({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", q => q.eq("userId", identity.subject))
+      .first();
+
+    if (!profile) throw new Error("Profile not found");
+
+    const paginatedRequests = await ctx.db
+      .query("requests")
+      .withIndex("by_requesterId", q => q.eq("requesterId", profile._id))
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    const enrichedPage = await Promise.all(
+      paginatedRequests.page.map(async request => {
+        const donations = await ctx.db
+          .query("donations")
+          .withIndex("by_requestId", q => q.eq("requestId", request._id))
+          .collect();
+
+        const volunteers = await Promise.all(
+          donations.map(async donation => {
+            const donorProfile = await ctx.db
+              .query("profiles")
+              .withIndex("by_userId", q => q.eq("userId", donation.donorId))
+              .first();
+            return {
+              ...donation,
+              donor: donorProfile,
+            };
+          })
+        );
+
+        return {
+          ...request,
+          volunteers,
+        };
+      })
+    );
+
+    return {
+      ...paginatedRequests,
+      page: enrichedPage,
+    };
+  },
+});
+
 export const getRequestById = query({
   args: { requestId: v.id("requests") },
   handler: async (ctx, args) => {
