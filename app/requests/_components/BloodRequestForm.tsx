@@ -7,6 +7,7 @@ import {
   getSubDistrictsByDistrict,
 } from "@/constants/bangladeshAdministrativeAreas";
 import { api } from "@/convex/_generated/api";
+import { type Id } from "@/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { HelpCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -37,13 +38,16 @@ export const formSchema = z.object({
 interface BloodRequestFormProps {
   onSuccess?: () => void;
   className?: string;
+  initialData?: z.infer<typeof formSchema>;
+  requestId?: Id<"requests">;
 }
 
-export function BloodRequestForm({ onSuccess, className }: BloodRequestFormProps) {
+export function BloodRequestForm({ onSuccess, className, initialData, requestId }: BloodRequestFormProps) {
   const createRequest = useMutation(api.requests.createBloodRequest);
+  const updateRequest = useMutation(api.requests.updateBloodRequest);
 
   const form = useForm({
-    defaultValues: {
+    defaultValues: initialData ?? {
       patientName: "",
       bloodTypeNeeded: "A+" as (typeof bloodTypes)[number],
       hospitalName: "",
@@ -61,9 +65,14 @@ export function BloodRequestForm({ onSuccess, className }: BloodRequestFormProps
     },
     onSubmit: async ({ value }) => {
       try {
-        await createRequest(value);
-        toast.success("Blood request created successfully!");
-        form.reset();
+        if (requestId) {
+          await updateRequest({ ...value, requestId });
+          toast.success("Blood request updated successfully!");
+        } else {
+          await createRequest(value);
+          toast.success("Blood request created successfully!");
+          form.reset();
+        }
         onSuccess?.();
       } catch (error) {
         if (error instanceof Error) {
@@ -443,7 +452,13 @@ export function BloodRequestForm({ onSuccess, className }: BloodRequestFormProps
             const [canSubmit, isSubmitting] = state;
             return (
               <Button type="submit" disabled={!canSubmit} className="w-full font-bold">
-                {isSubmitting ? "Posting..." : "Post Request"}
+                {isSubmitting
+                  ? requestId
+                    ? "Updating..."
+                    : "Posting..."
+                  : requestId
+                    ? "Update Request"
+                    : "Post Request"}
               </Button>
             );
           }}

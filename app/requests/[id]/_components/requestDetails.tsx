@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { BloodRequestForm } from "@/app/requests/_components/BloodRequestForm";
 import { api } from "@/convex/_generated/api";
 import { type Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
@@ -9,6 +11,7 @@ import {
   Calendar,
   CheckCircle2,
   Droplets,
+  Edit2,
   Hospital,
   MapPin,
   Phone,
@@ -36,9 +39,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
   const router = useRouter();
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const request = useQuery(api.requests.getRequestById, { requestId });
   const selectDonor = useMutation(api.donations.selectDonor);
@@ -171,6 +183,48 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
               <Badge className="rounded-full border-none bg-blue-100 px-3 py-1.5 text-[9px] font-black tracking-widest text-blue-600 uppercase sm:px-4 sm:text-[10px] dark:bg-blue-900/40 dark:text-blue-300">
                 Demo Data
               </Badge>
+            )}
+            {request.isOwner && (
+              <Sheet open={isEditOpen} onOpenChange={setIsEditOpen}>
+                <SheetTrigger
+                  render={props => (
+                    <Button
+                      {...props}
+                      variant="outline"
+                      size="sm"
+                      className="h-8 gap-2 rounded-full px-4 text-xs font-bold"
+                    >
+                      <Edit2 className="h-3.5 w-3.5" />
+                      Edit Request
+                    </Button>
+                  )}
+                />
+                <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">
+                  <SheetHeader className="mb-6 space-y-1">
+                    <SheetTitle className="text-2xl font-black">Edit Blood Request</SheetTitle>
+                    <SheetDescription className="font-medium">
+                      Update the details of your request.
+                    </SheetDescription>
+                  </SheetHeader>
+                  <BloodRequestForm
+                    requestId={request._id}
+                    initialData={{
+                      patientName: request.patientName,
+                      bloodTypeNeeded: request.bloodTypeNeeded,
+                      hospitalName: request.hospitalName,
+                      hospitalLocation: request.hospitalLocation,
+                      urgency: request.urgency,
+                      phoneNumber: request.phoneNumber,
+                      contactNumber: request.contactNumber,
+                      numberOfBags: request.numberOfBags,
+                      division: request.division ?? "",
+                      district: request.district ?? "",
+                      subDistrict: request.subDistrict ?? "",
+                    }}
+                    onSuccess={() => setIsEditOpen(false)}
+                  />
+                </SheetContent>
+              </Sheet>
             )}
           </div>
         </div>

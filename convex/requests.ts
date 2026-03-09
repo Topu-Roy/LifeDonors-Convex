@@ -48,6 +48,58 @@ export const createBloodRequest = mutation({
   },
 });
 
+export const updateBloodRequest = mutation({
+  args: {
+    requestId: v.id("requests"),
+    phoneNumber: v.string(),
+    patientName: v.string(),
+    hospitalName: v.string(),
+    hospitalLocation: v.string(),
+    bloodTypeNeeded: v.union(
+      v.literal("A+"),
+      v.literal("A-"),
+      v.literal("B+"),
+      v.literal("B-"),
+      v.literal("AB+"),
+      v.literal("AB-"),
+      v.literal("O+"),
+      v.literal("O-")
+    ),
+    urgency: v.union(v.literal("Low"), v.literal("Medium"), v.literal("High"), v.literal("Critical")),
+    contactNumber: v.string(),
+    numberOfBags: v.number(),
+    division: v.optional(v.string()),
+    district: v.optional(v.string()),
+    subDistrict: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const profile = await ctx.db
+      .query("profiles")
+      .withIndex("by_userId", q => q.eq("userId", identity.subject))
+      .first();
+
+    if (!profile) throw new Error("Profile not found");
+
+    const existingRequest = await ctx.db.get("requests", args.requestId);
+    if (!existingRequest) throw new Error("Request not found");
+    
+    if (existingRequest.requesterId !== profile._id) {
+      throw new Error("Unauthorized to edit this request");
+    }
+
+    const { requestId, ...updateData } = args;
+    const searchableText = `${updateData.patientName} ${updateData.hospitalName} ${updateData.bloodTypeNeeded}`.toLowerCase();
+
+    await ctx.db.patch("requests", requestId, {
+      ...updateData,
+      searchableText,
+    });
+  },
+});
+
 export const getAllRequests = query({
   args: {
     bloodType: v.optional(v.string()),
