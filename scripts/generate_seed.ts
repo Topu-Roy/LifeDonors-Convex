@@ -92,13 +92,13 @@ const hospitals = [
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const urgencies = ["Low", "Medium", "High", "Critical"];
-const causes = ["Operation", "Delivery", "Accident", "Cancer Treatment", "Thalassemia", "Other"];
+const causes = ["Operation", "Delivery", "Accident", "Other"];
 const genders = ["Male", "Female", "Other"];
 
 const getRandom = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
 
 for (const div of bangladeshAdministrativeData) {
-  const divisionDir = path.join("assets", div.division);
+  const divisionDir = path.join("assets", "seed", div.division);
   if (!fs.existsSync(divisionDir)) {
     fs.mkdirSync(divisionDir, { recursive: true });
   }

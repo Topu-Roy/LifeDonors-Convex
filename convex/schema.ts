@@ -53,20 +53,9 @@ export default defineSchema({
     createdAt: v.number(),
     isSeed: v.optional(v.boolean()),
     searchableText: v.optional(v.string()), // Combined text for searching
-    cause: v.optional(
-      v.union(
-        v.literal("Operation"),
-        v.literal("Delivery"),
-        v.literal("Accident"),
-        v.literal("Cancer Treatment"),
-        v.literal("Thalassemia"),
-        v.literal("Other")
-      )
-    ),
-    patientAge: v.optional(v.number()),
-    patientGender: v.optional(
-      v.union(v.literal("Male"), v.literal("Female"), v.literal("Other"))
-    ),
+    cause: v.union(v.literal("Operation"), v.literal("Delivery"), v.literal("Accident"), v.literal("Other")),
+    patientAge: v.number(),
+    patientGender: v.union(v.literal("Male"), v.literal("Female"), v.literal("Other")),
   })
     .index("by_status", ["status"])
     .index("by_bloodTypeNeeded", ["bloodTypeNeeded"])

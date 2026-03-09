@@ -5,10 +5,10 @@ import { authComponent, createAuth } from "@/convex/betterAuth/auth";
 type BloodType = "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 type Urgency = "Low" | "Medium" | "High" | "Critical";
 type Status = "Open" | "Accepted" | "Completed" | "Cancelled";
-type Cause = "Operation" | "Delivery" | "Accident" | "Cancer Treatment" | "Thalassemia" | "Other";
+type Cause = "Operation" | "Delivery" | "Accident" | "Other";
 type Gender = "Male" | "Female" | "Other";
 
-interface SeedRequest {
+type SeedRequest = {
   patientName: string;
   hospitalName: string;
   hospitalLocation: string;
@@ -17,15 +17,15 @@ interface SeedRequest {
   contactNumber: string;
   phoneNumber: string;
   numberOfBags: number;
-  cause?: Cause;
-  patientAge?: number;
-  patientGender?: Gender;
+  cause: Cause;
+  patientAge: number;
+  patientGender: Gender;
   division: string;
   district: string;
   subDistrict: string;
   status: Status;
   isSeed: boolean;
-}
+};
 
 export const seedDatabase = mutation({
   args: {},
@@ -47,30 +47,11 @@ export const seedDatabase = mutation({
       };
     }
 
-    // 3. Get or Create Admin Profile for requesterId
-    let adminProfile = await ctx.db
+    // 3. Get Admin Profile for requesterId
+    const adminProfile = await ctx.db
       .query("profiles")
       .withIndex("by_userId", q => q.eq("userId", session.user.id))
       .first();
-
-    if (!adminProfile) {
-      // Create a minimal profile for the admin if it doesn't exist
-      const adminProfileId = await ctx.db.insert("profiles", {
-        userId: session.user.id,
-        age: 30, // Placeholder
-        bmi: 22, // Placeholder
-        bloodType: "O+" as BloodType, // Cast to union type
-        hemoglobinLevel: 14, // Placeholder
-        diseases: [],
-        phoneNumber: session.user.email ?? "01700000000",
-        lastDonationDate: 0,
-        division: "Dhaka",
-        district: "Dhaka",
-        subDistrict: "Dhaka",
-      });
-
-      adminProfile = await ctx.db.get("profiles", adminProfileId);
-    }
 
     if (!adminProfile) throw new Error("Failed to resolve admin profile.");
 
@@ -78,7 +59,7 @@ export const seedDatabase = mutation({
     console.log(`Starting seed of ${allSeedData.length} requests...`);
 
     let count = 0;
-    const typedSeedData = allSeedData as unknown as SeedRequest[];
+    const typedSeedData = allSeedData as SeedRequest[];
 
     for (const request of typedSeedData) {
       const searchableText =
