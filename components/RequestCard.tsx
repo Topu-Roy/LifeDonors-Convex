@@ -128,21 +128,37 @@ export function RequestCard({ request, isOwner: isOwnerProp }: RequestCardProps)
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
-              <User className="text-primary h-4 w-4 shrink-0" />
-              <p className="truncate text-sm font-bold text-slate-600 dark:text-slate-400">
-                {request.patientName}
-              </p>
+            <div className="flex flex-col justify-center gap-1 rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
+              <div className="flex items-center gap-2">
+                <User className="text-primary h-4 w-4 shrink-0" />
+                <p className="truncate text-sm font-bold text-slate-600 dark:text-slate-400">
+                  {request.patientName}
+                </p>
+              </div>
+              {(request.patientGender ?? request.patientAge) && (
+                <p className="text-muted-foreground ml-6 truncate text-xs font-semibold">
+                  {request.patientGender && `${request.patientGender}`}
+                  {request.patientAge && request.patientGender && `, ${request.patientAge} yrs`}
+                  {request.patientAge && !request.patientGender && `${request.patientAge} yrs`}
+                </p>
+              )}
             </div>
-            <div className="flex items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
-              <Clock className="text-primary h-4 w-4 shrink-0" />
-              <p className="truncate text-sm font-bold text-slate-600 dark:text-slate-400">
-                By{" "}
-                {new Date(request.createdAt + 86400000).toLocaleDateString([], {
-                  month: "short",
-                  day: "numeric",
-                })}
-              </p>
+            <div className="flex flex-col justify-center gap-1 rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
+              <div className="flex items-center gap-2">
+                <Clock className="text-primary h-4 w-4 shrink-0" />
+                <p className="truncate text-sm font-bold text-slate-600 dark:text-slate-400">
+                  By{" "}
+                  {new Date(request.createdAt + 86400000).toLocaleDateString([], {
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </p>
+              </div>
+              {request.cause && (
+                <p className="text-primary ml-6 truncate text-xs font-black">
+                  {request.cause}
+                </p>
+              )}
             </div>
           </div>
         </div>

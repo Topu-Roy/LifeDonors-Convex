@@ -20,9 +20,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] as const;
 const urgencies = ["Low", "Medium", "High", "Critical"] as const;
+const causes = ["Operation", "Delivery", "Accident", "Cancer Treatment", "Thalassemia", "Other"] as const;
+const genders = ["Male", "Female", "Other"] as const;
 
 export const formSchema = z.object({
   patientName: z.string().min(2, "Name is too short"),
+  patientAge: z.number().min(1, "Age is required").max(120).optional(),
+  patientGender: z.enum(genders).optional(),
+  cause: z.enum(causes).optional(),
   bloodTypeNeeded: z.enum(bloodTypes),
   hospitalName: z.string().min(2, "Hospital name is required"),
   hospitalLocation: z.string().min(2, "Hospital location is required"),
@@ -49,6 +54,9 @@ export function BloodRequestForm({ onSuccess, className, initialData, requestId 
   const form = useForm({
     defaultValues: initialData ?? {
       patientName: "",
+      patientAge: undefined,
+      patientGender: undefined,
+      cause: undefined,
       bloodTypeNeeded: "A+" as (typeof bloodTypes)[number],
       hospitalName: "",
       hospitalLocation: "",
@@ -123,6 +131,90 @@ export function BloodRequestForm({ onSuccess, className, initialData, requestId 
               );
             }}
           </form.Field>
+
+          {/* Patient info: Gender, Age, Cause */}
+          <div className="grid grid-cols-3 gap-4">
+            <form.Field name="patientGender">
+              {field => {
+                const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Gender</FieldLabel>
+                    <Select
+                      onValueChange={val => field.handleChange(val as (typeof genders)[number])}
+                      value={field.state.value ?? ""}
+                    >
+                      <SelectTrigger id={field.name}>
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {genders.map(g => (
+                          <SelectItem key={g} value={g}>
+                            {g}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                );
+              }}
+            </form.Field>
+
+            <form.Field name="patientAge">
+              {field => {
+                const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Age</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      type="number"
+                      min={1}
+                      max={120}
+                      value={field.state.value ?? ""}
+                      onBlur={field.handleBlur}
+                      onChange={e =>
+                        field.handleChange(e.target.value ? Number(e.target.value) : undefined)
+                      }
+                      aria-invalid={isInvalid}
+                      placeholder="e.g. 35"
+                    />
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                );
+              }}
+            </form.Field>
+
+            <form.Field name="cause">
+              {field => {
+                const isInvalid = field.state.meta.isTouched && !!field.state.meta.errors.length;
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>Cause</FieldLabel>
+                    <Select
+                      onValueChange={val => field.handleChange(val as (typeof causes)[number])}
+                      value={field.state.value ?? ""}
+                    >
+                      <SelectTrigger id={field.name}>
+                        <SelectValue placeholder="Select cause" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {causes.map(c => (
+                          <SelectItem key={c} value={c}>
+                            {c}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                );
+              }}
+            </form.Field>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <form.Field name="bloodTypeNeeded">
               {field => {

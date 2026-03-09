@@ -34,6 +34,7 @@ export default function AdminPage() {
   const stats = useQuery(api.admin.getStats) as unknown as AdminStats | undefined;
   const profile = useQuery(api.users.getMyProfile);
   const seedDatabase = useMutation(api.seed.seedDatabase);
+  const deleteSeedData = useMutation(api.seed.deleteSeedData);
   const [isSeeding, setIsSeeding] = useState(false);
 
   const handleSeed = async () => {
@@ -49,6 +50,26 @@ export default function AdminPage() {
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to seed database");
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
+  const handleDeleteSeed = async () => {
+    if (
+      !confirm("Are you sure you want to delete the seed data? This can only be done when the database is empty.")
+    )
+      return;
+    setIsSeeding(true);
+    try {
+      const result = await deleteSeedData();
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete seed data");
     } finally {
       setIsSeeding(false);
     }
@@ -217,6 +238,24 @@ export default function AdminPage() {
               >
                 {isSeeding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Database className="h-4 w-4" />}
                 Seed Database
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-auto space-y-4">
+            <div className="border-primary/20 bg-background/50 rounded-2xl border border-dashed p-4">
+              <p className="text-primary mb-2 text-xs font-bold tracking-wider uppercase">Delete Seed Data</p>
+              <p className="text-muted-foreground mb-4 text-[10px] font-medium">
+                Delete all demo entries from the database. This is only possible if the database is currently
+                empty.
+              </p>
+              <Button
+                onClick={handleDeleteSeed}
+                disabled={isSeeding}
+                className="shadow-primary/20 h-12 w-full gap-2 rounded-2xl font-bold shadow-lg"
+              >
+                {isSeeding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Database className="h-4 w-4" />}
+                Delete Seed Data
               </Button>
             </div>
           </div>

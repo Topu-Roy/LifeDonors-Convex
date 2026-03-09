@@ -186,6 +186,9 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
                   requestId={request._id}
                   initialData={{
                     patientName: request.patientName,
+                    patientAge: request.patientAge,
+                    patientGender: request.patientGender,
+                    cause: request.cause,
                     bloodTypeNeeded: request.bloodTypeNeeded,
                     hospitalName: request.hospitalName,
                     hospitalLocation: request.hospitalLocation,
@@ -260,26 +263,39 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
                   {request.bloodTypeNeeded} Blood Required
                 </h1>
                 <p className="text-lg font-medium text-slate-500 md:text-xl dark:text-slate-400">
-                  Patient Name:{" "}
+                  Patient:{" "}
                   <span className="font-bold text-slate-900 dark:text-slate-100">{request.patientName}</span>
+                  {(request.patientGender ?? request.patientAge) && (
+                    <span className="text-muted-foreground ml-2 text-base font-medium">
+                      {request.patientGender && `(${request.patientGender}`}
+                      {request.patientAge && request.patientGender && `, ${request.patientAge} yrs)`}
+                      {request.patientAge && !request.patientGender && `(${request.patientAge} yrs)`}
+                      {request.patientGender && !request.patientAge && `)`}
+                    </span>
+                  )}
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-6 pt-2">
-                <div className="flex items-center gap-2 text-sm font-bold text-slate-500">
-                  <Calendar className="text-primary h-5 w-5" />
-                  Requested{" "}
-                  {new Date(request.createdAt).toLocaleDateString([], {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                <div className="flex flex-wrap gap-3 pt-2">
+                  <div className="flex items-center gap-2 text-sm font-bold text-slate-500">
+                    <Calendar className="text-primary h-5 w-5" />
+                    Requested{" "}
+                    {new Date(request.createdAt).toLocaleDateString([], {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </div>
+                  <div className="flex items-center gap-2 text-sm font-bold text-slate-500">
+                    <TrendingUp className="text-primary h-5 w-5" />
+                    {request.numberOfBags} {request.numberOfBags > 1 ? "Bags" : "Bag"} Needed
+                  </div>
+                  {request.cause && (
+                    <div className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-black">
+                      {request.cause}
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center gap-2 text-sm font-bold text-slate-500">
-                  <TrendingUp className="text-primary h-5 w-5" />
-                  {request.numberOfBags} {request.numberOfBags > 1 ? "Bags" : "Bag"} Needed
-                </div>
-              </div>
             </div>
           </div>
         </section>

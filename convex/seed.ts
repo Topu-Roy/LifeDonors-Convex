@@ -5,6 +5,8 @@ import { authComponent, createAuth } from "@/convex/betterAuth/auth";
 type BloodType = "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 type Urgency = "Low" | "Medium" | "High" | "Critical";
 type Status = "Open" | "Accepted" | "Completed" | "Cancelled";
+type Cause = "Operation" | "Delivery" | "Accident" | "Cancer Treatment" | "Thalassemia" | "Other";
+type Gender = "Male" | "Female" | "Other";
 
 interface SeedRequest {
   patientName: string;
@@ -15,6 +17,9 @@ interface SeedRequest {
   contactNumber: string;
   phoneNumber: string;
   numberOfBags: number;
+  cause?: Cause;
+  patientAge?: number;
+  patientGender?: Gender;
   division: string;
   district: string;
   subDistrict: string;
@@ -91,6 +96,34 @@ export const seedDatabase = mutation({
     return {
       success: true,
       message: `Successfully seeded ${count} requests into the database.`,
+    };
+  },
+});
+
+export const deleteSeedData = mutation({
+  args: {},
+  handler: async ctx => {
+    // 1. Admin Authorization Check
+    const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
+    const session = await auth.api.getSession({ headers });
+
+    if (session?.user.role !== "admin") {
+      throw new Error("Unauthorized: Only admins can delete seed data.");
+    }
+
+    // 2. Query and delete all requests with isSeed: true
+    const seedRequests = await ctx.db
+      .query("requests")
+      .filter(q => q.eq(q.field("isSeed"), true))
+      .collect();
+
+    for (const request of seedRequests) {
+      await ctx.db.delete("requests", request._id);
+    }
+
+    return {
+      success: true,
+      message: `Successfully deleted ${seedRequests.length} seeded requests.`,
     };
   },
 });

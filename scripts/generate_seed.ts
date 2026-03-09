@@ -92,6 +92,8 @@ const hospitals = [
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const urgencies = ["Low", "Medium", "High", "Critical"];
+const causes = ["Operation", "Delivery", "Accident", "Cancer Treatment", "Thalassemia", "Other"];
+const genders = ["Male", "Female", "Other"];
 
 const getRandom = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -117,6 +119,9 @@ for (const div of bangladeshAdministrativeData) {
         content += `    contactNumber: "01${Math.floor(Math.random() * 900000000 + 100000000)}",\n`;
         content += `    phoneNumber: "01700000000",\n`;
         content += `    numberOfBags: ${Math.floor(Math.random() * 4) + 1},\n`;
+        content += `    cause: "${getRandom(causes)}",\n`;
+        content += `    patientAge: ${Math.floor(Math.random() * 60) + 5},\n`;
+        content += `    patientGender: "${getRandom(genders)}",\n`;
         content += `    division: "${div.division}",\n`;
         content += `    district: "${dist.district}",\n`;
         content += `    subDistrict: "${sub}",\n`;

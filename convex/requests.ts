@@ -24,6 +24,18 @@ export const createBloodRequest = mutation({
     division: v.optional(v.string()),
     district: v.optional(v.string()),
     subDistrict: v.optional(v.string()),
+    cause: v.optional(
+      v.union(
+        v.literal("Operation"),
+        v.literal("Delivery"),
+        v.literal("Accident"),
+        v.literal("Cancer Treatment"),
+        v.literal("Thalassemia"),
+        v.literal("Other")
+      )
+    ),
+    patientAge: v.optional(v.number()),
+    patientGender: v.optional(v.union(v.literal("Male"), v.literal("Female"), v.literal("Other"))),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -71,6 +83,18 @@ export const updateBloodRequest = mutation({
     division: v.optional(v.string()),
     district: v.optional(v.string()),
     subDistrict: v.optional(v.string()),
+    cause: v.optional(
+      v.union(
+        v.literal("Operation"),
+        v.literal("Delivery"),
+        v.literal("Accident"),
+        v.literal("Cancer Treatment"),
+        v.literal("Thalassemia"),
+        v.literal("Other")
+      )
+    ),
+    patientAge: v.optional(v.number()),
+    patientGender: v.optional(v.union(v.literal("Male"), v.literal("Female"), v.literal("Other"))),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
