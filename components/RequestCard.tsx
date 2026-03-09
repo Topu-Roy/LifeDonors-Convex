@@ -154,11 +154,7 @@ export function RequestCard({ request, isOwner: isOwnerProp }: RequestCardProps)
                   })}
                 </p>
               </div>
-              {request.cause && (
-                <p className="text-primary ml-6 truncate text-xs font-black">
-                  {request.cause}
-                </p>
-              )}
+              {request.cause && <p className="text-primary ml-6 truncate text-xs font-black">{request.cause}</p>}
             </div>
           </div>
         </div>

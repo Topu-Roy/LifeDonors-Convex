@@ -3,51 +3,51 @@ import * as path from "path";
 import { bangladeshAdministrativeData } from "../constants/bangladeshAdministrativeAreas";
 
 const namesAndGender = [
-  { name: "Anisur Rahman", gender: "male" },
-  { name: "Farhana Islam", gender: "female" },
-  { name: "Kamrul Hassan", gender: "male" },
-  { name: "Sharmin Akter", gender: "female" },
-  { name: "Mizanur Chowdhury", gender: "male" },
-  { name: "Tania Ahmed", gender: "female" },
-  { name: "Asif Iqbal", gender: "male" },
-  { name: "Sumaiya Khan", gender: "female" },
-  { name: "Nasir Uddin", gender: "male" },
-  { name: "Arifa Sultana", gender: "female" },
-  { name: "Rafiqul Islam", gender: "male" },
-  { name: "Nusrat Jahan", gender: "female" },
-  { name: "Mahbubur Rahman", gender: "male" },
-  { name: "Sadia Afrin", gender: "female" },
-  { name: "Tanvir Ahmed", gender: "male" },
-  { name: "Rina Begum", gender: "female" },
-  { name: "Shafiqul Alam", gender: "male" },
-  { name: "Jesmin Akter", gender: "female" },
-  { name: "Monir Hossain", gender: "male" },
-  { name: "Salma Khatun", gender: "female" },
-  { name: "Zahid Hasan", gender: "male" },
-  { name: "Fatema Tuz Zohra", gender: "female" },
-  { name: "Saiful Islam", gender: "male" },
-  { name: "Nazma Begum", gender: "female" },
-  { name: "Abul Kashem", gender: "male" },
-  { name: "Rokeya Sultana", gender: "female" },
-  { name: "Mostafa Kamal", gender: "male" },
-  { name: "Bilkis Banu", gender: "female" },
-  { name: "Azizul Haque", gender: "male" },
-  { name: "Sabina Yasmin", gender: "female" },
-  { name: "Humayun Kabir", gender: "male" },
-  { name: "Kohinoor Akter", gender: "female" },
-  { name: "Rezaul Karim", gender: "male" },
-  { name: "Shahnaz Parvin", gender: "female" },
-  { name: "Aminul Islam", gender: "male" },
-  { name: "Ferdousi Begum", gender: "female" },
-  { name: "Habibur Rahman", gender: "male" },
-  { name: "Nilufar Yasmin", gender: "female" },
-  { name: "Jahangir Alam", gender: "male" },
-  { name: "Shamima Nasrin", gender: "female" },
-  { name: "Golam Mostafa", gender: "male" },
-  { name: "Khadija Begum", gender: "female" },
-  { name: "Anwar Hossain", gender: "male" },
-  { name: "Meherun Nesa", gender: "female" },
-  { name: "Shahadat Hossain", gender: "male" },
+  { name: "Anisur Rahman", gender: "Male" },
+  { name: "Farhana Islam", gender: "Female" },
+  { name: "Kamrul Hassan", gender: "Male" },
+  { name: "Sharmin Akter", gender: "Female" },
+  { name: "Mizanur Chowdhury", gender: "Male" },
+  { name: "Tania Ahmed", gender: "Female" },
+  { name: "Asif Iqbal", gender: "Male" },
+  { name: "Sumaiya Khan", gender: "Female" },
+  { name: "Nasir Uddin", gender: "Male" },
+  { name: "Arifa Sultana", gender: "Female" },
+  { name: "Rafiqul Islam", gender: "Male" },
+  { name: "Nusrat Jahan", gender: "Female" },
+  { name: "Mahbubur Rahman", gender: "Male" },
+  { name: "Sadia Afrin", gender: "Female" },
+  { name: "Tanvir Ahmed", gender: "Male" },
+  { name: "Rina Begum", gender: "Female" },
+  { name: "Shafiqul Alam", gender: "Male" },
+  { name: "Jesmin Akter", gender: "Female" },
+  { name: "Monir Hossain", gender: "Male" },
+  { name: "Salma Khatun", gender: "Female" },
+  { name: "Zahid Hasan", gender: "Male" },
+  { name: "Fatema Tuz Zohra", gender: "Female" },
+  { name: "Saiful Islam", gender: "Male" },
+  { name: "Nazma Begum", gender: "Female" },
+  { name: "Abul Kashem", gender: "Male" },
+  { name: "Rokeya Sultana", gender: "Female" },
+  { name: "Mostafa Kamal", gender: "Male" },
+  { name: "Bilkis Banu", gender: "Female" },
+  { name: "Azizul Haque", gender: "Male" },
+  { name: "Sabina Yasmin", gender: "Female" },
+  { name: "Humayun Kabir", gender: "Male" },
+  { name: "Kohinoor Akter", gender: "Female" },
+  { name: "Rezaul Karim", gender: "Male" },
+  { name: "Shahnaz Parvin", gender: "Female" },
+  { name: "Aminul Islam", gender: "Male" },
+  { name: "Ferdousi Begum", gender: "Female" },
+  { name: "Habibur Rahman", gender: "Male" },
+  { name: "Nilufar Yasmin", gender: "Female" },
+  { name: "Jahangir Alam", gender: "Male" },
+  { name: "Shamima Nasrin", gender: "Female" },
+  { name: "Golam Mostafa", gender: "Male" },
+  { name: "Khadija Begum", gender: "Female" },
+  { name: "Anwar Hossain", gender: "Male" },
+  { name: "Meherun Nesa", gender: "Female" },
+  { name: "Shahadat Hossain", gender: "Male" },
 ];
 
 const hospitals = [
@@ -113,24 +113,43 @@ for (const div of bangladeshAdministrativeData) {
       for (let i = 0; i < numRequests; i++) {
         const { name, gender } = getRandomNameAndAge(namesAndGender);
 
-        content += `  {\n`;
-        content += `    patientName: "${name}",\n`;
-        content += `    hospitalName: "${getRandom(hospitals)}",\n`;
-        content += `    hospitalLocation: "Ward ${Math.floor(Math.random() * 10) + 1}, ${getRandom(hospitals)} area",\n`;
-        content += `    bloodTypeNeeded: "${getRandom(bloodTypes)}",\n`;
-        content += `    urgency: "${getRandom(urgencies)}",\n`;
-        content += `    contactNumber: "01${Math.floor(Math.random() * 900000000 + 100000000)}",\n`;
-        content += `    phoneNumber: "01700000000",\n`;
-        content += `    numberOfBags: ${Math.floor(Math.random() * 4) + 1},\n`;
-        content += `    cause: "${getRandom(causes)}",\n`;
-        content += `    patientAge: ${Math.floor(Math.random() * 60) + 5},\n`;
-        content += `    patientGender: "${gender}",\n`;
-        content += `    division: "${div.division}",\n`;
-        content += `    district: "${dist.district}",\n`;
-        content += `    subDistrict: "${sub}",\n`;
-        content += `    status: "Open",\n`;
-        content += `    isSeed: true,\n`;
-        content += `  },\n`;
+        content += `  {
+            patientName: "${name}",
+            hospitalName: "${getRandom(hospitals)}",
+            hospitalLocation: "Ward ${Math.floor(Math.random() * 10) + 1}, ${getRandom(hospitals)} area",
+            bloodTypeNeeded: "${getRandom(bloodTypes)}",
+            urgency: "${getRandom(urgencies)}",
+            contactNumber: "01700000000",
+            phoneNumber: "01700000000",
+            numberOfBags: ${Math.floor(Math.random() * 4) + 1},
+            cause: "${gender === "Male" ? getRandom(causes.filter(c => c !== "Delivery")) : getRandom(causes)}",
+            patientAge: ${Math.floor(Math.random() * 60) + 5},
+            patientGender: "${gender}",
+            division: "${div.division}",
+            district: "${dist.district}",
+            subDistrict: "${sub}",
+            status: "Open",
+            isSeed: true,
+          },\n`;
+
+        // content += `  {\n`;
+        // content += `    patientName: "${name}",\n`;
+        // content += `    hospitalName: "${getRandom(hospitals)}",\n`;
+        // content += `    hospitalLocation: "Ward ${Math.floor(Math.random() * 10) + 1}, ${getRandom(hospitals)} area",\n`;
+        // content += `    bloodTypeNeeded: "${getRandom(bloodTypes)}",\n`;
+        // content += `    urgency: "${getRandom(urgencies)}",\n`;
+        // content += `    contactNumber: ""01700000000"",\n`;
+        // content += `    phoneNumber: "01700000000",\n`;
+        // content += `    numberOfBags: ${Math.floor(Math.random() * 4) + 1},\n`;
+        // content += `    cause: "${gender === "Male" ? getRandom(causes.filter(c => c !== "Delivery")) : getRandom(causes)}",\n`;
+        // content += `    patientAge: ${Math.floor(Math.random() * 60) + 5},\n`;
+        // content += `    patientGender: "${gender}",\n`;
+        // content += `    division: "${div.division}",\n`;
+        // content += `    district: "${dist.district}",\n`;
+        // content += `    subDistrict: "${sub}",\n`;
+        // content += `    status: "Open",\n`;
+        // content += `    isSeed: true,\n`;
+        // content += `  },\n`;
       }
     }
     content += `];\n`;
