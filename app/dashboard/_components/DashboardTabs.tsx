@@ -93,7 +93,7 @@ export function DashboardTabs() {
             )}
           </h2>
           <Link
-            href="/requests"
+            href="/requests/new"
             className={cn(
               buttonVariants({ size: "sm" }),
               "shadow-primary/20 h-10 shrink-0 gap-2 rounded-xl px-4 font-bold shadow-lg"
@@ -117,7 +117,7 @@ export function DashboardTabs() {
               ))}
               {/* Create New Placeholder Card */}
               <Link
-                href="/requests"
+                href="/requests/new"
                 className="group border-border hover:border-primary hover:bg-primary/5 flex min-h-[250px] flex-col items-center justify-center gap-4 rounded-3xl border-2 border-dashed bg-transparent p-6 text-center transition-all"
               >
                 <div className="bg-primary/10 text-primary flex h-14 w-14 items-center justify-center rounded-2xl transition-transform group-hover:scale-110">
