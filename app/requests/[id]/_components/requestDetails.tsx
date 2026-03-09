@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/Container";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,13 +41,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
   const router = useRouter();
@@ -146,88 +147,101 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
 
   return (
     <div className="min-h-screen bg-[#f6f8f6] dark:bg-[#102216]">
-      <Container className="space-y-10 py-10">
-        {/* Top Navbar/Back */}
+      <Container className="space-y-10 pt-4 pb-10 md:pt-10">
+        {/* Top Navbar/Back & Edit */}
         <div className="flex items-center justify-between">
           <Link
             href="/requests"
-            className="border-primary/10 hover:text-primary flex w-fit items-center gap-2 rounded-2xl border bg-white px-4 py-2 text-xs font-bold text-slate-600 shadow-sm transition-all sm:text-sm dark:bg-slate-900"
+            className="border-primary/10 hover:text-primary text-muted-foreground flex w-fit items-center gap-2 rounded-2xl border px-4 py-2 text-xs font-bold shadow-sm transition-all sm:text-sm"
           >
             <ArrowLeft className="h-4 w-4" />
             <span className="xs:inline hidden">Back to Explorer</span>
             <span className="xs:hidden">Back</span>
           </Link>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <Badge
-              className={cn(
-                "rounded-full border-none px-3 py-1.5 text-[9px] font-black tracking-widest uppercase sm:px-4 sm:text-[10px]",
-                urgencyBadgeStyles[request.urgency]
-              )}
-            >
-              <span className="xs:inline hidden">{request.urgency} Priority</span>
-              <span className="xs:inline">{request.urgency}</span>
-            </Badge>
-            <Badge
-              variant={request.status === "Completed" ? "default" : "outline"}
-              className={cn(
-                "rounded-full px-3 py-1.5 text-[9px] font-black tracking-widest uppercase sm:px-4 sm:text-[10px]",
-                request.status === "Completed" && "border-none bg-green-500 text-white hover:bg-green-600",
-                request.status === "Cancelled" && "border-none bg-slate-200 text-slate-500 dark:bg-slate-800",
-                request.status === "Open" && "border-primary/20 text-primary"
-              )}
-            >
-              {request.status}
-            </Badge>
-            {request.isSeed && (
-              <Badge className="rounded-full border-none bg-blue-100 px-3 py-1.5 text-[9px] font-black tracking-widest text-blue-600 uppercase sm:px-4 sm:text-[10px] dark:bg-blue-900/40 dark:text-blue-300">
-                Demo Data
-              </Badge>
-            )}
-            {request.isOwner && (
-              <Sheet open={isEditOpen} onOpenChange={setIsEditOpen}>
-                <SheetTrigger
-                  render={props => (
-                    <Button
-                      {...props}
-                      variant="outline"
-                      size="sm"
-                      className="h-8 gap-2 rounded-full px-4 text-xs font-bold"
-                    >
-                      <Edit2 className="h-3.5 w-3.5" />
-                      Edit Request
-                    </Button>
-                  )}
+          {request.isOwner && (
+            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+              <DialogTrigger
+                render={props => (
+                  <Button
+                    {...props}
+                    variant="outline"
+                    size="sm"
+                    className="border-primary/10 hover:text-primary text-muted-foreground flex w-fit items-center gap-2 rounded-2xl border px-4 py-4 text-xs font-bold shadow-sm transition-all sm:text-sm"
+                  >
+                    <Edit2 className="h-3.5 w-3.5" />
+                    Edit Request
+                  </Button>
+                )}
+              />
+
+              <DialogContent className="max-h-[90vh] w-[95%] max-w-6xl overflow-y-auto">
+                <DialogHeader className="mb-4 space-y-1">
+                  <DialogTitle className="text-2xl font-black">Edit Blood Request</DialogTitle>
+                  <DialogDescription className="font-medium">
+                    Update the details of your request.
+                  </DialogDescription>
+                </DialogHeader>
+                <BloodRequestForm
+                  requestId={request._id}
+                  initialData={{
+                    patientName: request.patientName,
+                    bloodTypeNeeded: request.bloodTypeNeeded,
+                    hospitalName: request.hospitalName,
+                    hospitalLocation: request.hospitalLocation,
+                    urgency: request.urgency,
+                    phoneNumber: request.phoneNumber,
+                    contactNumber: request.contactNumber,
+                    numberOfBags: request.numberOfBags,
+                    division: request.division ?? "",
+                    district: request.district ?? "",
+                    subDistrict: request.subDistrict ?? "",
+                  }}
+                  onSuccess={() => setIsEditOpen(false)}
                 />
-                <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">
-                  <SheetHeader className="mb-6 space-y-1">
-                    <SheetTitle className="text-2xl font-black">Edit Blood Request</SheetTitle>
-                    <SheetDescription className="font-medium">
-                      Update the details of your request.
-                    </SheetDescription>
-                  </SheetHeader>
-                  <BloodRequestForm
-                    requestId={request._id}
-                    initialData={{
-                      patientName: request.patientName,
-                      bloodTypeNeeded: request.bloodTypeNeeded,
-                      hospitalName: request.hospitalName,
-                      hospitalLocation: request.hospitalLocation,
-                      urgency: request.urgency,
-                      phoneNumber: request.phoneNumber,
-                      contactNumber: request.contactNumber,
-                      numberOfBags: request.numberOfBags,
-                      division: request.division ?? "",
-                      district: request.district ?? "",
-                      subDistrict: request.subDistrict ?? "",
-                    }}
-                    onSuccess={() => setIsEditOpen(false)}
-                  />
-                </SheetContent>
-              </Sheet>
-            )}
-          </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
+
+        {/* Badges */}
+        <div className="flex flex-wrap items-center gap-3">
+          <Badge
+            className={cn(
+              "rounded-full border-none px-3 py-4 text-xs font-black tracking-widest uppercase sm:px-4 sm:text-[10px]",
+              urgencyBadgeStyles[request.urgency]
+            )}
+          >
+            <span className="xs:inline hidden">{request.urgency} Priority</span>
+            <span className="xs:inline">{request.urgency}</span>
+          </Badge>
+          <Badge
+            variant={request.status === "Completed" ? "default" : "outline"}
+            className={cn(
+              "ppx-3 rounded-full py-4 text-xs font-black tracking-widest uppercase sm:px-4 sm:text-[10px]",
+              request.status === "Completed" && "border-none bg-green-500 text-white hover:bg-green-600",
+              request.status === "Cancelled" && "border-none bg-slate-200 text-slate-500 dark:bg-slate-800",
+              request.status === "Open" && "border-primary/20 text-primary"
+            )}
+          >
+            {request.status}
+          </Badge>
+          {request.isSeed && (
+            <Badge className="rounded-full border-none bg-blue-100 px-3 py-4 text-xs font-black tracking-widest text-blue-600 uppercase sm:px-4 sm:text-[10px] dark:bg-blue-900/40 dark:text-blue-300">
+              Demo Data
+            </Badge>
+          )}
+        </div>
+
+        {/* Seed Alert */}
+        {request.isSeed ? (
+          <Alert className="bg-accent space-y-2 px-4 py-4">
+            <AlertTitle className="">Note</AlertTitle>
+            <AlertDescription className="w-full italic">
+              This is not a real request. This is a demo request created to test the application.
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
         {/* Hero Section */}
         <section className="border-primary/10 shadow-primary/5 bg-card text-card-foreground relative overflow-hidden rounded-3xl border p-8 shadow-xl md:p-12">
@@ -480,57 +494,6 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
                 )}
               </section>
             )}
-
-            {/* Danger Zone */}
-            {request.isOwner && request.status !== "Cancelled" && request.status !== "Completed" && (
-              <section className="border-t border-red-100 pt-10 dark:border-red-900/20">
-                <div className="flex flex-col items-center justify-between gap-8 rounded-3xl border-2 border-dashed border-red-200 bg-red-50/50 p-8 md:flex-row md:p-10 dark:border-red-900/40 dark:bg-red-950/10">
-                  <div className="space-y-2 text-center md:text-left">
-                    <div className="flex items-center justify-center gap-2 md:justify-start">
-                      <ShieldAlert className="h-6 w-6 text-red-600" />
-                      <h3 className="text-xl font-black tracking-tighter text-red-600 uppercase italic">
-                        Danger Zone
-                      </h3>
-                    </div>
-                    <p className="max-w-sm text-sm font-bold text-slate-500 dark:text-slate-400">
-                      Cancel this blood request. This will notify all volunteers and mark request as inactive.
-                    </p>
-                  </div>
-                  <AlertDialog>
-                    <AlertDialogTrigger
-                      render={props => (
-                        <Button
-                          {...props}
-                          variant="destructive"
-                          className="h-14 rounded-2xl px-10 text-base font-black shadow-xl shadow-red-500/20 transition-all active:scale-95"
-                        >
-                          Cancel Entire Request
-                        </Button>
-                      )}
-                    />
-
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This will cancel the entire request. It will notify all volunteers and mark the request
-                          as inactive. This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Keep Request</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleCancelRequest}
-                          className="bg-red-600 text-white hover:bg-red-700"
-                        >
-                          Cancel Request
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </section>
-            )}
           </div>
 
           {/* Sidebar Area: Fulfillment & Logistics */}
@@ -632,6 +595,57 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
               </div>
             </Card>
           </aside>
+
+          {/* Danger Zone */}
+          {request.isOwner && request.status !== "Cancelled" && request.status !== "Completed" && (
+            <section className="border-t border-red-100 pt-10 dark:border-red-900/20">
+              <div className="flex flex-col items-center justify-between gap-8 rounded-3xl border-2 border-dashed border-red-200 bg-red-50/50 p-8 md:flex-row md:p-10 dark:border-red-900/40 dark:bg-red-950/10">
+                <div className="space-y-2 text-center md:text-left">
+                  <div className="flex items-center justify-center gap-2 md:justify-start">
+                    <ShieldAlert className="h-6 w-6 text-red-600" />
+                    <h3 className="text-xl font-black tracking-tighter text-red-600 uppercase italic">
+                      Danger Zone
+                    </h3>
+                  </div>
+                  <p className="max-w-sm text-sm font-bold text-slate-500 dark:text-slate-400">
+                    Cancel this blood request. This will notify all volunteers and mark request as inactive.
+                  </p>
+                </div>
+                <AlertDialog>
+                  <AlertDialogTrigger
+                    render={props => (
+                      <Button
+                        {...props}
+                        variant="destructive"
+                        className="h-14 rounded-2xl px-10 text-base font-black shadow-xl shadow-red-500/20 transition-all active:scale-95"
+                      >
+                        Cancel Entire Request
+                      </Button>
+                    )}
+                  />
+
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will cancel the entire request. It will notify all volunteers and mark the request as
+                        inactive. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Keep Request</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleCancelRequest}
+                        className="bg-red-600 text-white hover:bg-red-700"
+                      >
+                        Cancel Request
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </section>
+          )}
         </div>
       </Container>
     </div>
