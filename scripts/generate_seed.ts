@@ -2,53 +2,53 @@ import * as fs from "fs";
 import * as path from "path";
 import { bangladeshAdministrativeData } from "../constants/bangladeshAdministrativeAreas";
 
-const names = [
-  "Anisur Rahman",
-  "Farhana Islam",
-  "Kamrul Hassan",
-  "Sharmin Akter",
-  "Mizanur Chowdhury",
-  "Tania Ahmed",
-  "Asif Iqbal",
-  "Sumaiya Khan",
-  "Nasir Uddin",
-  "Arifa Sultana",
-  "Rafiqul Islam",
-  "Nusrat Jahan",
-  "Mahbubur Rahman",
-  "Sadia Afrin",
-  "Tanvir Ahmed",
-  "Rina Begum",
-  "Shafiqul Alam",
-  "Jesmin Akter",
-  "Monir Hossain",
-  "Salma Khatun",
-  "Zahid Hasan",
-  "Fatema Tuz Zohra",
-  "Saiful Islam",
-  "Nazma Begum",
-  "Abul Kashem",
-  "Rokeya Sultana",
-  "Mostafa Kamal",
-  "Bilkis Banu",
-  "Azizul Haque",
-  "Sabina Yasmin",
-  "Humayun Kabir",
-  "Kohinoor Akter",
-  "Rezaul Karim",
-  "Shahnaz Parvin",
-  "Aminul Islam",
-  "Ferdousi Begum",
-  "Habibur Rahman",
-  "Nilufar Yasmin",
-  "Jahangir Alam",
-  "Shamima Nasrin",
-  "Golam Mostafa",
-  "Khadija Begum",
-  "Anwar Hossain",
-  "Meherun Nesa",
-  "Shahadat Hossain",
-]; // 45
+const namesAndGender = [
+  { name: "Anisur Rahman", gender: "male" },
+  { name: "Farhana Islam", gender: "female" },
+  { name: "Kamrul Hassan", gender: "male" },
+  { name: "Sharmin Akter", gender: "female" },
+  { name: "Mizanur Chowdhury", gender: "male" },
+  { name: "Tania Ahmed", gender: "female" },
+  { name: "Asif Iqbal", gender: "male" },
+  { name: "Sumaiya Khan", gender: "female" },
+  { name: "Nasir Uddin", gender: "male" },
+  { name: "Arifa Sultana", gender: "female" },
+  { name: "Rafiqul Islam", gender: "male" },
+  { name: "Nusrat Jahan", gender: "female" },
+  { name: "Mahbubur Rahman", gender: "male" },
+  { name: "Sadia Afrin", gender: "female" },
+  { name: "Tanvir Ahmed", gender: "male" },
+  { name: "Rina Begum", gender: "female" },
+  { name: "Shafiqul Alam", gender: "male" },
+  { name: "Jesmin Akter", gender: "female" },
+  { name: "Monir Hossain", gender: "male" },
+  { name: "Salma Khatun", gender: "female" },
+  { name: "Zahid Hasan", gender: "male" },
+  { name: "Fatema Tuz Zohra", gender: "female" },
+  { name: "Saiful Islam", gender: "male" },
+  { name: "Nazma Begum", gender: "female" },
+  { name: "Abul Kashem", gender: "male" },
+  { name: "Rokeya Sultana", gender: "female" },
+  { name: "Mostafa Kamal", gender: "male" },
+  { name: "Bilkis Banu", gender: "female" },
+  { name: "Azizul Haque", gender: "male" },
+  { name: "Sabina Yasmin", gender: "female" },
+  { name: "Humayun Kabir", gender: "male" },
+  { name: "Kohinoor Akter", gender: "female" },
+  { name: "Rezaul Karim", gender: "male" },
+  { name: "Shahnaz Parvin", gender: "female" },
+  { name: "Aminul Islam", gender: "male" },
+  { name: "Ferdousi Begum", gender: "female" },
+  { name: "Habibur Rahman", gender: "male" },
+  { name: "Nilufar Yasmin", gender: "female" },
+  { name: "Jahangir Alam", gender: "male" },
+  { name: "Shamima Nasrin", gender: "female" },
+  { name: "Golam Mostafa", gender: "male" },
+  { name: "Khadija Begum", gender: "female" },
+  { name: "Anwar Hossain", gender: "male" },
+  { name: "Meherun Nesa", gender: "female" },
+  { name: "Shahadat Hossain", gender: "male" },
+];
 
 const hospitals = [
   "Apollo Hospital",
@@ -88,14 +88,15 @@ const hospitals = [
   "Monno Medical College Hospital",
   "Marks Medical College Hospital",
   "Zainul Haque Sikder Women's Medical College & Hospital",
-]; // 37
+];
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const urgencies = ["Low", "Medium", "High", "Critical"];
 const causes = ["Operation", "Delivery", "Accident", "Other"];
-const genders = ["Male", "Female", "Other"];
 
 const getRandom = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
+const getRandomNameAndAge = (arr: { name: string; gender: string }[]) =>
+  arr[Math.floor(Math.random() * arr.length)];
 
 for (const div of bangladeshAdministrativeData) {
   const divisionDir = path.join("assets", "seed", div.division);
@@ -110,8 +111,10 @@ for (const div of bangladeshAdministrativeData) {
     for (const sub of dist.subDistricts) {
       const numRequests = Math.floor(Math.random() * 6) + 5; // 5 to 10
       for (let i = 0; i < numRequests; i++) {
+        const { name, gender } = getRandomNameAndAge(namesAndGender);
+
         content += `  {\n`;
-        content += `    patientName: "${getRandom(names)}",\n`;
+        content += `    patientName: "${name}",\n`;
         content += `    hospitalName: "${getRandom(hospitals)}",\n`;
         content += `    hospitalLocation: "Ward ${Math.floor(Math.random() * 10) + 1}, ${getRandom(hospitals)} area",\n`;
         content += `    bloodTypeNeeded: "${getRandom(bloodTypes)}",\n`;
@@ -121,7 +124,7 @@ for (const div of bangladeshAdministrativeData) {
         content += `    numberOfBags: ${Math.floor(Math.random() * 4) + 1},\n`;
         content += `    cause: "${getRandom(causes)}",\n`;
         content += `    patientAge: ${Math.floor(Math.random() * 60) + 5},\n`;
-        content += `    patientGender: "${getRandom(genders)}",\n`;
+        content += `    patientGender: "${gender}",\n`;
         content += `    division: "${div.division}",\n`;
         content += `    district: "${dist.district}",\n`;
         content += `    subDistrict: "${sub}",\n`;

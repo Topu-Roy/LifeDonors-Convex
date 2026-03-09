@@ -20,14 +20,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] as const;
 const urgencies = ["Low", "Medium", "High", "Critical"] as const;
-const causes = ["Operation", "Delivery", "Accident", "Cancer Treatment", "Thalassemia", "Other"] as const;
+const causes = ["Operation", "Delivery", "Accident", "Other"] as const;
 const genders = ["Male", "Female", "Other"] as const;
 
 export const formSchema = z.object({
   patientName: z.string().min(2, "Name is too short"),
-  patientAge: z.number().min(1, "Age is required").max(120).optional(),
-  patientGender: z.enum(genders).optional(),
-  cause: z.enum(causes).optional(),
+  patientAge: z.number().min(1, "Age is required").max(120),
+  patientGender: z.enum(genders),
+  cause: z.enum(causes),
   bloodTypeNeeded: z.enum(bloodTypes),
   hospitalName: z.string().min(2, "Hospital name is required"),
   hospitalLocation: z.string().min(2, "Hospital location is required"),
@@ -40,12 +40,12 @@ export const formSchema = z.object({
   subDistrict: z.string().min(1, "Sub-district is required"),
 });
 
-interface BloodRequestFormProps {
+type BloodRequestFormProps = {
   onSuccess?: () => void;
   className?: string;
   initialData?: z.infer<typeof formSchema>;
   requestId?: Id<"requests">;
-}
+};
 
 export function BloodRequestForm({ onSuccess, className, initialData, requestId }: BloodRequestFormProps) {
   const createRequest = useMutation(api.requests.createBloodRequest);
@@ -74,10 +74,10 @@ export function BloodRequestForm({ onSuccess, className, initialData, requestId 
     onSubmit: async ({ value }) => {
       try {
         if (requestId) {
-          await updateRequest({ ...value, requestId });
+          await updateRequest({ ...(value as z.infer<typeof formSchema>), requestId });
           toast.success("Blood request updated successfully!");
         } else {
-          await createRequest(value);
+          await createRequest(value as z.infer<typeof formSchema>);
           toast.success("Blood request created successfully!");
           form.reset();
         }
@@ -140,10 +140,7 @@ export function BloodRequestForm({ onSuccess, className, initialData, requestId 
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor={field.name}>Gender</FieldLabel>
-                    <Select
-                      onValueChange={val => field.handleChange(val as (typeof genders)[number])}
-                      value={field.state.value ?? ""}
-                    >
+                    <Select onValueChange={val => field.handleChange(val!)} value={field.state.value ?? ""}>
                       <SelectTrigger id={field.name}>
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
@@ -175,9 +172,7 @@ export function BloodRequestForm({ onSuccess, className, initialData, requestId 
                       max={120}
                       value={field.state.value ?? ""}
                       onBlur={field.handleBlur}
-                      onChange={e =>
-                        field.handleChange(e.target.value ? Number(e.target.value) : undefined)
-                      }
+                      onChange={e => field.handleChange(prev => (e.target.value ? Number(e.target.value) : prev))}
                       aria-invalid={isInvalid}
                       placeholder="e.g. 35"
                     />
@@ -193,10 +188,7 @@ export function BloodRequestForm({ onSuccess, className, initialData, requestId 
                 return (
                   <Field data-invalid={isInvalid}>
                     <FieldLabel htmlFor={field.name}>Cause</FieldLabel>
-                    <Select
-                      onValueChange={val => field.handleChange(val as (typeof causes)[number])}
-                      value={field.state.value ?? ""}
-                    >
+                    <Select onValueChange={val => field.handleChange(val!)} value={field.state.value ?? ""}>
                       <SelectTrigger id={field.name}>
                         <SelectValue placeholder="Select cause" />
                       </SelectTrigger>

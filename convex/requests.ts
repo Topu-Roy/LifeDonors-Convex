@@ -24,18 +24,9 @@ export const createBloodRequest = mutation({
     division: v.optional(v.string()),
     district: v.optional(v.string()),
     subDistrict: v.optional(v.string()),
-    cause: v.optional(
-      v.union(
-        v.literal("Operation"),
-        v.literal("Delivery"),
-        v.literal("Accident"),
-        v.literal("Cancer Treatment"),
-        v.literal("Thalassemia"),
-        v.literal("Other")
-      )
-    ),
-    patientAge: v.optional(v.number()),
-    patientGender: v.optional(v.union(v.literal("Male"), v.literal("Female"), v.literal("Other"))),
+    cause: v.union(v.literal("Operation"), v.literal("Delivery"), v.literal("Accident"), v.literal("Other")),
+    patientAge: v.number(),
+    patientGender: v.union(v.literal("Male"), v.literal("Female"), v.literal("Other")),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -83,18 +74,9 @@ export const updateBloodRequest = mutation({
     division: v.optional(v.string()),
     district: v.optional(v.string()),
     subDistrict: v.optional(v.string()),
-    cause: v.optional(
-      v.union(
-        v.literal("Operation"),
-        v.literal("Delivery"),
-        v.literal("Accident"),
-        v.literal("Cancer Treatment"),
-        v.literal("Thalassemia"),
-        v.literal("Other")
-      )
-    ),
-    patientAge: v.optional(v.number()),
-    patientGender: v.optional(v.union(v.literal("Male"), v.literal("Female"), v.literal("Other"))),
+    cause: v.union(v.literal("Operation"), v.literal("Delivery"), v.literal("Accident"), v.literal("Other")),
+    patientAge: v.number(),
+    patientGender: v.union(v.literal("Male"), v.literal("Female"), v.literal("Other")),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -109,13 +91,14 @@ export const updateBloodRequest = mutation({
 
     const existingRequest = await ctx.db.get("requests", args.requestId);
     if (!existingRequest) throw new Error("Request not found");
-    
+
     if (existingRequest.requesterId !== profile._id) {
       throw new Error("Unauthorized to edit this request");
     }
 
     const { requestId, ...updateData } = args;
-    const searchableText = `${updateData.patientName} ${updateData.hospitalName} ${updateData.bloodTypeNeeded}`.toLowerCase();
+    const searchableText =
+      `${updateData.patientName} ${updateData.hospitalName} ${updateData.bloodTypeNeeded}`.toLowerCase();
 
     await ctx.db.patch("requests", requestId, {
       ...updateData,
