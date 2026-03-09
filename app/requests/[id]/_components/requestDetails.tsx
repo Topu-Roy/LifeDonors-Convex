@@ -22,6 +22,17 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/Container";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -84,10 +95,8 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
 
   const handleRejectDonor = async (donationId: Id<"donations">) => {
     try {
-      if (confirm("Reject this donor?")) {
-        await rejectDonor({ donationId, requestId });
-        toast.success("Donor rejected");
-      }
+      await rejectDonor({ donationId, requestId });
+      toast.success("Donor rejected");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to reject donor");
     }
@@ -104,11 +113,9 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
 
   const handleCancelRequest = async () => {
     try {
-      if (confirm("Are you sure you want to cancel the ENTIRE request? This cannot be undone.")) {
-        await cancelRequest({ requestId: request._id });
-        toast.success("Request cancelled");
-        router.push("/requests");
-      }
+      await cancelRequest({ requestId: request._id });
+      toast.success("Request cancelled");
+      router.push("/requests");
     } catch {
       toast.error("Failed to cancel request");
     }
@@ -169,13 +176,13 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
         </div>
 
         {/* Hero Section */}
-        <section className="border-primary/10 shadow-primary/5 relative overflow-hidden rounded-3xl border bg-white p-8 shadow-xl md:p-12 dark:bg-slate-900">
+        <section className="border-primary/10 shadow-primary/5 bg-card text-card-foreground relative overflow-hidden rounded-3xl border p-8 shadow-xl md:p-12">
           <div className="pointer-events-none absolute top-0 right-0 p-12 opacity-5 dark:opacity-10">
             <Droplets className="text-primary h-48 w-48" />
           </div>
 
           <div className="relative z-10 flex flex-col items-start gap-10 md:flex-row md:items-center">
-            <div className="bg-primary shadow-primary/20 flex h-28 w-28 shrink-0 items-center justify-center rounded-3xl text-5xl font-black text-slate-900 shadow-2xl">
+            <div className="bg-primary shadow-primary/20 flex h-28 w-28 shrink-0 items-center justify-center rounded-3xl text-5xl font-black text-white shadow-2xl">
               {request.bloodTypeNeeded}
             </div>
 
@@ -212,117 +219,216 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
           {/* Main Content: Volunteers */}
           <div className="space-y-10 lg:col-span-2">
-            <section className="space-y-6">
-              <div className="flex items-center justify-between px-2">
-                <h2 className="flex items-center gap-3 text-2xl font-black tracking-tight">
-                  Potential Volunteers
-                  <span className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full text-sm font-black">
-                    {request.volunteers.length}
-                  </span>
-                </h2>
-              </div>
-
-              {request.volunteers.length === 0 ? (
-                <div className="border-primary/10 rounded-3xl border-2 border-dashed bg-white py-20 text-center dark:bg-slate-900">
-                  <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-slate-100 dark:bg-slate-800">
-                    <User className="h-10 w-10 text-slate-400" />
-                  </div>
-                  <h3 className="mb-2 text-xl font-black">No volunteers yet</h3>
-                  <p className="mx-auto max-w-xs font-medium text-slate-500 dark:text-slate-400">
-                    As soon as donors respond to this request, they will appear here for your review.
-                  </p>
+            {request.isOwner && (
+              <section className="space-y-6">
+                <div className="flex items-center justify-between px-2">
+                  <h2 className="flex items-center gap-3 text-2xl font-black tracking-tight">
+                    Potential Volunteers
+                    <span className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full text-sm font-black">
+                      {request.volunteers.length}
+                    </span>
+                  </h2>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {request.volunteers.map(v => (
-                    <Card
-                      key={v._id}
-                      className={cn(
-                        "group overflow-hidden rounded-3xl border-2 transition-all duration-300",
-                        v.status === "Accepted" || v.status === "Donated"
-                          ? "border-primary/40 shadow-primary/5 scale-100 shadow-lg"
-                          : "border-slate-100 bg-white dark:border-slate-800 dark:bg-slate-900"
-                      )}
-                    >
-                      <CardContent className="p-6 md:p-8">
-                        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
-                          <div className="flex items-center gap-6">
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 sm:h-16 sm:w-16 dark:bg-slate-800">
-                              <User className="h-6 w-6 sm:h-8 sm:w-8" />
-                            </div>
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-3">
-                                <span className="text-lg font-black tracking-tight sm:text-xl">
-                                  {v.donor?.phoneNumber ?? "Private Donor"}
-                                </span>
-                                <Badge
-                                  className={cn(
-                                    "rounded-full border-none px-3 py-0.5 text-[9px] font-black tracking-widest uppercase",
-                                    v.status === "Donated" && "bg-green-500 text-white",
-                                    v.status === "Accepted" && "bg-primary text-slate-900",
-                                    v.status === "Offered" && "bg-slate-100 text-slate-500"
-                                  )}
-                                >
-                                  {v.status}
-                                </Badge>
+
+                {request.volunteers.length === 0 ? (
+                  <div className="border-primary/10 rounded-3xl border-2 border-dashed bg-white py-20 text-center dark:bg-slate-900">
+                    <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-slate-100 dark:bg-slate-800">
+                      <User className="h-10 w-10 text-slate-400" />
+                    </div>
+                    <h3 className="mb-2 text-xl font-black">No volunteers yet</h3>
+                    <p className="mx-auto max-w-xs font-medium text-slate-500 dark:text-slate-400">
+                      As soon as donors respond to this request, they will appear here for your review.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {request.volunteers.map(v => (
+                      <Card
+                        key={v._id}
+                        className={cn(
+                          "group overflow-hidden rounded-3xl border-2 transition-all duration-300",
+                          v.status === "Accepted" || v.status === "Donated"
+                            ? "border-primary/40 shadow-primary/5 scale-100 shadow-lg"
+                            : "border-slate-100 bg-white dark:border-slate-800 dark:bg-slate-900"
+                        )}
+                      >
+                        <CardContent className="p-6 md:p-8">
+                          <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+                            <div className="flex items-center gap-6">
+                              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 sm:h-16 sm:w-16 dark:bg-slate-800">
+                                <User className="h-6 w-6 sm:h-8 sm:w-8" />
                               </div>
-                              {v.donor && (
-                                <p className="flex items-center gap-1 text-xs font-bold text-slate-500">
-                                  <MapPin className="h-3 w-3" />
-                                  {v.donor.district && `${v.donor.subDistrict}, ${v.donor.district}`}
-                                </p>
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-3">
+                                  <span className="text-lg font-black tracking-tight sm:text-xl">
+                                    {v.donor?.phoneNumber ?? "Private Donor"}
+                                  </span>
+                                  <Badge
+                                    className={cn(
+                                      "rounded-full border-none px-3 py-0.5 text-[9px] font-black tracking-widest uppercase",
+                                      v.status === "Donated" && "bg-green-500 text-white",
+                                      v.status === "Accepted" && "bg-primary text-slate-900",
+                                      v.status === "Offered" && "bg-slate-100 text-slate-500"
+                                    )}
+                                  >
+                                    {v.status}
+                                  </Badge>
+                                </div>
+                                {v.donor && (
+                                  <p className="flex items-center gap-1 text-xs font-bold text-slate-500">
+                                    <MapPin className="h-3 w-3" />
+                                    {v.donor.district && `${v.donor.subDistrict}, ${v.donor.district}`}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex w-full flex-col gap-3 sm:flex-row md:w-auto">
+                              {v.status === "Offered" && (
+                                <>
+                                  <AlertDialog>
+                                    <AlertDialogTrigger
+                                      render={props => (
+                                        <Button
+                                          {...props}
+                                          className="bg-primary h-12 w-full rounded-xl font-bold text-slate-900 transition-transform hover:scale-105 sm:w-auto"
+                                        >
+                                          Select Donor
+                                        </Button>
+                                      )}
+                                    />
+
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Select Donor</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure you want to select this donor? Their contact info will
+                                          become fully visible to you.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleSelectDonor(v._id)}>
+                                          Confirm Selection
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+
+                                  <AlertDialog>
+                                    <AlertDialogTrigger
+                                      render={props => (
+                                        <Button
+                                          {...props}
+                                          variant="ghost"
+                                          className="flex h-12 w-full items-center justify-center gap-2 rounded-xl text-red-500 hover:bg-red-50 sm:w-12 sm:gap-0 dark:hover:bg-red-950/20"
+                                        >
+                                          <XCircle className="h-6 w-6" />
+                                          <span className="font-bold sm:hidden">Reject Donor</span>
+                                        </Button>
+                                      )}
+                                    />
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Reject Donor</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure you want to reject this volunteer? They will be notified and
+                                          this cannot be undone.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                          className="bg-red-600 text-white hover:bg-red-700"
+                                          onClick={() => handleRejectDonor(v._id)}
+                                        >
+                                          Reject
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </>
+                              )}
+                              {v.status === "Accepted" && (
+                                <>
+                                  <AlertDialog>
+                                    <AlertDialogTrigger
+                                      render={props => (
+                                        <Button
+                                          {...props}
+                                          className="h-12 w-full gap-2 rounded-xl bg-green-600 font-bold text-white transition-transform hover:scale-105 hover:bg-green-700 sm:w-auto"
+                                        >
+                                          <CheckCircle2 className="h-5 w-5" />
+                                          Mark Donated
+                                        </Button>
+                                      )}
+                                    />
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Confirm Donation</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure this donor has successfully completed the donation? This
+                                          updates your fulfillment progress.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                          className="bg-green-600 text-white hover:bg-green-700"
+                                          onClick={() => handleUpdateStatus(v._id, "Donated")}
+                                        >
+                                          Confirm
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+
+                                  <AlertDialog>
+                                    <AlertDialogTrigger
+                                      render={props => (
+                                        <Button
+                                          {...props}
+                                          variant="outline"
+                                          className="h-12 w-full rounded-xl border-red-200 font-bold text-red-600 transition-all hover:bg-red-50 sm:w-auto"
+                                        >
+                                          No Show
+                                        </Button>
+                                      )}
+                                    />
+
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Report No Show</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure the donor failed to show up? This will mark their donation
+                                          log negatively.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                          className="bg-red-600 text-white hover:bg-red-700"
+                                          onClick={() => handleUpdateStatus(v._id, "No Show")}
+                                        >
+                                          Confirm No Show
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </>
                               )}
                             </div>
                           </div>
-
-                          <div className="flex w-full flex-col gap-3 sm:flex-row md:w-auto">
-                            {v.status === "Offered" && (
-                              <>
-                                <Button
-                                  className="bg-primary h-12 w-full rounded-xl font-bold text-slate-900 transition-transform hover:scale-105 sm:w-auto"
-                                  onClick={() => handleSelectDonor(v._id)}
-                                >
-                                  Select Donor
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl text-red-500 hover:bg-red-50 sm:w-12 sm:gap-0 dark:hover:bg-red-950/20"
-                                  onClick={() => handleRejectDonor(v._id)}
-                                >
-                                  <XCircle className="h-6 w-6" />
-                                  <span className="font-bold sm:hidden">Reject Donor</span>
-                                </Button>
-                              </>
-                            )}
-                            {v.status === "Accepted" && (
-                              <>
-                                <Button
-                                  className="h-12 w-full gap-2 rounded-xl bg-green-600 font-bold text-white transition-transform hover:scale-105 hover:bg-green-700 sm:w-auto"
-                                  onClick={() => handleUpdateStatus(v._id, "Donated")}
-                                >
-                                  <CheckCircle2 className="h-5 w-5" />
-                                  Mark Donated
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  className="h-12 w-full rounded-xl border-red-200 font-bold text-red-600 transition-all hover:bg-red-50 sm:w-auto"
-                                  onClick={() => handleUpdateStatus(v._id, "No Show")}
-                                >
-                                  No Show
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </section>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
 
             {/* Danger Zone */}
-            {request.status !== "Cancelled" && request.status !== "Completed" && (
+            {request.isOwner && request.status !== "Cancelled" && request.status !== "Completed" && (
               <section className="border-t border-red-100 pt-10 dark:border-red-900/20">
                 <div className="flex flex-col items-center justify-between gap-8 rounded-3xl border-2 border-dashed border-red-200 bg-red-50/50 p-8 md:flex-row md:p-10 dark:border-red-900/40 dark:bg-red-950/10">
                   <div className="space-y-2 text-center md:text-left">
@@ -336,13 +442,38 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
                       Cancel this blood request. This will notify all volunteers and mark request as inactive.
                     </p>
                   </div>
-                  <Button
-                    variant="destructive"
-                    className="h-14 rounded-2xl px-10 text-base font-black shadow-xl shadow-red-500/20 transition-all active:scale-95"
-                    onClick={handleCancelRequest}
-                  >
-                    Cancel Entire Request
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger
+                      render={props => (
+                        <Button
+                          {...props}
+                          variant="destructive"
+                          className="h-14 rounded-2xl px-10 text-base font-black shadow-xl shadow-red-500/20 transition-all active:scale-95"
+                        >
+                          Cancel Entire Request
+                        </Button>
+                      )}
+                    />
+
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will cancel the entire request. It will notify all volunteers and mark the request
+                          as inactive. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Keep Request</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleCancelRequest}
+                          className="bg-red-600 text-white hover:bg-red-700"
+                        >
+                          Cancel Request
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </section>
             )}

@@ -256,16 +256,20 @@ export const getPaginatedMyRequests = query({
 export const getRequestById = query({
   args: { requestId: v.id("requests") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-
-    const profile = await ctx.db
-      .query("profiles")
-      .withIndex("by_userId", q => q.eq("userId", identity.subject))
-      .first();
-
     const request = await ctx.db.get("requests", args.requestId);
-    if (!request || request.requesterId !== profile?._id) return null;
+    if (!request) return null;
+
+    let isOwner = false;
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity) {
+      const profile = await ctx.db
+        .query("profiles")
+        .withIndex("by_userId", q => q.eq("userId", identity.subject))
+        .first();
+      if (request.requesterId === profile?._id) {
+        isOwner = true;
+      }
+    }
 
     const donations = await ctx.db
       .query("donations")
@@ -274,6 +278,13 @@ export const getRequestById = query({
 
     const volunteers = await Promise.all(
       donations.map(async donation => {
+        if (!isOwner) {
+          return {
+            ...donation,
+            donor: null,
+          };
+        }
+
         const donorProfile = await ctx.db
           .query("profiles")
           .withIndex("by_userId", q => q.eq("userId", donation.donorId))
@@ -287,6 +298,7 @@ export const getRequestById = query({
 
     return {
       ...request,
+      isOwner,
       volunteers,
     };
   },
