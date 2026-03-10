@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { DashboardTabs } from "@/app/dashboard/_components/DashboardTabs";
+import { DashboardTabs } from "@/app/dashboard/_components/dashboardTabs";
 import { LayoutDashboard } from "lucide-react";
 import { Container } from "@/components/Container";
 
