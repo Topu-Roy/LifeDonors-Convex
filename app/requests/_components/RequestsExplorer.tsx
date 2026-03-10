@@ -11,21 +11,22 @@ import {
   filterUrgencyAtom,
 } from "@/state/requests/store";
 import { usePaginatedQuery } from "convex/react";
-import { useAtom } from "jotai";
-import { Filter as FilterIcon, Plus, Search, X } from "lucide-react";
+import { useAtomValue } from "jotai";
+import { Filter as FilterIcon, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { RequestCard } from "@/components/RequestCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ActiveFilters, ClearFiltersButton } from "./activeFilters";
 
 export function RequestsExplorer() {
-  const [filterBloodType, setFilterBloodType] = useAtom(filterBloodTypeAtom);
-  const [filterDivision, setFilterDivision] = useAtom(filterDivisionAtom);
-  const [filterDistrict, setFilterDistrict] = useAtom(filterDistrictAtom);
-  const [filterSubDistrict, setFilterSubDistrict] = useAtom(filterSubDistrictAtom);
-  const [filterUrgency, setFilterUrgency] = useAtom(filterUrgencyAtom);
+  const filterBloodType = useAtomValue(filterBloodTypeAtom);
+  const filterDivision = useAtomValue(filterDivisionAtom);
+  const filterDistrict = useAtomValue(filterDistrictAtom);
+  const filterSubDistrict = useAtomValue(filterSubDistrictAtom);
+  const filterUrgency = useAtomValue(filterUrgencyAtom);
   const [searchQuery, setSearchQuery] = useState("");
 
   const {
@@ -54,6 +55,10 @@ export function RequestsExplorer() {
     filterSubDistrict,
     filterUrgency,
   ].filter(f => f && f !== "ALL").length;
+
+  function setSearchQueryString(val: string) {
+    setSearchQuery(val);
+  }
 
   return (
     <div className="flex flex-col gap-10 lg:flex-row">
@@ -124,47 +129,7 @@ export function RequestsExplorer() {
       {/* Main Content Area */}
       <main className="flex-1 space-y-6">
         {/* Active Filter Tags */}
-        <div className="flex flex-wrap gap-2">
-          {filterBloodType && filterBloodType !== "ALL" && (
-            <Badge
-              variant="secondary"
-              className="bg-primary/10 text-primary border-primary/20 gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
-            >
-              {filterBloodType}
-              <button onClick={() => setFilterBloodType(undefined)}>
-                <X className="h-3 w-3 transition-colors hover:text-slate-900" />
-              </button>
-            </Badge>
-          )}
-          {filterUrgency && filterUrgency !== "ALL" && (
-            <Badge
-              variant="secondary"
-              className="bg-primary/10 text-primary border-primary/20 gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
-            >
-              {filterUrgency}
-              <button onClick={() => setFilterUrgency(undefined)}>
-                <X className="h-3 w-3 transition-colors hover:text-slate-900" />
-              </button>
-            </Badge>
-          )}
-          {filterDivision && filterDivision !== "ALL" && (
-            <Badge
-              variant="secondary"
-              className="bg-primary/10 text-primary border-primary/20 gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
-            >
-              {filterDivision}
-              <button
-                onClick={() => {
-                  setFilterDivision(undefined);
-                  setFilterDistrict(undefined);
-                  setFilterSubDistrict(undefined);
-                }}
-              >
-                <X className="h-3 w-3 transition-colors hover:text-slate-900" />
-              </button>
-            </Badge>
-          )}
-        </div>
+        <ActiveFilters />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {status === "LoadingFirstPage" ? (
@@ -196,18 +161,7 @@ export function RequestsExplorer() {
               <p className="mx-auto max-w-xs font-medium text-slate-500 dark:text-slate-400">
                 Try adjusting your filters or search query to find more results.
               </p>
-              <Button
-                variant="outline"
-                className="border-primary/20 mt-8 rounded-2xl font-bold"
-                onClick={() => {
-                  setFilterBloodType(undefined);
-                  setFilterDivision(undefined);
-                  setFilterUrgency(undefined);
-                  setSearchQuery("");
-                }}
-              >
-                Clear All Filters
-              </Button>
+              <ClearFiltersButton setSearchQuery={setSearchQueryString} />
             </div>
           )}
         </div>
