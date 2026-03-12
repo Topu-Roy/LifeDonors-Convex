@@ -1,0 +1,17 @@
+# Dependencies
+node_modules
+
+# Next.js
+.next
+out
+build
+
+# Convex
+.convex
+convex/_generated
+convex/betterAuth/_generated
+
+# Misc
+.env*
+*.min.js
+*.min.css
