@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { type ProfileType } from "@/app/profile/_components/ProfileView";
 import { BasicInfoStep } from "@/app/profile/setup/_components/BasicInfoStep";
 import { EligibilityStep } from "@/app/profile/setup/_components/EligibilityStep";
 import { HealthDetailsStep } from "@/app/profile/setup/_components/HealthDetailsStep";
@@ -12,6 +11,7 @@ import { useAtom } from "jotai";
 import { Check, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { type ProfileType } from "../../_components/ProfileView";
 
 const steps = [
   { id: 1, title: "Basic Information", description: "Age, Phone & Location" },
@@ -36,12 +36,12 @@ const isProfileComplete = (p: ProfileType) => {
 
 export function SetupWizard() {
   const profile = useQuery(api.users.getMyProfile);
-  const router = useRouter();
   const [currentStep] = useAtom(currentStepAtom);
+  const router = useRouter();
 
   useEffect(() => {
     if (profile !== undefined && isProfileComplete(profile)) {
-      router.push("/profile");
+      router.replace("/profile");
     }
   }, [profile, router]);
 

@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { type Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Container } from "@/components/Container";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DetailedHealthInfo } from "./detailedHealthInfo";
@@ -39,6 +40,7 @@ export type ProfileType =
 export function ProfileView() {
   const profile = useQuery(api.users.getMyProfile);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const router = useRouter();
 
   if (profile === undefined) {
     return (
@@ -48,7 +50,10 @@ export function ProfileView() {
     );
   }
 
-  if (!profile) return null;
+  if (!profile) {
+    router.push("/profile/setup");
+    return;
+  }
 
   function setIsDialogOpenState(state: boolean) {
     setIsDialogOpen(state);
