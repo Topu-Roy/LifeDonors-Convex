@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono, Lora, Montserrat } from "next/font/google";
 import "./globals.css";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
+import { Footer } from "@/components/footer";
 import { Navbar } from "@/components/Navbar";
 
 const fontSans = Montserrat({
@@ -35,7 +36,8 @@ export default function RootLayout({
         <ConvexClientProvider>
           <div className="relative flex min-h-screen flex-col">
             <Navbar />
-            <main className="flex-1">{children}</main>
+            {children}
+            <Footer />
           </div>
         </ConvexClientProvider>
       </body>
