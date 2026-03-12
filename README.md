@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LifeDonors Platform
 
-## Getting Started
+[![LifeDonors Hero](https://github.com/Topu-Roy/LifeDonors-Convex/blob/main/public/og-image.png?raw=true)](https://lifedonors.vercel.app)
 
-First, run the development server:
+**LifeDonors** is a modern, privacy-focused blood donation management platform designed to connect people in need with voluntary blood donors in their community. Built with speed, safety, and visual excellence in mind, the platform provides real-time tracking of blood requests and donor availability.
+
+## 🩸 Core Mission
+
+Our goal is to bridges the gap between those who need blood and those who want to give it. By utilizing modern web technologies, we've created a platform that is not only functional but also intuitive and visually stunning—ensuring that help is just a few clicks away when every second counts.
+
+## ✨ Key Features
+
+- **Eligibility Checker**: An interactive tool that helps users determine their eligibility to donate based on vitals like age, BMI, and hemoglobin levels.
+- **Urgent Blood Requests**: A searchable, filterable explorer to find nearby blood needs by location, blood type, and urgency.
+- **Comprehensive Profiles**: Secure donor profiles that calculate donor metrics and track donation history.
+- **Donor Dashboard**: A centralized hub for donors and requesters to manage their commitments and active requests.
+- **Admin Controls**: A powerful interface for system administrators to monitor platform stats, manage seed data, and ensure platform health.
+- **Privacy-First Design**: Built with data security at the core, ensuring health information is only accessible to relevant parties.
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Database & Backend**: [Convex](https://www.convex.dev/) (Real-time backend)
+- **Authentication**: [Better Auth](https://www.better-auth.com/) with Convex integration
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **UI Components**: [Shadcn UI](https://ui.shadcn.com/) + [Lucide React](https://lucide.dev/)
+- **State Management**: [Jotai](https://jotai.org/)
+- **Runtime**: [Bun](https://bun.sh/)
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- [Bun](https://bun.sh/) installed on your machine.
+- A [Convex](https://www.convex.dev/) account and project.
+- Environment variables configured for Better Auth and Convex.
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Topu-Roy/LifeDonors-Convex.git
+   cd LifeDonors-Convex
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   bun install
+   ```
+
+3. **Initialize Convex:**
+   ```bash
+   bun x convex dev
+   ```
+
+4. **Environment Variables:**
+   Create a `.env.local` file and add the necessary credentials:
+   ```env
+   # Better Auth
+   BETTER_AUTH_SECRET=your_secret
+   BETTER_AUTH_URL=http://localhost:3000
+
+   # Convex
+   CONVEX_DEPLOYMENT=your_deployment_id
+   NEXT_PUBLIC_CONVEX_URL=your_convex_url
+   ```
+
+5. **Start the development server:**
+   ```bash
+   bun dev
+   ```
+
+## 🧪 Seeding Data
+
+For development and testing, you can use the built-in seeding scripts to populate your database with dummy requests and profiles:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Generate and push seed data
+bun seed:generate
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Alternatively, use the **Admin Dashboard** (`/admin`) to trigger seeding or clear the database directly from the UI.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built with ❤️ for a better community.
