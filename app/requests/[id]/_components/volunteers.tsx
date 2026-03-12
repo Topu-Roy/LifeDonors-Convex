@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { type Id } from "@/convex/_generated/dataModel";
-import { useMutation } from "convex/react";
-import { CheckCircle2, MapPin, User, XCircle } from "lucide-react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import { CheckCircle2, Heart, LogIn, MapPin, User, XCircle } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
@@ -50,9 +52,13 @@ type Props = {
 };
 
 export function Volunteers({ volunteers, requestId, isOwner }: Props) {
+  const { isAuthenticated } = useConvexAuth();
   const selectDonor = useMutation(api.donations.selectDonor);
   const rejectDonor = useMutation(api.donations.rejectDonor);
   const updateDonationStatus = useMutation(api.donations.updateDonationStatus);
+  const offerDonation = useMutation(api.donations.offerDonation);
+
+  const [isOffering, setIsOffering] = useState(false);
 
   const handleSelectDonor = async (donationId: Id<"donations">) => {
     try {
@@ -81,9 +87,30 @@ export function Volunteers({ volunteers, requestId, isOwner }: Props) {
     }
   };
 
+  const handleOfferHelp = async () => {
+    setIsOffering(true);
+    try {
+      await offerDonation({ requestId });
+      toast.success("Thank you for volunteering! The requester will be notified.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to offer help");
+    } finally {
+      setIsOffering(false);
+    }
+  };
+
+  // Check if current user has already volunteered
+  // Note: Since we can't easily get the userId from useConvexAuth directly in a clean way
+  // without another query, and we know `donorId` in donations is the Better Auth subject,
+  // we can use the same logic as elsewhere or just check if any donation belongs to the user
+  // if we had their ID. Let's use getMyProfile to be sure.
+  const myProfile = useQuery(api.users.getMyProfile);
+  const hasVolunteered = volunteers.some(v => v.donorId === myProfile?.userId);
+  const myDonation = volunteers.find(v => v.donorId === myProfile?.userId);
+
   return (
     <div className="space-y-10 lg:col-span-2">
-      {isOwner && (
+      {isOwner ? (
         <section className="space-y-6">
           <div className="flex items-center justify-between px-2">
             <h2 className="flex items-center gap-3 text-2xl font-black tracking-tight">
@@ -289,6 +316,71 @@ export function Volunteers({ volunteers, requestId, isOwner }: Props) {
             </div>
           )}
         </section>
+      ) : (
+        <Card className="border-primary/10 shadow-primary/5 relative min-h-[450px] overflow-hidden rounded-[3rem] border-2 bg-white p-8 shadow-2xl md:p-12 dark:bg-slate-900">
+          <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 opacity-5 dark:opacity-10">
+            <Heart className="text-primary h-full w-full fill-current" />
+          </div>
+
+          <div className="relative z-10 flex h-full flex-col justify-center space-y-10">
+            <div className="space-y-4 text-center">
+              <div className="bg-primary/10 mx-auto flex h-24 w-24 items-center justify-center rounded-4xl">
+                <Heart className="text-primary fill-primary/20 h-12 w-12" />
+              </div>
+              <h2 className="text-3xl font-black tracking-tighter md:text-4xl">Volunteer to Save a Life</h2>
+              <p className="mx-auto max-w-md font-medium text-slate-500 dark:text-slate-400">
+                Your donation can be the difference someone needs today. Join our network of heroes.
+              </p>
+            </div>
+
+            <div className="flex justify-center">
+              {!isAuthenticated ? (
+                <div className="border-primary/10 w-full max-w-sm space-y-6 rounded-4xl border-2 border-dashed p-8 text-center">
+                  <p className="text-sm font-bold text-slate-500">
+                    Sign in to volunteer and connect with the requester.
+                  </p>
+                  <Link href="/sign-in" className="block">
+                    <Button className="h-14 w-full gap-2 rounded-2xl text-lg font-black shadow-xl transition-transform hover:scale-105 active:scale-95">
+                      <LogIn className="h-5 w-5" />
+                      Sign In to Volunteer
+                    </Button>
+                  </Link>
+                </div>
+              ) : hasVolunteered ? (
+                <div className="border-primary/20 bg-primary/5 w-full max-w-md space-y-6 rounded-[2.5rem] border-2 border-dashed p-10 text-center">
+                  <div className="bg-primary shadow-primary/20 mx-auto flex h-16 w-16 items-center justify-center rounded-2xl shadow-lg">
+                    <CheckCircle2 className="h-10 w-10 text-slate-900" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-black italic">You have Volunteered!</h3>
+                    <p className="font-medium text-slate-600 dark:text-slate-300">
+                      Thank you for your kindness. Current status:{" "}
+                      <Badge className="bg-primary ml-1 text-[10px] font-black tracking-widest text-slate-900 uppercase">
+                        {myDonation?.status}
+                      </Badge>
+                    </p>
+                  </div>
+                  <p className="mt-4 text-xs font-bold tracking-tighter text-slate-400 uppercase">
+                    The requester will contact you if they select your offer.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex w-full max-w-md flex-col items-center gap-6">
+                  <Button
+                    onClick={handleOfferHelp}
+                    disabled={isOffering}
+                    className="shadow-primary/30 h-20 w-full rounded-4xl text-2xl font-black shadow-2xl transition-all hover:scale-105 active:scale-95"
+                  >
+                    {isOffering ? "Processing heroes..." : "I Want to Help"}
+                  </Button>
+                  <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase italic">
+                    By clicking, you commit to being available for this donation.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
       )}
     </div>
   );

@@ -266,10 +266,10 @@ export function RequestDetails({ requestId }: { requestId: Id<"requests"> }) {
               </div>
             </Card>
           </aside>
-
-          {/* Danger Zone */}
-          <DangerZone requestId={requestId} />
         </div>
+
+        {/* Danger Zone */}
+        <DangerZone requestId={requestId} />
       </Container>
     </div>
   );
