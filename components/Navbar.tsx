@@ -44,9 +44,13 @@ export function Navbar() {
   return (
     <header className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <Container className="flex h-14 items-center justify-between">
-        <Link href="/" className="flex shrink-0 items-center space-x-2">
-          <Droplet className="text-primary h-6 w-6" />
-          <span className="font-bold sm:inline-block">LifeDonors</span>
+        <Link href="/">
+          <div className="flex items-center gap-3">
+            <div className="bg-primary shadow-primary/20 flex size-8 items-center justify-center rounded-xl shadow-lg">
+              <Droplet className="h-6 w-6 fill-current text-white" />
+            </div>
+            <span className="text-xl font-black tracking-tighter italic">LifeDonors</span>
+          </div>
         </Link>
 
         {/* Desktop Navigation */}

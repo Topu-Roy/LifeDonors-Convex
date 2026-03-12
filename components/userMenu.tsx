@@ -16,9 +16,7 @@ import {
   UserCircle,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,7 +32,6 @@ import {
 
 export function UserMenu() {
   const profile = useQuery(api.users.getMyProfile);
-  const pathname = usePathname();
 
   // If loading
   if (profile === undefined) {
@@ -44,15 +41,11 @@ export function UserMenu() {
   // If not logged in
   if (profile === null) {
     return (
-      <Link
-        href="/sign-in"
-        className={cn(
-          "hover:text-primary flex items-center gap-1.5 text-sm font-medium transition-colors",
-          pathname === "/sign-in" ? "text-primary" : "text-muted-foreground"
-        )}
-      >
-        <LogIn className="h-4 w-4" />
-        Sign In
+      <Link href="/sign-in">
+        <Button className={"hover:bg-primary/90 flex items-center gap-2 px-4 py-4 text-sm font-medium"}>
+          <LogIn className="h-4 w-4" />
+          Sign In
+        </Button>
       </Link>
     );
   }
