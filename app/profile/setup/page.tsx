@@ -2,6 +2,12 @@ import { Suspense } from "react";
 import { SetupWizard } from "@/app/profile/setup/_components/SetupWizard";
 import { Droplet } from "lucide-react";
 import { Container } from "@/components/Container";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Profile Setup | LifeDonors",
+  description: "Complete your donor profile to start saving lives.",
+};
 
 export default function ProfileSetupPage() {
   return (

@@ -1,10 +1,16 @@
 import { ShieldCheck } from "lucide-react";
+import type { Metadata } from "next";
 import { Container } from "@/components/Container";
 import { Card } from "@/components/ui/card";
 import { AdminGuard } from "./_components/AdminGuard";
 import { DeleteSeedData } from "./_components/deleteSeedData";
 import { SeedDatabase } from "./_components/seedDatabase";
 import { DetailedStats, StatsGrid } from "./_components/stats";
+
+export const metadata: Metadata = {
+  title: "Admin Dashboard | LifeDonors",
+  description: "Administrative tools for managing LifeDonors platform data.",
+};
 
 export default function AdminPage() {
   return (

@@ -1,5 +1,11 @@
 import { Suspense } from "react";
 import { ProfileView } from "@/app/profile/_components/ProfileView";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Profile | LifeDonors",
+  description: "View and manage your donor profile and health statistics.",
+};
 
 export default function ProfilePage() {
   return (

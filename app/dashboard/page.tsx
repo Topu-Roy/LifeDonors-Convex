@@ -2,6 +2,12 @@ import { Suspense } from "react";
 import { DashboardTabs } from "@/app/dashboard/_components/dashboardTabs";
 import { LayoutDashboard } from "lucide-react";
 import { Container } from "@/components/Container";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard | LifeDonors",
+  description: "Monitor your blood donation requests and commitments in one place.",
+};
 
 export default function DashboardPage() {
   return (

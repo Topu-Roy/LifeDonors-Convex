@@ -7,6 +7,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/Container";
 import { Button } from "@/components/ui/button";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Save Lives Together",
+  description:
+    "LifeDonors connects blood donors with urgent requests in real-time. Join our community and make a difference today.",
+};
 
 export default function Home() {
   return (

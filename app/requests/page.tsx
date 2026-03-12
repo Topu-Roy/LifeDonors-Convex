@@ -1,6 +1,12 @@
 import { Suspense } from "react";
 import { RequestsExplorer } from "@/app/requests/_components/RequestsExplorer";
 import { Container } from "@/components/Container";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Blood Requests Explorer",
+  description: "Find blood requests in your area and help those in need.",
+};
 
 export default function RequestsPage() {
   return (
